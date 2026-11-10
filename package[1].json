@@ -1,0 +1,2 @@
+{ "name": "vigyan-atlas", "version": "1.7.0", "private": true, "description": "Vigyan Atlas — CBSE Class X Science in 3D (static site, no build step). Developer © PP Creations by Paras Pranav.",
+  "scripts": { "deploy": "vercel --prod", "preview": "npx serve public -l 3000" } }
