@@ -1,0 +1,550 @@
+{
+ "generated": "2026-11-10",
+ "prac": [
+  {
+   "no": 1,
+   "title": "Prepare and compare mixtures",
+   "chapterRef": "Ch 5",
+   "model": "ix5/types",
+   "modelPresent": true
+  },
+  {
+   "no": 2,
+   "title": "Separate mixture components",
+   "chapterRef": "Ch 5",
+   "model": "ix5/lab",
+   "modelPresent": true
+  },
+  {
+   "no": 3,
+   "title": "Verify conservation of mass",
+   "chapterRef": "Ch 9",
+   "model": "ix7/conserve",
+   "modelPresent": true
+  },
+  {
+   "no": 4,
+   "title": "Prepare stained temporary mounts",
+   "chapterRef": "Ch 2",
+   "model": "ix1/cell",
+   "modelPresent": true
+  },
+  {
+   "no": 5,
+   "title": "Identify plant and animal tissues",
+   "chapterRef": "Ch 3",
+   "model": "ix2/tissues",
+   "modelPresent": true
+  },
+  {
+   "no": 6,
+   "title": "Observe asexual reproduction",
+   "chapterRef": "Ch 11",
+   "model": "ix3/budding",
+   "modelPresent": true
+  },
+  {
+   "no": 7,
+   "title": "Study a typical bisexual flower",
+   "chapterRef": "Ch 11",
+   "model": "ix3/flower",
+   "modelPresent": true
+  },
+  {
+   "no": 8,
+   "title": "Identify specimens, virtual specimens, slides or models",
+   "chapterRef": "Ch 12",
+   "model": "ix4/kingdoms",
+   "modelPresent": true
+  },
+  {
+   "no": 9,
+   "title": "Verify conservation of energy using a simple pendulum",
+   "chapterRef": "Ch 7",
+   "model": "ix11/energy",
+   "modelPresent": true
+  },
+  {
+   "no": 10,
+   "title": "Determine the speed of a pulse in a stretched string / slinky",
+   "chapterRef": "Ch 10",
+   "model": "ix12/wave",
+   "modelPresent": true
+  },
+  {
+   "no": 11,
+   "title": "Calculate the mechanical advantage of a lever",
+   "chapterRef": "Ch 7",
+   "model": "ix11/machines",
+   "modelPresent": true
+  },
+  {
+   "no": 12,
+   "title": "Verify Newton’s second law",
+   "chapterRef": "Ch 6",
+   "model": "ix10/trolley",
+   "modelPresent": true
+  },
+  {
+   "no": 13,
+   "title": "Plot distance–time and velocity–time graphs",
+   "chapterRef": "Ch 4",
+   "model": "ix9/line",
+   "modelPresent": true
+  }
+ ],
+ "modules": [
+  {
+   "track": "compulsory_086",
+   "id": "ix1",
+   "no": "1",
+   "title": "Cell",
+   "periods": 12,
+   "sourcePages": null,
+   "unit": "World of living · 27 marks",
+   "keyConcepts": 8,
+   "learningOutcomes": 12,
+   "activities": 0,
+   "practicals": [
+    4
+   ],
+   "models": [
+    "ix1/cell",
+    "ix1/osmosis",
+    "ix1/division"
+   ],
+   "teacherValidationFlags": []
+  },
+  {
+   "track": "compulsory_086",
+   "id": "ix2",
+   "no": "2",
+   "title": "Tissues",
+   "periods": 13,
+   "sourcePages": null,
+   "unit": "World of living · 27 marks",
+   "keyConcepts": 9,
+   "learningOutcomes": 10,
+   "activities": 0,
+   "practicals": [
+    5
+   ],
+   "models": [
+    "ix2/tissues",
+    "ix2/joint",
+    "ix2/xylem"
+   ],
+   "teacherValidationFlags": [
+    "Meristematic tissue ‘types’ are not named in the syllabus PDF: only apical meristem is shown; confirm the other names with the prescribed textbook / teacher."
+   ]
+  },
+  {
+   "track": "compulsory_086",
+   "id": "ix3",
+   "no": "3",
+   "title": "Reproduction",
+   "periods": 13,
+   "sourcePages": null,
+   "unit": "World of living · 27 marks",
+   "keyConcepts": 6,
+   "learningOutcomes": 10,
+   "activities": 0,
+   "practicals": [
+    6,
+    7
+   ],
+   "models": [
+    "ix3/fission",
+    "ix3/budding",
+    "ix3/vegetative",
+    "ix3/flower",
+    "ix3/dispersal",
+    "ix3/human"
+   ],
+   "teacherValidationFlags": [
+    "Human-reproduction content is kept neutral, non-graphic and age-appropriate."
+   ]
+  },
+  {
+   "track": "compulsory_086",
+   "id": "ix4",
+   "no": "4",
+   "title": "Diversity",
+   "periods": 12,
+   "sourcePages": null,
+   "unit": "World of living · 27 marks",
+   "keyConcepts": 5,
+   "learningOutcomes": 6,
+   "activities": 0,
+   "practicals": [
+    8
+   ],
+   "models": [
+    "ix4/kingdoms",
+    "ix4/acellular"
+   ],
+   "teacherValidationFlags": [
+    "Major divisions of plants and animals are not enumerated in the syllabus PDF: populate from the prescribed textbook / approved source (not invented here)."
+   ]
+  },
+  {
+   "track": "compulsory_086",
+   "id": "ix5",
+   "no": "5",
+   "title": "Exploring Mixtures and their Separation",
+   "periods": 12,
+   "sourcePages": null,
+   "unit": "Matter · 25 marks",
+   "keyConcepts": 4,
+   "learningOutcomes": 13,
+   "activities": 0,
+   "practicals": [
+    1,
+    2
+   ],
+   "models": [
+    "ix5/types",
+    "ix5/lab",
+    "ix5/conc"
+   ],
+   "teacherValidationFlags": []
+  },
+  {
+   "track": "compulsory_086",
+   "id": "ix6",
+   "no": "6",
+   "title": "Structure of an Atom",
+   "periods": 14,
+   "sourcePages": null,
+   "unit": "Matter · 25 marks",
+   "keyConcepts": 8,
+   "learningOutcomes": 12,
+   "activities": 0,
+   "practicals": [],
+   "models": [
+    "ix6/atom",
+    "ix6/models"
+   ],
+   "teacherValidationFlags": [
+    "Bohr’s shell diagram is the syllabus model, not the full modern quantum description."
+   ]
+  },
+  {
+   "track": "compulsory_086",
+   "id": "ix7",
+   "no": "7",
+   "title": "Atoms and Molecules",
+   "periods": 14,
+   "sourcePages": null,
+   "unit": "Matter · 25 marks",
+   "keyConcepts": 8,
+   "learningOutcomes": 11,
+   "activities": 0,
+   "practicals": [
+    3
+   ],
+   "models": [
+    "ix7/conserve",
+    "ix7/molecules",
+    "ix7/ionic",
+    "ix7/covalent"
+   ],
+   "teacherValidationFlags": []
+  },
+  {
+   "track": "compulsory_086",
+   "id": "ix8",
+   "no": "8",
+   "title": "Earth as a System: Energy, Matter & Life",
+   "periods": 12,
+   "sourcePages": null,
+   "unit": "Earth as a system · 5 marks",
+   "keyConcepts": 6,
+   "learningOutcomes": 10,
+   "activities": 0,
+   "practicals": [],
+   "models": [
+    "ix8/spheres",
+    "ix8/spectrum",
+    "ix8/heating",
+    "ix8/breeze",
+    "ix8/cycles"
+   ],
+   "teacherValidationFlags": [
+    "Albedo and spectrum values are approximate textbook figures."
+   ]
+  },
+  {
+   "track": "compulsory_086",
+   "id": "ix9",
+   "no": "9",
+   "title": "Motion",
+   "periods": 13,
+   "sourcePages": null,
+   "unit": "Motion, force, work & sound · 23 marks",
+   "keyConcepts": 4,
+   "learningOutcomes": 6,
+   "activities": 0,
+   "practicals": [
+    13
+   ],
+   "models": [
+    "ix9/line",
+    "ix9/circular"
+   ],
+   "teacherValidationFlags": []
+  },
+  {
+   "track": "compulsory_086",
+   "id": "ix10",
+   "no": "10",
+   "title": "Force and Laws of Motion",
+   "periods": 13,
+   "sourcePages": null,
+   "unit": "Motion, force, work & sound · 23 marks",
+   "keyConcepts": 5,
+   "learningOutcomes": 6,
+   "activities": 0,
+   "practicals": [
+    12
+   ],
+   "models": [
+    "ix10/forces",
+    "ix10/trolley"
+   ],
+   "teacherValidationFlags": []
+  },
+  {
+   "track": "compulsory_086",
+   "id": "ix11",
+   "no": "11",
+   "title": "Work, Energy and Simple Machines",
+   "periods": 13,
+   "sourcePages": null,
+   "unit": "Motion, force, work & sound · 23 marks",
+   "keyConcepts": 6,
+   "learningOutcomes": 7,
+   "activities": 0,
+   "practicals": [
+    9,
+    11
+   ],
+   "models": [
+    "ix11/energy",
+    "ix11/machines"
+   ],
+   "teacherValidationFlags": []
+  },
+  {
+   "track": "compulsory_086",
+   "id": "ix12",
+   "no": "12",
+   "title": "Sound",
+   "periods": 11,
+   "sourcePages": null,
+   "unit": "Motion, force, work & sound · 23 marks",
+   "keyConcepts": 7,
+   "learningOutcomes": 8,
+   "activities": 0,
+   "practicals": [
+    10
+   ],
+   "models": [
+    "ix12/source",
+    "ix12/wave",
+    "ix12/echo"
+   ],
+   "teacherValidationFlags": []
+  },
+  {
+   "track": "advanced_optional",
+   "id": "adv1",
+   "no": "1",
+   "title": "Measurement — The Foundation of Science",
+   "periods": null,
+   "sourcePages": "pp. 4–9",
+   "unit": "Grade 9 · Optional extension",
+   "keyConcepts": 8,
+   "learningOutcomes": 0,
+   "activities": 3,
+   "practicals": [],
+   "models": [
+    "adv1/measure"
+   ],
+   "teacherValidationFlags": []
+  },
+  {
+   "track": "advanced_optional",
+   "id": "adv2",
+   "no": "2",
+   "title": "Understanding Motion through Experience",
+   "periods": null,
+   "sourcePages": "pp. 10–15",
+   "unit": "Grade 9 · Optional extension",
+   "keyConcepts": 10,
+   "learningOutcomes": 0,
+   "activities": 3,
+   "practicals": [],
+   "models": [
+    "adv2/frame"
+   ],
+   "teacherValidationFlags": []
+  },
+  {
+   "track": "advanced_optional",
+   "id": "adv3",
+   "no": "3",
+   "title": "Newton’s Laws of Motion",
+   "periods": null,
+   "sourcePages": "pp. 16–25",
+   "unit": "Grade 9 · Optional extension",
+   "keyConcepts": 8,
+   "learningOutcomes": 0,
+   "activities": 3,
+   "practicals": [],
+   "models": [
+    "adv3/pseudo",
+    "adv3/gravity"
+   ],
+   "teacherValidationFlags": [
+    "Source flag (Advanced PDF p. 21): the printed altitude formula appears to omit ‘R +’ (g_h = GM/h², R²/h²). The consistent form is g_h = GM/(R + h)² and g_h/g = R²/(R + h)². Shown correctly here — teacher validation required.",
+    "Centrifugal force is explained as frame-dependent: in an inertial frame gravity supplies the inward centripetal acceleration."
+   ]
+  },
+  {
+   "track": "advanced_optional",
+   "id": "adv4",
+   "no": "4",
+   "title": "The Geometry of Power — Advanced Simple Machines",
+   "periods": null,
+   "sourcePages": "pp. 26–30",
+   "unit": "Grade 9 · Optional extension",
+   "keyConcepts": 7,
+   "learningOutcomes": 0,
+   "activities": 0,
+   "practicals": [],
+   "models": [
+    "adv4/machines"
+   ],
+   "teacherValidationFlags": []
+  },
+  {
+   "track": "advanced_optional",
+   "id": "adv5",
+   "no": "5",
+   "title": "Work and Energy",
+   "periods": null,
+   "sourcePages": "pp. 31–35",
+   "unit": "Grade 9 · Optional extension",
+   "keyConcepts": 6,
+   "learningOutcomes": 0,
+   "activities": 2,
+   "practicals": [],
+   "models": [
+    "adv5/spring"
+   ],
+   "teacherValidationFlags": []
+  },
+  {
+   "track": "advanced_optional",
+   "id": "adv6",
+   "no": "6",
+   "title": "Structure of Atom",
+   "periods": null,
+   "sourcePages": "pp. 36–43",
+   "unit": "Grade 9 · Optional extension",
+   "keyConcepts": 9,
+   "learningOutcomes": 0,
+   "activities": 0,
+   "practicals": [],
+   "models": [
+    "adv6/rays",
+    "adv6/spectrum",
+    "adv6/models"
+   ],
+   "teacherValidationFlags": [
+    "Historical models are models, not photographs of an atom."
+   ]
+  },
+  {
+   "track": "advanced_optional",
+   "id": "adv7",
+   "no": "7",
+   "title": "Chemical Bonding",
+   "periods": null,
+   "sourcePages": "pp. 44–50",
+   "unit": "Grade 9 · Optional extension",
+   "keyConcepts": 6,
+   "learningOutcomes": 0,
+   "activities": 0,
+   "practicals": [],
+   "models": [
+    "adv7/bonding"
+   ],
+   "teacherValidationFlags": []
+  },
+  {
+   "track": "advanced_optional",
+   "id": "adv8",
+   "no": "8",
+   "title": "Mixtures and Separation of Mixtures",
+   "periods": null,
+   "sourcePages": "pp. 51–55",
+   "unit": "Grade 9 · Optional extension",
+   "keyConcepts": 5,
+   "learningOutcomes": 0,
+   "activities": 0,
+   "practicals": [],
+   "models": [
+    "adv8/column",
+    "adv8/fractional"
+   ],
+   "teacherValidationFlags": []
+  },
+  {
+   "track": "advanced_optional",
+   "id": "adv9",
+   "no": "9",
+   "title": "Microscope and Microscopy",
+   "periods": null,
+   "sourcePages": "pp. 56–69",
+   "unit": "Grade 9 · Optional extension",
+   "keyConcepts": 10,
+   "learningOutcomes": 0,
+   "activities": 2,
+   "practicals": [],
+   "models": [
+    "adv9/microscope",
+    "adv9/resolution"
+   ],
+   "teacherValidationFlags": []
+  },
+  {
+   "track": "advanced_optional",
+   "id": "adv10",
+   "no": "10",
+   "title": "Engineering Life: Miracles in Biotechnology",
+   "periods": null,
+   "sourcePages": "pp. 70–85",
+   "unit": "Grade 9 · Optional extension",
+   "keyConcepts": 9,
+   "learningOutcomes": 0,
+   "activities": 3,
+   "practicals": [],
+   "models": [
+    "adv10/fermenter",
+    "adv10/insulin"
+   ],
+   "teacherValidationFlags": [
+    "Bt, Golden Rice, bioremediation and ethics are in the syllabus panel as text; the 3D scenes cover the fermenter and the insulin workflow."
+   ]
+  }
+ ],
+ "totals": {
+  "compulsoryModules": 12,
+  "advancedModules": 10,
+  "practicals": 13,
+  "models3D": 53,
+  "keyConceptsListed": 154
+ }
+}
