@@ -68,6 +68,14 @@
     <div class="sub" data-sub="spheres" onclick="selectSub('spheres')">Atmosphere, Hydrosphere, Cryosphere, Geosphere, Biosphere</div>
     <div class="topic" data-topic="breeze" onclick="selectTopic('breeze')">समुद्री पवन · Sea & Land Breeze <span class="hi">समुद्री व स्थलीय पवन</span></div>
     <div class="sub" data-sub="breeze" onclick="selectSub('breeze')">Coastal Convection Loop — तटीय संवहन चक्र</div>
+    <div class="topic" data-topic="measure" onclick="selectTopic('measure')">मापन व SI मात्रक · Measurement & SI Units <span class="hi">उन्नत मापन</span></div>
+    <div class="sub" data-sub="measure" onclick="selectSub('measure')">Ruler, Vernier, Balance, Stopwatch & Cylinder</div>
+    <div class="topic" data-topic="frames" onclick="selectTopic('frames')">संदर्भ तंत्र व सदिश · Frames & Vectors <span class="hi">संदर्भ तंत्र व सदिश</span></div>
+    <div class="sub" data-sub="frames" onclick="selectSub('frames')">Inertial Frames & Vector Triangle Resultant</div>
+    <div class="topic" data-topic="pseudo" onclick="selectTopic('pseudo')">छद्म बल · Pseudo Force <span class="hi">त्वरित संदर्भ तंत्र</span></div>
+    <div class="sub" data-sub="pseudo" onclick="selectSub('pseudo')">Accelerating Bus Pendulum & Lift Scale</div>
+    <div class="topic" data-topic="spring" onclick="selectTopic('spring')">हुक का नियम · Hooke's Law & Spring Energy <span class="hi">कमानी व ऊर्जा</span></div>
+    <div class="sub" data-sub="spring" onclick="selectSub('spring')">Spring Extension & Elastic Potential Energy</div>
   </div>
   <div id="stage">
     <div id="imageWrap"><img id="mainImg" src="" alt=""><div id="labels"></div></div>
@@ -186,6 +194,50 @@ const DATA={
     {x:76,y:37,en:'Rising Warm Air',hi:'ऊपर उठती गर्म वायु'},
     {x:52,y:8,en:'Upper Return Convection',hi:'ऊपरी वापसी संवहन'}
   ]
+ },
+ measure:{
+  title:'मापन व SI मात्रक · Measurement & SI Units', desc:'लंबाई, द्रव्यमान, समय, आयतन और ताप के मानक वैज्ञानिक उपकरण व SI मात्रक प्रणाली। Fundamental laboratory instruments for length, mass, time, volume and temperature.',
+  img:'images/measurement_si_units.jpg',
+  marks:[
+    {x:18,y:33,en:'Meter Ruler (Length, m)',hi:'मीटर पैमाना (लंबाई)'},
+    {x:38,y:25,en:'Vernier Caliper (Precision)',hi:'वर्नियर कैलिपर'},
+    {x:23,y:76,en:'Beam Balance & Standard Masses (kg)',hi:'तुला व मानक बाट'},
+    {x:62,y:31,en:'Stopwatch & Clock (Time, s)',hi:'विराम घड़ी (समय)'},
+    {x:64,y:71,en:'Graduated Cylinder & Thermometer',hi:'मापक सिलेंडर व थर्मामीटर'}
+  ]
+ },
+ frames:{
+  title:'संदर्भ तंत्र व सदिश · Frames & Vectors', desc:'स्थिर बनाम गतिमान संदर्भ तंत्र में सापेक्ष गति तथा सदिश योग का त्रिभुज/समांतर चतुर्भुज नियम। Inertial reference frames and vector triangle/parallelogram addition.',
+  img:'images/frames_vectors_motion.jpg',
+  marks:[
+    {x:12,y:48,en:'Stationary Ground Observer',hi:'स्थिर भू-प्रेक्षक'},
+    {x:34,y:52,en:'Moving Train Frame',hi:'गतिमान रेल संदर्भ तंत्र'},
+    {x:75,y:67,en:'Horizontal Component Vector',hi:'क्षैतिज घटक सदिश'},
+    {x:90,y:48,en:'Vertical Component Vector',hi:'ऊर्ध्वाधर घटक सदिश'},
+    {x:76,y:48,en:'Resultant Displacement Vector',hi:'परिणामी विस्थापन सदिश'}
+  ]
+ },
+ pseudo:{
+  title:'छद्म बल · Pseudo Force (Bus & Lift)', desc:'त्वरित (अजड़त्वीय) तंत्र में त्वरण के विपरीत आभासी छद्म बल (F = −ma) तथा लिफ्ट में आभासी भार। Apparent backward pseudo force in an accelerating bus and apparent weight in a lift.',
+  img:'images/pseudo_force.jpg',
+  marks:[
+    {x:33,y:86,en:'Forward Frame Acceleration (a)',hi:'आगे की ओर त्वरण (a)'},
+    {x:30,y:51,en:'Backward Pseudo Force (F = −ma)',hi:'पीछे की ओर छद्म बल'},
+    {x:39,y:53,en:'Passenger Tilted Backward',hi:'पीछे झुकता यात्री'},
+    {x:83,y:13,en:'Upward Lift Acceleration',hi:'ऊपर त्वरित लिफ्ट'},
+    {x:83,y:68,en:'Compressed Scale (Apparent Weight)',hi:'दबाव तुला (आभासी भार)'}
+  ]
+ },
+ spring:{
+  title:'हुक का नियम व कमानी ऊर्जा · Hooke\'s Law & Spring Energy', desc:'प्रत्यास्थ सीमा के भीतर बल विस्तार के अनुक्रमानुपाती (F = kx) और ग्राफ क्षेत्रफल संचित स्थितिज ऊर्जा (½kx²)। Spring extension proportional to load and elastic potential energy triangle.',
+  img:'images/hookes_law_spring.jpg',
+  marks:[
+    {x:13,y:35,en:'Unstretched Equilibrium Spring',hi:'सामान्य कमानी लंबाई'},
+    {x:28,y:52,en:'Single-Load Extension (x)',hi:'एकल भार विस्तार (x)'},
+    {x:43,y:62,en:'Double-Load Extension (2x)',hi:'दोगुना भार विस्तार (2x)'},
+    {x:72,y:54,en:'Hooke\'s Law Line (F = kx)',hi:'हुक का नियम रेखा (F = kx)'},
+    {x:79,y:68,en:'Elastic Potential Energy (½kx²)',hi:'प्रत्यास्थ स्थितिज ऊर्जा क्षेत्र'}
+  ]
  }
 };
 
@@ -243,7 +295,7 @@ function renderLabels(){
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
 
 // Init
-const _ALIASES={newton_laws:'newton',work_energy:'energy'};
+const _ALIASES={newton_laws:'newton',work_energy:'energy',frame:'frames',measurement_si_units:'measure',frames_vectors_motion:'frames',pseudo_force:'pseudo',hookes_law_spring:'spring'};
 const _qp=new URLSearchParams(window.location.search);
 const _rawSub=_qp.get('sub'),_sub=_ALIASES[_rawSub]||_rawSub;
 const _rawTop=_qp.get('topic'),_top=_ALIASES[_rawTop]||_rawTop;
