@@ -81,6 +81,10 @@
     <div class="sub" data-sub="teeth" onclick="selectSub('teeth')">Teeth Types — दांत के प्रकार</div>
     <div class="topic" data-topic="seeds" onclick="selectTopic('seeds')">बीज और अंकुरण · Seeds & Germination <span class="hi">बीज और अंकुरण</span></div>
     <div class="sub" data-sub="seeds_germination" onclick="selectSub('seeds_germination')">Seed & Germination — बीज और अंकुरण</div>
+    <div class="topic" data-topic="kingdoms" onclick="selectTopic('kingdoms')">पाँच जगत · Five Kingdoms <span class="hi">पाँच जगत</span></div>
+    <div class="sub" data-sub="five_kingdoms" onclick="selectSub('five_kingdoms')">Monera, Protista, Fungi, Plantae, Animalia</div>
+    <div class="topic" data-topic="bacteria" onclick="selectTopic('bacteria')">जीवाणु व वायरस · Bacteria & Viruses <span class="hi">सूक्ष्मजीव व विषाणु</span></div>
+    <div class="sub" data-sub="bacteriophage_virus" onclick="selectSub('bacteriophage_virus')">Bacteriophage Virus & Rod Bacterium</div>
   </div>
   <div id="stage">
     <div id="imageWrap"><img id="mainImg" src="" alt=""><div id="labels"></div></div>
@@ -340,6 +344,28 @@ const DATA={
     {x:46,y:42,en:'Vena Cava',hi:'वेनाकावा'},
     {x:56,y:66,en:'Ventricles',hi:'निलय'},
     {x:48,y:48,en:'Atria',hi:'अलिंद'}
+  ]
+ },
+ five_kingdoms:{
+  title:'Five Kingdoms of Life — जीवन के पाँच जगत', desc:'मोनेरा (जीवाणु), प्रोटिस्टा (अमीबा), कवक (मशरूम), पादप (फ़र्न) व जंतु जगत। Monera, Protista, Fungi, Plantae and Animalia diversity.',
+  img:'images/five_kingdoms.jpg',
+  marks:[
+    {x:13,y:75,en:'Monera (Bacteria)',hi:'मोनेरा (जीवाणु)'},
+    {x:31,y:69,en:'Protista (Amoeba)',hi:'प्रोटिस्टा (अमीबा)'},
+    {x:50,y:44,en:'Fungi (Mushrooms)',hi:'कवक (मशरूम)'},
+    {x:68,y:44,en:'Plantae (Fern)',hi:'पादप जगत (फ़र्न)'},
+    {x:87,y:56,en:'Animalia (Butterfly & Frog)',hi:'जंतु जगत'}
+  ]
+ },
+ bacteriophage_virus:{
+  title:'Viruses & Bacteria — विषाणु व जीवाणु', desc:'अकोशिकीय T4 बैक्टीरियोफेज विषाणु द्वारा जीवाणु कोशिका पर संक्रमण। Acellular T4 bacteriophage docking onto a flagellated bacterium.',
+  img:'images/bacteriophage_virus.jpg',
+  marks:[
+    {x:61,y:18,en:'Viral Capsid Head',hi:'विषाणु कैप्सिड शीर्ष'},
+    {x:53,y:41,en:'Helical Tail Sheath',hi:'पूंछ आवरण'},
+    {x:45,y:58,en:'Tail Fibres',hi:'पूंछ तंतु'},
+    {x:41,y:72,en:'Rod Bacterium (Prokaryote)',hi:'दंडाकार जीवाणु'},
+    {x:82,y:74,en:'Bacterial Flagella',hi:'कशाभिका'}
   ]
  }
 };
