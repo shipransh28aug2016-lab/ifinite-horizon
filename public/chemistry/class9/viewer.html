@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vigyan Atlas — Class IX Chemistry: Step-wise Lab Experiments</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0a0f1a;color:#e8eef2;font:14px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Noto Sans,Nirmala UI,"Noto Sans Devanagari",Arial,sans-serif;overflow:hidden}
+  #view{position:relative;width:100vw;height:100vh;background:linear-gradient(180deg,#0f1b33 0%,#070a14 100%);overflow:hidden;display:flex}
+  canvas{display:block;width:100%;height:100%}
+  #sidebar{position:absolute;top:0;left:0;width:300px;height:100%;background:rgba(8,15,26,0.95);backdrop-filter:blur(8px);border-right:1px solid rgba(255,255,255,0.08);z-index:25;overflow-y:auto;transform:translateX(-102%);transition:transform .25s}
+  #sidebar.open{transform:translateX(0)}
+  #sidebar h2{font-size:15px;color:#ffd54f;padding:14px;border-bottom:1px solid rgba(255,255,255,0.1)}
+  .exp{padding:8px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;color:#c9d6df;transition:all .15s;display:flex;justify-content:space-between;align-items:center}
+  .exp:hover{background:rgba(255,255,255,0.04);color:#fff}
+  .exp.active{background:linear-gradient(90deg,rgba(255,213,79,0.12),transparent);color:#ffd54f;border-left:3px solid #ffd54f}
+  .exp .hi{font-size:11px;color:#8ee0a7;opacity:0.75}
+  #lab{position:absolute;top:0;right:0;width:340px;height:100%;background:rgba(12,20,36,0.97);backdrop-filter:blur(10px);border-left:1px solid rgba(255,255,255,0.08);z-index:25;overflow-y:auto;transform:translateX(102%);transition:transform .25s}
+  #lab.open{transform:translateX(0)}
+  .labhead{padding:14px;border-bottom:1px solid rgba(255,255,255,0.08)}
+  .labhead h3{color:#ffd54f;font-size:15px;margin:0 0 4px 0}
+  .labhead p{color:#9fb3c8;font-size:12px;margin:0}
+  .section{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.05)}
+  .section h4{color:#8ee0a7;font-size:12.5px;text-transform:uppercase;letter-spacing:.6px;margin:0 0 6px 0}
+  .section p{color:#c9d6df;font-size:13px;line-height:1.5;margin:0 0 6px 0;white-space:pre-wrap}
+  .step{padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:6px;border-left:3px solid rgba(255,213,79,0.2)}
+  .step.active{border-left-color:#ffd54f;background:rgba(255,213,79,0.08)}
+  .step .stt{color:#ffd54f;font-size:11px;font-weight:700}
+  .step p{color:#c9d6df;font-size:12.5px;margin:2px 0 0 0;line-height:1.45}
+  .matlist{color:#c9d6df;font-size:12.5px;line-height:1.6}
+  .matlist span{display:block;margin:2px 0;padding-left:14px;position:relative}
+  .matlist span::before{content:"▸";position:absolute;left:0;color:#ffd54f}
+  #hud{position:absolute;top:12px;left:14px;right:360px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;z-index:25;pointer-events:none}
+  #hud>*{pointer-events:auto}
+  .bar{background:rgba(10,16,28,0.8);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:9px 13px;display:flex;gap:11px;align-items:center;flex-wrap:wrap}
+  .bar h2{font-size:15px;color:#ffd54f;margin:0 0 4px 0;letter-spacing:.3px}
+  .bar p{font-size:12px;color:#9fb3c8;margin:0;line-height:1.45}
+  .btn{border:none;background:#1d3a5a;color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:6px 12px;font-size:12.5px;cursor:pointer;transition:all .15s}
+  .btn:hover{background:#2a527e;border-color:#6fb3d8}
+  .btn.active{background:#ffd54f;color:#0b1220;border-color:#ffd54f}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .openBtn{position:absolute;top:12px;left:12px;z-index:35}
+  .labBtn{position:absolute;top:12px;right:12px;z-index:35}
+  #labels{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:20}
+  .lab{position:absolute;transform:translate(-50%,-10px);font:bold 12px/1.2 system-ui;color:#fff;text-shadow:0 0 10px rgba(0,0,0,.9),0 0 4px #000;padding:2px 7px;border-radius:6px;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.35);white-space:nowrap;opacity:0;transition:opacity .15s}
+  .lab.show{opacity:1}
+  .lab.hi{border-color:#ffd54f;background:rgba(15,30,50,.85);color:#ffd54f}
+  .hint{position:absolute;bottom:14px;left:14px;right:360px;color:#8aa3b8;font-size:12px;z-index:25;text-align:center;pointer-events:none}
+  @media (max-width:900px){#sidebar{width:250px}#lab{width:290px}#hud{left:12px;right:300px}.hint{right:300px}}
+  @media (max-width:640px){#sidebar{width:220px}#lab{width:260px}#hud{left:12px;right:270px}.hint{right:270px}}
+</style>
+</head>
+<body>
+<div id="view">
+  <button class="openBtn btn" onclick="toggleSidebar()">☰ Experiments</button>
+  <button class="labBtn btn" onclick="toggleLab()">🧪 Lab Panel</button>
+  <div id="sidebar">
+    <h2>कक्षा 9 रसायन विज्ञान · Class IX Chemistry</h2>
+    <div class="exp active" data-exp="states" onclick="selectExp('states')">पदार्थ की अवस्थाएँ · States of Matter <span class="hi">पदार्थ की अवस्थाएँ</span></div>
+    <div class="exp" data-exp="diffusion" onclick="selectExp('diffusion')">विसरण · Diffusion <span class="hi">विसरण</span></div>
+    <div class="exp" data-exp="evaporation" onclick="selectExp('evaporation')">वाष्पीकरण · Evaporation <span class="hi">वाष्पीकरण</span></div>
+    <div class="exp" data-exp="mixture" onclick="selectExp('mixture')">मिश्रण पृथक्करण · Separation of Mixtures <span class="hi">मिश्रण पृथक्करण</span></div>
+    <div class="exp" data-exp="molecule" onclick="selectExp('molecule')">आणविक मॉडल · Molecular Model <span class="hi">आणविक मॉडल</span></div>
+    <div class="exp" data-exp="atom" onclick="selectExp('atom')">परमाणु संरचना · Atomic Structure <span class="hi">परमाणु संरचना</span></div>
+    <div class="exp" data-exp="tyndall" onclick="selectExp('tyndall')">टिंडल प्रभाव · Tyndall Effect <span class="hi">टिंडल प्रभाव</span></div>
+  </div>
+  <div id="lab">
+    <div class="labhead">
+      <h3 id="labTitle">प्रयोग विवरण · Lab Details</h3>
+      <p id="labSub"></p>
+    </div>
+    <div class="section">
+      <h4>उद्देश्य · Aim</h4>
+      <p id="labAim"></p>
+    </div>
+    <div class="section">
+      <h4>सामग्री · Materials</h4>
+      <div class="matlist" id="labMat"></div>
+    </div>
+    <div class="section">
+      <h4>प्रक्रिया · Procedure</h4>
+      <div id="labSteps"></div>
+    </div>
+    <div class="section">
+      <h4>अवलोकन · Observation</h4>
+      <p id="labObs"></p>
+    </div>
+    <div class="section">
+      <h4>निष्कर्ष · Conclusion</h4>
+      <p id="labConc"></p>
+    </div>
+  </div>
+  <div id="hud">
+    <div class="bar">
+      <div>
+        <h2 id="expTitle">पदार्थ की अवस्थाएँ</h2>
+        <p id="expDesc"></p>
+      </div>
+    </div>
+    <div class="bar" style="flex:1;justify-content:flex-end">
+      <button class="btn" id="btnPrev">◀ पिछला</button>
+      <span class="btn" style="background:transparent;border:none;color:#c9d6df;cursor:default;padding:0" id="stepInfo">स्टेप 1 / 1</span>
+      <button class="btn" id="btnNext">अगला ▶</button>
+    </div>
+  </div>
+  <div id="labels"></div>
+  <div class="hint">खींचकर घुमाएं · स्टेप-बाय-स्टेप लैब प्रक्रिया · बिल्ट-इन PBR · वीडियो नहीं</div>
+</div>
+<script type="importmap">
+{"imports":{"three":"../../lib/three.module.js","three/addons/":"../../lib/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+// ---------- State ----------
+let state = { exp: 'states', step: 0 };
+
+// ---------- Scene ----------
+const view = document.querySelector('#view');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x070a14);
+scene.fog = new THREE.FogExp2(0x070a14, 0.15);
+
+const camera = new THREE.PerspectiveCamera(45, view.clientWidth / view.clientHeight, 0.1, 200);
+camera.position.set(0, 1.0, 4.6);
+
+const renderer = new THREE.WebGLRenderer({antialias:true, powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.setSize(view.clientWidth, view.clientHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+view.appendChild(renderer.domElement);
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = 0.06;
+controls.minDistance = 1.6; controls.maxDistance = 18; controls.autoRotate = false;
+
+// ---------- Lights ----------
+const amb = new THREE.AmbientLight(0xffffff, 0.25); scene.add(amb);
+const spot = new THREE.SpotLight(0xffffff, 60, 30, 0.35, 0.5, 1);
+spot.position.set(1.8, 2.6, 2.2); spot.target.position.set(0,0,0);
+spot.castShadow = true; spot.shadow.mapSize.set(2048,2048);
+scene.add(spot); scene.add(spot.target);
+const fill = new THREE.PointLight(0x6fb3d8, 14, 16); fill.position.set(-2.2,0.4,1.6); scene.add(fill);
+const rim = new THREE.PointLight(0xffd54f, 16, 16); rim.position.set(1.4,-1.2,-2.2); scene.add(rim);
+
+// ---------- PBR materials ----------
+function matPBR(color, opts={}) {
+  return new THREE.MeshStandardMaterial(Object.assign({color, roughness:0.5, metalness:0.1, clearcoat:0.4, clearcoatRoughness:0.25}, opts));
+}
+function matLab(color, opts={}) {
+  return new THREE.MeshStandardMaterial(Object.assign({color, roughness:0.45, metalness:0.15, clearcoat:0.3, clearcoatRoughness:0.2}, opts));
+}
+function matGlassLiq(color, opts={}) {
+  return new THREE.MeshPhysicalMaterial(Object.assign({color, roughness:0.12, metalness:0, transmission:0.55, thickness:0.7, clearcoat:0.9, clearcoatRoughness:0.1, ior:1.33}, opts));
+}
+function matMetal(color=0xa0a8b0, opts={}) {
+  return new THREE.MeshStandardMaterial(Object.assign({color, roughness:0.3, metalness:0.85}, opts));
+}
+function matFire(color=0xffd54f, opts={}) {
+  return new THREE.MeshBasicMaterial(Object.assign({color, transparent:true, opacity:0.9}, opts));
+}
+
+// ---------- Lab equipment ----------
+function makeStand() {
+  const g = new THREE.Group();
+  const base = new THREE.Mesh(new THREE.BoxGeometry(1.4,0.12,0.7), matMetal(0x7a8088));
+  base.position.set(0,-0.06,0); base.castShadow=true; base.receiveShadow=true; g.add(base);
+  const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.045,0.045,1.6,12), matMetal());
+  rod.position.set(0,0.74,0); rod.castShadow=true; g.add(rod);
+  return g;
+}
+function makeBeaker(h=0.9, r=0.28, liqColor=0x6fb3d8, liqLevel=0.7) {
+  const g = new THREE.Group();
+  const wall = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 32), matLab(0xd0d8e0));
+  wall.material.transparent=true; wall.material.opacity=0.55; wall.castShadow=true; g.add(wall);
+  const bottom = new THREE.Mesh(new THREE.CylinderGeometry(r, r, 0.03, 32), matLab(0xb8c0c8));
+  bottom.position.set(0,-h/2+0.015,0); bottom.castShadow=true; g.add(bottom);
+  const rim = new THREE.Mesh(new THREE.CylinderGeometry(r+0.02, r+0.02, 0.04, 32), matLab(0xa8b0b8));
+  rim.position.set(0,h/2-0.02,0); rim.castShadow=true; g.add(rim);
+  const liq = new THREE.Mesh(new THREE.CylinderGeometry(r-0.01, r-0.01, h*liqLevel, 32), matGlassLiq(liqColor));
+  liq.position.set(0,-h/2+0.03+(h*liqLevel)/2,0); g.add(liq);
+  return g;
+}
+function makeTestTube(h=1.0, r=0.14, liqColor=0xf0a040, liqLevel=0.5) {
+  const g = new THREE.Group();
+  const wall = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 24), matLab(0xd0d8e0));
+  wall.material.transparent=true; wall.material.opacity=0.5; wall.castShadow=true; g.add(wall);
+  const bottom = new THREE.Mesh(new THREE.SphereGeometry(r, 24, 16), matLab(0xb8c0c8));
+  bottom.position.set(0,-h/2+r,0); g.add(bottom);
+  const liq = new THREE.Mesh(new THREE.CylinderGeometry(r-0.008, r-0.008, h*liqLevel, 24), matGlassLiq(liqColor));
+  liq.position.set(0,-h/2+r-0.02+(h*liqLevel)/2,0); g.add(liq);
+  return g;
+}
+function makeBurner() {
+  const g = new THREE.Group();
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.22,0.22,0.18,20), matMetal(0x4a4a4a));
+  base.position.set(0,-0.09,0); base.castShadow=true; g.add(base);
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.11,0.11,0.5,20), matMetal(0x6a6a6a));
+  body.position.set(0,0.16,0); body.castShadow=true; g.add(body);
+  const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.12,16), matMetal(0x3a3a3a));
+  nozzle.position.set(0,0.47,0); g.add(nozzle);
+  const flame = new THREE.Mesh(new THREE.ConeGeometry(0.09,0.45,16), matFire(0xffd54f));
+  flame.position.set(0,0.74,0); g.add(flame);
+  return g;
+}
+// Particle (for matter states)
+function makeParticle(color, size=0.08) {
+  return new THREE.Mesh(new THREE.SphereGeometry(size,16,12), matPBR(color));
+}
+// Arrow
+function makeArrow(p0,p1,color=0xffd54f) {
+  const dir=new THREE.Vector3().subVectors(p1,p0).normalize();
+  const len=p0.distanceTo(p1);
+  const g=new THREE.Group();
+  const shaft=new THREE.Mesh(new THREE.CylinderGeometry(0.025,0.025,len,10),matLab(color));
+  shaft.position.copy(p0).lerp(p1,0.5);shaft.lookAt(p1);shaft.rotation.x-=Math.PI/2;g.add(shaft);
+  const head=new THREE.Mesh(new THREE.ConeGeometry(0.07,0.3,12),matLab(color));
+  head.position.copy(p1);head.lookAt(p0);head.rotation.x-=Math.PI/2;g.add(head);
+  return g;
+}
+// ---------- Labels ----------
+const labelsEl=document.getElementById('labels');
+const labelEls=new Map();
+function label(id,text,pos,active,hi){
+  let el=labelEls.get(id);
+  if(!el){el=document.createElement('div');el.className='lab'+(hi?' hi':'');el.textContent=text;labelsEl.appendChild(el);labelEls.set(id,el);}
+  if(active){
+    const v=pos.clone().project(camera);
+    const x=(v.x*0.5+0.5)*view.clientWidth;
+    const y=(1-(v.y*0.5+0.5))*view.clientHeight;
+    el.style.left=x+'px';el.style.top=y+'px';el.classList.add('show');
+    if(hi)el.classList.add('hi');else el.classList.remove('hi');
+  }else{el.classList.remove('show');}
+}
+function clearLabels(){labelEls.forEach(e=>e.classList.remove('show'));}
+// ---------- Current model ----------
+let currentGroup=null;
+function clearScene(){
+  if(currentGroup){
+    scene.remove(currentGroup);
+    currentGroup.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose();}});
+  }
+  currentGroup=null;clearLabels();
+}
+// ---------- Experiment data ----------
+const EXPS={
+ states:{
+  title:'पदार्थ की अवस्थाएँ · States of Matter', sub:'ठोस, द्रव, गैस — कण मॉडल',
+  aim:'ठोस, द्रव और गैस अवस्था में कणों की व्यवस्था और गति का अध्ययन करना।',
+  mat:['ठोस कण','द्रव कण','गैस कण','कण मॉडल'],
+  steps:[
+    {proc:'ठोस अवस्था: कण पास-पास और व्यवस्थित, केवल कंपन करते हैं।',obs:'आकृति और आयतन निश्चित।',build:(g)=>{
+      const particles=new THREE.Group();
+      for(let i=0;i<5;i++){for(let j=0;j<5;j++){for(let k=0;k<5;k++){
+        const p=makeParticle(0xa8b0c0,0.07);p.position.set((i-2)*0.16,(j-2)*0.16,(k-2)*0.16);p.castShadow=true;particles.add(p);
+      }}}}
+      particles.position.set(-1,0,0);g.add(particles);
+      const box=new THREE.Mesh(new THREE.BoxGeometry(1.1,1.1,1.1),matLab(0xffffff));box.material.transparent=true;box.material.opacity=0.15;box.position.set(-1,0,0);g.add(box);
+      label('solid','ठोस — कण व्यवस्थित',new THREE.Vector3(-1,0.7,0),true,true);
+    }},
+    {proc:'द्रव अवस्था: कण पास-पास लेकिन अव्यवस्थित, एक-दूसरे के ऊपर फिसल सकते हैं।',obs:'आयतन निश्चित, आकृति बर्तन जैसी।',build:(g)=>{
+      const particles=new THREE.Group();
+      for(let i=0;i<25;i++){
+        const p=makeParticle(0x6fb3d8,0.075);p.position.set((Math.random()-0.5)*0.9,(Math.random()-0.5)*0.9,(Math.random()-0.5)*0.9);p.castShadow=true;particles.add(p);
+      }
+      particles.position.set(0,0,0);g.add(particles);
+      const beaker=makeBeaker(1.2,0.5,0x6fb3d8,0.85);beaker.position.set(0,0.3,0);g.add(beaker);
+      label('liquid','द्रव — कण फिसलते हैं',new THREE.Vector3(0,0.95,0),true,true);
+    }},
+    {proc:'गैस अवस्था: कण दूर-दूर और स्वतंत्र रूप से गतिशील।',obs:'निश्चित न आकृति, न आयतन।',build:(g)=>{
+      const particles=new THREE.Group();
+      for(let i=0;i<18;i++){
+        const p=makeParticle(0xffd54f,0.07);p.position.set((Math.random()-0.5)*1.6,(Math.random()-0.5)*1.6,(Math.random()-0.5)*1.6);p.castShadow=true;particles.add(p);
+      }
+      particles.position.set(1,0,0);g.add(particles);
+      const box=new THREE.Mesh(new THREE.BoxGeometry(1.7,1.7,1.7),matLab(0xffffff));box.material.transparent=true;box.material.opacity=0.1;box.position.set(1,0,0);g.add(box);
+      label('gas','गैस — कण स्वतंत्र',new THREE.Vector3(1,0.95,0),true,true);
+    }}],
+  obs:'ठोस में कण निश्चित स्थान पर, द्रव में प्रवाहित, गैस में स्वतंत्र गतिशील।',
+  conc:'पदार्थ की तीन अवस्थाएँ कणों की दूरी और गति से भिन्न होती हैं।'
+ },
+ diffusion:{
+  title:'विसरण · Diffusion', sub:'स्याही का जल में फैलना',
+  aim:'द्रव में कणों की स्वतंत्र गति से विसरण देखना।',
+  mat:['जल','स्याही की बूंद','कांच की नली'],
+  steps:[
+    {proc:'कांच की नली में शुद्ध जल लें।',obs:'जल स्पष्ट और स्थिर।',build:(g)=>{
+      const tube=makeTestTube(1.1,0.18,0xe8f0e8,0.7);tube.position.set(0,0.4,0);g.add(tube);
+      label('water','शुद्ध जल',new THREE.Vector3(0,0.95,0),true,true);
+    }},
+    {proc:'स्याही की एक बूंद डालें।',obs:'स्याही फैलने लगती है।',build:(g)=>{
+      const tube=makeTestTube(1.1,0.18,0x4080c0,0.65);tube.position.set(0,0.4,0);g.add(tube);
+      const ink=new THREE.Group();
+      for(let i=0;i<15;i++){const p=makeParticle(0x3060a0,0.04);p.position.set((Math.random()-0.5)*0.3,(Math.random()-0.5)*0.4,(Math.random()-0.5)*0.3);ink.add(p);}
+      ink.position.set(0,0.2,0);g.add(ink);
+      label('ink','स्याही फैल रही है',new THREE.Vector3(0,0.95,0),true,true);
+    }},
+    {proc:'कुछ देर में पूरा जल समान रूप से रंगीन हो जाता है।',obs:'समान मिश्रण (विसरण पूर्ण)।',build:(g)=>{
+      const tube=makeTestTube(1.1,0.18,0x6fb3d8,0.7);tube.position.set(0,0.4,0);g.add(tube);
+      label('mixed','विसरण पूर्ण',new THREE.Vector3(0,0.95,0),true,true);
+    }}],
+  obs:'स्याही के कण जल के कणों के बीच फैलकर पूरी नली को रंगीन कर देते हैं।',
+  conc:'द्रव के कण निरंतर गतिशील होते हैं, इसलिए विसरण होता है।'
+ },
+ evaporation:{
+  title:'वाष्पीकरण · Evaporation', sub:'जल का वाष्प में बदलना',
+  aim:'ताप और पृष्ठीय क्षेत्रफल से वाष्पीकरण की दर देखना।',
+  mat:['जल','बीकर','बनसेन बर्नर','थर्मामीटर'],
+  steps:[
+    {proc:'बीकर में जल लें और तापमान नोट करें।',obs:'जल सामान्य ताप पर।',build:(g)=>{
+      const stand=makeStand();stand.position.set(0,0,0);g.add(stand);
+      const beaker=makeBeaker(1.0,0.3,0xe8f0e8,0.8);beaker.position.set(0,0.4,0);g.add(beaker);
+      label('water1','जल सामान्य',new THREE.Vector3(0,0.95,0),true,true);
+    }},
+    {proc:'बनसेन बर्नर से गर्म करें।',obs:'जल का तापमान बढ़ता है, भाप उठती है।',build:(g)=>{
+      const stand=makeStand();stand.position.set(0,0,0);g.add(stand);
+      const beaker=makeBeaker(1.0,0.3,0xe8f0e8,0.6);beaker.position.set(0,0.4,0);g.add(beaker);
+      const burn=makeBurner();burn.position.set(0,-0.35,0);g.add(burn);
+      const steam=new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.3,0.6,16),matLab(0xd0d0d0));steam.material.transparent=true;steam.material.opacity=0.4;steam.position.set(0,1.0,0);g.add(steam);
+      label('heat','गर्म हो रहा है',new THREE.Vector3(0,0.95,0),true,true);
+    }},
+    {proc:'जल वाष्प बनकर उड़ जाता है।',obs:'पानी का स्तर घटता है।',build:(g)=>{
+      const stand=makeStand();stand.position.set(0,0,0);g.add(stand);
+      const beaker=makeBeaker(1.0,0.3,0xe8f0e8,0.3);beaker.position.set(0,0.4,0);g.add(beaker);
+      const vap=new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.5,0.9,16),matLab(0xd0d0d0));vap.material.transparent=true;vap.material.opacity=0.3;vap.position.set(0,1.2,0);g.add(vap);
+      label('vap','वाष्प',new THREE.Vector3(0,0.95,0),true,true);
+    }}],
+  obs:'गर्म करने पर जल तेजी से वाष्पित होता है।',
+  conc:'तापमान बढ़ने पर वाष्पीकरण की दर बढ़ती है।'
+ },
+ mixture:{
+  title:'मिश्रण पृथक्करण · Separation of Mixtures', sub:'छनाई, वाष्पीकरण, क्रोमैटोग्राफी',
+  aim:'मिश्रण के घटकों को अलग करना।',
+  mat:['मिश्रण (रेत + नमक + लोहा)','चुंबक','फिल्टर पेपर','बीकर','बनसेन बर्नर'],
+  steps:[
+    {proc:'मिश्रण में से चुंबक से लोहा अलग करें।',obs:'लोहा चुंबक से चिपक जाता है।',build:(g)=>{
+      const mix=new THREE.Group();
+      for(let i=0;i<15;i++){const p=makeParticle(0x8a6d3f,0.06);p.position.set((Math.random()-0.5)*1.2,(Math.random()-0.5)*0.4,(Math.random()-0.5)*0.4);mix.add(p);}
+      const magnet=new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.15,0.8,16),matLab(0x303030));magnet.position.set(0.9,0,0);g.add(magnet);
+      mix.position.set(0,0,0);g.add(mix);
+      label('iron','लोहा अलग',new THREE.Vector3(0,0.4,0),true,true);
+    }},
+    {proc:'शेष मिश्रण में जल डालें और छानें।',obs:'नमक घुल जाता है, रेत रह जाती है।',build:(g)=>{
+      const beaker=makeBeaker(1.0,0.3,0xe8e8e8,0.7);beaker.position.set(0,0.4,0);g.add(beaker);
+      const filter=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.18,0.6,20),matLab(0xf0f0f0));filter.position.set(0,-0.1,0);g.add(filter);
+      label('filter','छनाई',new THREE.Vector3(0,0.95,0),true,true);
+    }},
+    {proc:'फ़िल्ट्रेट को वाष्पित करें।',obs:'नमक के क्रिस्टल बचते हैं।',build:(g)=>{
+      const dish=new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.28,0.12,24),matLab(0x908070));dish.position.set(0,0,0);g.add(dish);
+      const crystals=new THREE.Group();
+      for(let i=0;i<8;i++){const c=new THREE.Mesh(new THREE.BoxGeometry(0.08,0.08,0.08,8),matLab(0xf0f0f0));c.position.set((Math.random()-0.5)*0.2,0.07,(Math.random()-0.5)*0.2);crystals.add(c);}
+      crystals.position.set(0,0.07,0);g.add(crystals);
+      label('salt','नमक क्रिस्टल',new THREE.Vector3(0,0.35,0),true,true);
+    }}],
+  obs:'लोहा चुंबक से, रेत छनाई से, नमक वाष्पीकरण से अलग होता है।',
+  conc:'भौतिक विधियों से मिश्रण के घटक अलग किए जा सकते हैं।'
+ },
+ molecule:{
+  title:'आणविक मॉडल · Molecular Model', sub:'जल H₂O अणु',
+  aim:'जल अणु की संरचना (2 हाइड्रोजन + 1 ऑक्सीजन) दर्शाना।',
+  mat:['हाइड्रोजन परमाणु','ऑक्सीजन परमाणु','बॉल-एंड-स्टिक'],
+  steps:[
+    {proc:'एक ऑक्सीजन परमाणु लें।',obs:'लाल बड़ा गोला।',build:(g)=>{
+      const O=new THREE.Mesh(new THREE.SphereGeometry(0.32,32,24),matPBR(0xd02020));O.position.set(0,0,0);g.add(O);
+      label('o','ऑक्सीजन',new THREE.Vector3(0,0.5,0),true,true);
+    }},
+    {proc:'दो हाइड्रोजन परमाणु ऑक्सीजन से जोड़ें।',obs:'H₂O अणु बनता है।',build:(g)=>{
+      const O=new THREE.Mesh(new THREE.SphereGeometry(0.32,32,24),matPBR(0xd02020));O.position.set(0,0,0);g.add(O);
+      for(let i=0;i<2;i++){const ang=(i==0?-0.7:0.7);const H=new THREE.Mesh(new THREE.SphereGeometry(0.14,24,20),matPBR(0xf0f0f0));H.position.set(Math.sin(ang)*0.75,Math.cos(ang)*0.75,0);g.add(H);const b=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,0.7,8),matLab(0x606070));b.position.set(Math.sin(ang)*0.38,Math.cos(ang)*0.38,0);b.rotation.z=ang-1.57;g.add(b);}
+      label('h2o','H₂O जल',new THREE.Vector3(0,0.95,0),true,true);
+    }},
+    {proc:'सहसंयोजक बंध इलेक्ट्रॉन साझा करके बनता है।',obs:'अणु स्थिर और कोणीय।',build:(g)=>{
+      const O=new THREE.Mesh(new THREE.SphereGeometry(0.32,32,24),matPBR(0xd02020));O.position.set(0,0,0);g.add(O);
+      const glow=new THREE.Mesh(new THREE.SphereGeometry(0.7,32,24),matPBR(0xd02020));glow.material.transparent=true;glow.material.opacity=0.15;glow.position.copy(O.position);g.add(glow);
+      label('bond','सहसंयोजक बंध',new THREE.Vector3(0,0.95,0),true,true);
+    }}],
+  obs:'जल अणु वृताकार (bent) होता है, ऑक्सीजन के चारों ओर दो हाइड्रोजन।',
+  conc:'जल अणु में एक ऑक्सीजन और दो हाइड्रोजन परमाणु सहसंयोजक बंधन से जुड़े होते हैं।'
+ },
+ atom:{
+  title:'परमाणु संरचना · Atomic Structure', sub:'बोहर मॉडल — इलेक्ट्रॉन कक्षाएँ',
+  aim:'परमाणु में नाभिक के चारों ओर इलेक्ट्रॉन कक्षाएँ दर्शाना।',
+  mat:['प्रोटॉन','न्यूट्रॉन','इलेक्ट्रॉन','बोहर मॉडल'],
+  steps:[
+    {proc:'नाभिक में प्रोटॉन और न्यूट्रॉन रखें।',obs:'धनात्मक नाभिक।',build:(g)=>{
+      const nucleus=new THREE.Group();
+      for(let i=0;i<6;i++){const p=makeParticle(0xff4444,0.12);p.position.set((Math.random()-0.3)*0.25,(Math.random()-0.3)*0.25,(Math.random()-0.3)*0.25);nucleus.add(p);}
+      for(let i=0;i<6;i++){const n=makeParticle(0xffffff,0.12);n.position.set((Math.random()-0.3)*0.25,(Math.random()-0.3)*0.25,(Math.random()-0.3)*0.25);nucleus.add(n);}
+      nucleus.position.set(0,0,0);g.add(nucleus);
+      label('nucleus','नाभिक (p+n)',new THREE.Vector3(0,0.35,0),true,true);
+    }},
+    {proc:'पहली कक्षा में 2 इलेक्ट्रॉन रखें।',obs:'K कक्ष पूर्ण।',build:(g)=>{
+      const nucleus=new THREE.Mesh(new THREE.SphereGeometry(0.2,24,20),matPBR(0xff4444));nucleus.position.set(0,0,0);g.add(nucleus);
+      const orbit1=new THREE.Mesh(new THREE.RingGeometry(0.5,0.52,32),matLab(0x4080c0));orbit1.rotation.x=Math.PI/2;g.add(orbit1);
+      for(let i=0;i<2;i++){const e=new THREE.Mesh(new THREE.SphereGeometry(0.05,16,12),matPBR(0xffff44));e.position.set(Math.cos(i*Math.PI)*0.5,0,Math.sin(i*Math.PI)*0.5);g.add(e);}
+      label('k','K कक्षा (2 e⁻)',new THREE.Vector3(0.5,0,0),true,true);
+    }},
+    {proc:'दूसरी कक्षा में 8 इलेक्ट्रॉन रखें।',obs:'L कक्षा पूर्ण।',build:(g)=>{
+      const nucleus=new THREE.Mesh(new THREE.SphereGeometry(0.2,24,20),matPBR(0xff4444));nucleus.position.set(0,0,0);g.add(nucleus);
+      for(let r of [0.5,0.85]){const orbit=new THREE.Mesh(new THREE.RingGeometry(r,r+0.02,32),matLab(0x4080c0));orbit.rotation.x=Math.PI/2;g.add(orbit);}
+      const n2=Math.min(8,8);for(let i=0;i<n2;i++){const ang=(i/n2)*Math.PI*2;const e=new THREE.Mesh(new THREE.SphereGeometry(0.05,16,12),matPBR(0xffff44));e.position.set(Math.cos(ang)*0.85,0,Math.sin(ang)*0.85);g.add(e);}
+      label('l','L कक्षा (8 e⁻)',new THREE.Vector3(0.85,0,0),true,true);
+    }}],
+  obs:'नाभिक के चारों ओर इलेक्ट्रॉन निश्चित कक्षाओं में घूमते हैं।',
+  conc:'बोहर मॉडल: नाभिक (प्रोटॉन+न्यूट्रॉन) के चारों ओर इलेक्ट्रॉन कक्षाएँ K, L, M...'
+ },
+ tyndall:{
+  title:'टिंडल प्रभाव · Tyndall Effect', sub:'कोलॉइड में प्रकाश मार्ग',
+  aim:'कोलॉइडीय विलयन में प्रकाश किरण का मार्ग देखना।',
+  mat:['दूध का घोल','जल','टॉर्च','कांच की नली'],
+  steps:[
+    {proc:'शुद्ध जल की नली में टॉर्च की किरण डालें।',obs:'किरण का मार्ग नहीं दिखता।',build:(g)=>{
+      const tube=makeTestTube(1.1,0.18,0xe8f0e8,0.7);tube.position.set(0,0.4,0);g.add(tube);
+      const beam=new THREE.Mesh(new THREE.BoxGeometry(0.03,0.03,1.0),matLab(0xffffff));beam.material.transparent=true;beam.material.opacity=0.2;beam.position.set(0,0,0);beam.rotation.z=0.4;g.add(beam);
+      label('water','शुद्ध जल',new THREE.Vector3(0,0.95,0),true,true);
+    }},
+    {proc:'दूध का घोल (कोलॉइड) लें और किरण डालें।',obs:'किरण का मार्ग चमकता दिखता है।',build:(g)=>{
+      const tube=makeTestTube(1.1,0.18,0xf0e0c0,0.7);tube.position.set(0,0.4,0);g.add(tube);
+      const beam=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,1.0,12),matLab(0xffd54f));beam.material.transparent=true;beam.material.opacity=0.5;beam.position.set(0,0,0);beam.rotation.z=0.4;g.add(beam);
+      const spot=new THREE.Mesh(new THREE.SphereGeometry(0.1,24,20),matLab(0xffd54f));spot.position.set(0.6,-0.1,0);g.add(spot);
+      label('milk','दूध कोलॉइड',new THREE.Vector3(0,0.95,0),true,true);
+    }},
+    {proc:'कोलॉइडीय कण प्रकाश को प्रकीर्णित करते हैं।',obs:'टिंडल प्रभाव।',build:(g)=>{
+      const tube=makeTestTube(1.1,0.18,0xf0e0c0,0.7);tube.position.set(0,0.4,0);g.add(tube);
+      for(let i=0;i<12;i++){const p=makeParticle(0xd0a060,0.03);p.position.set((Math.random()-0.5)*0.9,(Math.random()-0.5)*0.6,(Math.random()-0.5)*0.3);g.add(p);}
+      const beam=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,1.0,12),matLab(0xffd54f));beam.material.transparent=true;beam.material.opacity=0.5;beam.position.set(0,0,0);beam.rotation.z=0.4;g.add(beam);
+      label('scatter','प्रकाश प्रकीर्णन',new THREE.Vector3(0,0.95,0),true,true);
+    }}],
+  obs:'कोलॉइडीय घोल में प्रकाश किरण का चमकता मार्ग दिखाई देता है।',
+  conc:'कणों का आकार बड़ा होने पर कोलॉइड में टिंडल प्रभाव दिखता है।'
+ }
+};
+
+// ---------- Build ----------
+function buildExp(name){
+  const e=EXPS[name];
+  clearScene();
+  const g=new THREE.Group();
+  state.exp=name; state.step=0;
+  updateUI();
+  renderStep(g);
+}
+function renderStep(g){
+  const e=EXPS[state.exp];
+  const s=e.steps[state.step];
+  clearLabels();
+  if(currentGroup){scene.remove(currentGroup);}
+  currentGroup=g;
+  s.build(g);
+  scene.add(g);
+  camera.position.set(0,1.0,4.6); controls.target.set(0,0,0);
+  document.getElementById('labTitle').textContent=e.title;
+  document.getElementById('labSub').textContent=e.sub;
+  document.getElementById('labAim').textContent=e.aim;
+  document.getElementById('labMat').innerHTML=e.mat.map(m=>`<span>${m}</span>`).join('');
+  document.getElementById('labObs').textContent=e.obs;
+  document.getElementById('labConc').textContent=e.conc;
+  const stepsHtml=e.steps.map((s,i)=>`<div class="step${i===state.step?' active':''}"><div class="stt">स्टेप ${i+1}</div><p>${s.proc}</p></div>`).join('');
+  document.getElementById('labSteps').innerHTML=stepsHtml;
+  document.getElementById('expTitle').textContent=e.title;
+  document.getElementById('expDesc').textContent=e.sub;
+  document.getElementById('stepInfo').textContent=`स्टेप ${state.step+1} / ${e.steps.length}`;
+  document.getElementById('btnPrev').disabled=state.step===0;
+  document.getElementById('btnNext').disabled=state.step===e.steps.length-1;
+}
+function selectExp(name){
+  document.querySelectorAll('.exp').forEach(el=>{el.classList.remove('active');if(el.dataset.exp===name)el.classList.add('active');});
+  buildExp(name);
+  document.getElementById('sidebar').classList.remove('open');
+}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
+function toggleLab(){document.getElementById('lab').classList.toggle('open');}
+document.getElementById('btnPrev').addEventListener('click',()=>{if(state.step>0){state.step--;renderStep(new THREE.Group());}});
+document.getElementById('btnNext').addEventListener('click',()=>{const e=EXPS[state.exp];if(state.step<e.steps.length-1){state.step++;renderStep(new THREE.Group());}});
+
+// ---------- Animation ----------
+function animate(){
+  requestAnimationFrame(animate);
+  const t=performance.now()*0.0015;
+  controls.update();
+  if(currentGroup){currentGroup.rotation.y=Math.sin(t*0.3)*0.06;currentGroup.rotation.x=Math.sin(t*0.2)*0.04;}
+  renderer.render(scene,camera);
+}
+animate();
+window.addEventListener('resize',()=>{
+  camera.aspect=view.clientWidth/view.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(view.clientWidth,view.clientHeight);
+});
+buildExp('states');
+</script>
+</body>
+</html>
