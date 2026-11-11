@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vigyan Atlas — Class X Chemistry: Realistic 2D Images (NCERT)</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0a0f1a;color:#e8eef2;font:14px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Noto Sans,Nirmala UI,"Noto Sans Devanagari",Arial,sans-serif;overflow:hidden}
+  #view{position:relative;width:100vw;height:100vh;background:linear-gradient(180deg,#0f1b33 0%,#070a14 100%);overflow:hidden;display:flex}
+  canvas{display:block}
+  #sidebar{position:absolute;top:0;left:0;width:300px;height:100%;background:rgba(8,15,26,0.95);backdrop-filter:blur(8px);border-right:1px solid rgba(255,255,255,0.08);z-index:25;overflow-y:auto;transform:translateX(-102%);transition:transform .25s}
+  #sidebar.open{transform:translateX(0)}
+  #sidebar h2{font-size:15px;color:#ffd54f;padding:14px;border-bottom:1px solid rgba(255,255,255,0.1)}
+  .topic{padding:8px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;color:#c9d6df;transition:all .15s;display:flex;justify-content:space-between;align-items:center}
+  .topic:hover{background:rgba(255,255,255,0.04);color:#fff}
+  .topic.active{background:linear-gradient(90deg,rgba(255,213,79,0.12),transparent);color:#ffd54f;border-left:3px solid #ffd54f}
+  .sub{padding:6px 14px 6px 34px;font-size:12.5px;color:#9fb3c8;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.03);transition:all .15s;display:flex;justify-content:space-between;align-items:center}
+  .sub:hover{background:rgba(255,255,255,0.03);color:#fff}
+  .sub.active{background:rgba(255,213,79,0.08);color:#ffd54f;border-left:2px solid #ffd54f}
+  #stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,#162432 0%,#070a14 70%);padding:20px;overflow:auto}
+  #imageWrap{position:relative;display:inline-block;max-width:92vw;max-height:82vh;box-shadow:0 20px 60px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden}
+  #imageWrap img{display:block;max-width:100%;max-height:100%;object-fit:contain}
+  .mark{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10}
+  .dot{width:10px;height:10px;background:#ffd54f;border-radius:50%;box-shadow:0 0 12px #ffd54f;border:2px solid #0b1220}
+  .lbl{position:absolute;left:calc(50% + 14px);top:50%;transform:translateY(-50%);background:rgba(8,15,26,.92);backdrop-filter:blur(6px);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:6px 10px;font-size:12.5px;line-height:1.35;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .18s;min-width:140px;max-width:260px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+  .lbl.hi{border-color:#ffd54f;background:rgba(15,30,50,.95);color:#ffd54f}
+  .lbl .en{font-weight:700;display:block}
+  .lbl .hi{font-size:11.5px;color:#8ee0a7;opacity:.9;display:block;margin-top:2px}
+  .mark.active .lbl{opacity:1}
+  .mark.active .dot{background:#ffd54f;box-shadow:0 0 16px #ffd54f}
+  #hud{position:absolute;top:12px;left:320px;right:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;z-index:25;pointer-events:none}
+  #hud>*{pointer-events:auto}
+  .bar{background:rgba(10,16,28,0.8);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:9px 13px;display:flex;gap:11px;align-items:center;flex-wrap:wrap}
+  .bar h2{font-size:15px;color:#ffd54f;margin:0 0 4px 0;letter-spacing:.3px}
+  .bar p{font-size:12px;color:#9fb3c8;margin:0;line-height:1.45}
+  .btn{border:none;background:#1d3a5a;color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:6px 12px;font-size:12.5px;cursor:pointer;transition:all .15s}
+  .btn:hover{background:#2a527e;border-color:#6fb3d8}
+  .btn.active{background:#ffd54f;color:#0b1220;border-color:#ffd54f}
+  .openBtn{position:absolute;top:12px;left:12px;z-index:35}
+  .hint{position:absolute;bottom:14px;left:320px;right:12px;color:#8aa3b8;font-size:12px;z-index:25;text-align:center;pointer-events:none}
+  @media (max-width:900px){#sidebar{width:250px}#hud{left:12px;right:12px}.hint{left:12px;right:12px}}
+  @media (max-width:640px){#sidebar{width:220px}}
+</style>
+</head>
+<body>
+<div id="view">
+  <button class="openBtn btn" onclick="toggleSidebar()">☰ Topics</button>
+  <div id="sidebar">
+    <h2>कक्षा 10 रसायन विज्ञान · Class X Chemistry</h2>
+    <div class="topic active" data-topic="combination" onclick="selectTopic('combination')">संयोग अभिक्रिया · Combination Reaction <span class="hi">संयोग अभिक्रिया</span></div>
+    <div class="sub active" data-sub="combination" onclick="selectSub('combination')">Magnesium burning in oxygen — मैग्नीशियम जल रहा है ऑक्सीजन में</div>
+    <div class="topic" data-topic="decomposition" onclick="selectTopic('decomposition')">विश्लेषण अभिक्रिया · Decomposition Reaction <span class="hi">विश्लेषण अभिक्रिया</span></div>
+    <div class="sub" data-sub="decomposition" onclick="selectSub('decomposition')">Heating ferrous sulphate crystals — हरी क्रिस्टल गरम करना</div>
+    <div class="topic" data-topic="displacement" onclick="selectTopic('displacement')">स्थापन अभिक्रिया · Displacement Reaction <span class="hi">स्थापन अभिक्रिया</span></div>
+    <div class="sub" data-sub="displacement" onclick="selectSub('displacement')">Zinc in copper sulphate — जिंक तांबा सल्फेट में</div>
+    <div class="topic" data-topic="double_displacement" onclick="selectTopic('double_displacement')">द्वि-संस्थापन · Double Displacement <span class="hi">द्वि-संस्थापन</span></div>
+    <div class="sub" data-sub="double_displacement" onclick="selectSub('double_displacement')">White precipitate — सफेद अवक्षेप</div>
+    <div class="topic" data-topic="ph" onclick="selectTopic('ph')">pH परीक्षण · pH Testing <span class="hi">pH परीक्षण</span></div>
+    <div class="sub" data-sub="ph" onclick="selectSub('ph')">Universal indicator — सार्वत्रिक सूचक</div>
+    <div class="topic" data-topic="neutralisation" onclick="selectTopic('neutralisation')">उत्क्षेपीकरण · Neutralisation <span class="hi">उत्क्षेपीकरण</span></div>
+    <div class="sub" data-sub="neutralisation" onclick="selectSub('neutralisation')">Acid + Base → Salt + Water — अम्ल + क्षार → लवण + जल</div>
+    <div class="topic" data-topic="metal_acid" onclick="selectTopic('metal_acid')">धातु + अम्ल · Metal + Acid <span class="hi">धातु + अम्ल</span></div>
+    <div class="sub" data-sub="metal_acid" onclick="selectSub('metal_acid')">Zinc + dilute HCl, hydrogen gas — जिंक + तनु एचसीएल, हाइड्रोजन गैस</div>
+    <div class="topic" data-topic="reactivity" onclick="selectTopic('reactivity')">प्रतिक्रियाशीलता क्रम · Reactivity Series <span class="hi">प्रतिक्रियाशीलता क्रम</span></div>
+    <div class="sub" data-sub="reactivity" onclick="selectSub('reactivity')">Metals in acid, decreasing bubbles — धातु अम्ल में, घटते बुलबुले</div>
+    <div class="topic" data-topic="covalent" onclick="selectTopic('covalent')">सहसंयोजक बंधन · Covalent Bonding <span class="hi">सहसंयोजक बंधन</span></div>
+    <div class="sub" data-sub="covalent" onclick="selectSub('covalent')">CH₄, H₂O, O₂ shared electron pairs — साझा इलेक्ट्रॉन युग्म</div>
+    <div class="topic" data-topic="micelle" onclick="selectTopic('micelle')">मिसेल निर्माण · Micelle Formation <span class="hi">मिसेल निर्माण</span></div>
+    <div class="sub" data-sub="micelle" onclick="selectSub('micelle')">Soap trapping grease droplet — साबुन ग्रीस बूंद को घेर रहा है</div>
+  </div>
+  <div id="stage">
+    <div id="imageWrap"><img id="mainImg" src="" alt=""></div>
+  </div>
+  <div id="hud">
+    <div class="bar">
+      <div>
+        <h2 id="imgTitle">संयोग अभिक्रिया · Combination Reaction</h2>
+        <p id="imgDesc">मैग्नीशियम रिबन ऑक्सीजन में जलकर मैग्नesium ऑक्साइड बनाता है। Magnesium burns in oxygen forming magnesium oxide — realistic lab image.</p>
+      </div>
+    </div>
+  </div>
+  <div id="labels"></div>
+  <div class="hint">चित्र पर डॉट पर क्लिक करें · लेबल अंग्रेजी + हिंदी में · क्लास X NCERT विषय</div>
+</div>
+<script>
+// Label data: subtopic -> {title, desc, img, marks:[{x,y,en,hi}]}
+const DATA={
+ combination:{
+  title:'संयोग अभिक्रिया · Combination Reaction', desc:'मैग्नीशियम रिबन ऑक्सीजन में जलकर मैग्नीशियम ऑक्साइड बनाता है। Magnesium burns in oxygen forming magnesium oxide — realistic lab image.',
+  img:'images/combination_reaction.png',
+  marks:[
+    {x:50,y:30,en:'Magnesium Ribbon',hi:'मैग्नीशियम रिबन'},
+    {x:50,y:38,en:'Bright White Flame',hi:'तेज़ सफेद लपट'},
+    {x:50,y:55,en:'Oxygen',hi:'ऑक्सीजन'},
+    {x:50,y:68,en:'Magnesium Oxide Ash',hi:'मैग्नीशियम ऑक्साइड राख'},
+    {x:35,y:50,en:'Crucible',hi:'क्रूसिबल'}
+  ]
+ },
+ decomposition:{
+  title:'विश्लेषण अभिक्रिया · Decomposition Reaction', desc:'हरी फेरस सल्फेट क्रिस्टल गरम करने पर भूरे फेरिक ऑक्साइड में बदलती है। Heating ferrous sulphate crystals turns them brown ferric oxide.',
+  img:'images/decomposition_reaction.png',
+  marks:[
+    {x:45,y:30,en:'Ferrous Sulphate Crystals',hi:'हरी फेरस सल्फेट क्रिस्टल'},
+    {x:45,y:42,en:'Test Tube',hi:'परीक्षण नली'},
+    {x:45,y:55,en:'Brown Ferric Oxide',hi:'भूरा फेरिक ऑक्साइड'},
+    {x:45,y:68,en:'Heat / Flame',hi:'गरमाहट / लपट'},
+    {x:20,y:50,en:'Tongs',hi:'chimta'}
+  ]
+ },
+ displacement:{
+  title:'स्थापन अभिक्रिया · Displacement Reaction', desc:'जिंक तांबा सल्फेट से तांबा विस्थापित करता है — नीला रंग फीका पड़ता है, तांबा जमा होता है। Zinc displaces copper from copper sulphate — blue fades, copper deposits.',
+  img:'images/displacement_reaction.png',
+  marks:[
+    {x:45,y:35,en:'Zinc Strip',hi:'जिंक पट्टी'},
+    {x:50,y:45,en:'Copper Sulphate Solution',hi:'तांबा सल्फेट घोल'},
+    {x:65,y:55,en:'Copper Deposit',hi:'तांबा जमा'},
+    {x:35,y:50,en:'Blue Colour Fading',hi:'नीला रंग फीका'},
+    {x:45,y:70,en:'Beaker',hi:'बीकर'}
+  ]
+ },
+ double_displacement:{
+  title:'द्वि-संस्थापन · Double Displacement', desc:'सोडियम सल्फेट और बेरियम क्लोराइड मिलाकर सफेद बेरियम सल्फेट अवक्षेप बनता है। Sodium sulphate + barium chloride → white barium sulphate precipitate.',
+  img:'images/double_displacement.png',
+  marks:[
+    {x:40,y:35,en:'Sodium Sulphate',hi:'सोडियम सल्फेट'},
+    {x:60,y:35,en:'Barium Chloride',hi:'बेरियम क्लोराइड'},
+    {x:50,y:55,en:'White Precipitate',hi:'सफेद अवक्षेप'},
+    {x:30,y:50,en:'Beaker',hi:'बीकर'},
+    {x:50,y:70,en:'Sodium Chloride',hi:'सोडियम क्लोराइड'}
+  ]
+ },
+ ph:{
+  title:'pH परीक्षण · pH Testing', desc:'सार्वत्रिक सूचक पट्टियाँ — लाल (अम्लीय) से बैंगनी (क्षारीय) तक, हरा तटस्थ। Universal indicator strips — red (acidic) to violet (basic), green neutral.',
+  img:'images/ph_testing.png',
+  marks:[
+    {x:25,y:40,en:'Red — Acidic',hi:'लाल — अम्लीय'},
+    {x:40,y:40,en:'Yellow — Weakly Acidic',hi:'पीला — हल्का अम्लीय'},
+    {x:50,y:40,en:'Green — Neutral',hi:'हरा — तटस्थ'},
+    {x:65,y:40,en:'Blue — Basic',hi:'नीला — क्षारीय'},
+    {x:80,y:40,en:'Violet — Strongly Basic',hi:'बैंगनी — प्रबल क्षारीय'},
+    {x:50,y:65,en:'pH Strip',hi:'pH पट्टी'}
+  ]
+ },
+ neutralisation:{
+  title:'उत्क्षेपीकरण · Neutralisation', desc:'अम्ल और क्षार के बीच अभिक्रिया — लवण और जल बनते हैं, पिंक से रंगहीन। Acid + base reaction — salt and water formed, pink to colourless.',
+  img:'images/neutralisation.png',
+  marks:[
+    {x:38,y:30,en:'Burette',hi:'ब्यूरेट'},
+    {x:55,y:45,en:'Conical Flask',hi:'शंक्वाकार पात्र'},
+    {x:55,y:35,en:'Pink Basic Solution',hi:'पिंक क्षारीय घोल'},
+    {x:55,y:55,en:'Colourless at Endpoint',hi:'अंत बिंदु पर रंगहीन'},
+    {x:70,y:50,en:'Phenolphthalein',hi:'फेनॉल्फ़थेलीन'}
+  ]
+ },
+ metal_acid:{
+  title:'धातु + अम्ल · Metal + Acid', desc:'जिंक + तनु एचसीएल → जिंक क्लोराइड + हाइड्रोजन गैस, बुलबुले निकलते हैं। Zinc + dilute HCl → zinc chloride + hydrogen gas, bubbles evolve.',
+  img:'images/metal_acid.png',
+  marks:[
+    {x:42,y:35,en:'Zinc Granules',hi:'जिंक दाने'},
+    {x:50,y:50,en:'Dilute Hydrochloric Acid',hi:'तनु हाइड्रोक्लोरिक अम्ल'},
+    {x:65,y:45,en:'Hydrogen Gas Bubbles',hi:'हाइड्रोजन गैस के बुलबुले'},
+    {x:30,y:50,en:'Test Tube',hi:'परीक्षण नली'},
+    {x:50,y:65,en:'Effervescence',hi:'फेनर्सेन्स'}
+  ]
+ },
+ reactivity:{
+  title:'प्रतिक्रियाशीलता क्रम · Reactivity Series', desc:'धातुओं की अभिक्रियाशीलता घटते क्रम — मैग्नीशियम सबसे अधिक, तांबा लगभग बिना बुलबुले। Reactivity of metals in decreasing order — magnesium most, copper almost no bubbles.',
+  img:'images/reactivity_series.png',
+  marks:[
+    {x:18,y:40,en:'Magnesium — Most Reactive',hi:'मैग्नीशियम — सबसे अधिक अभिक्रियाशील'},
+    {x:36,y:40,en:'Zinc',hi:'जिंक'},
+    {x:54,y:40,en:'Iron',hi:'लोहा'},
+    {x:82,y:40,en:'Copper — Least Reactive',hi:'तांबा — सबसे कम अभिक्रियाशील'},
+    {x:50,y:65,en:'Dilute Acid',hi:'तनु अम्ल'}
+  ]
+ },
+ covalent:{
+  title:'सहसंयोजक बंधन · Covalent Bonding', desc:'परमाणु इलेक्ट्रॉन युग्म साझा करते हैं — CH₄, H₂O, O₂ बॉल-एंड-स्टिक मॉडल。 Atoms share electron pairs — CH₄, H₂O, O₂ ball-and-stick models.',
+  img:'images/covalent_bonding.png',
+  marks:[
+    {x:30,y:40,en:'Methane CH₄',hi:'मीथेन CH₄'},
+    {x:50,y:40,en:'Water H₂O',hi:'जल H₂O'},
+    {x:75,y:40,en:'Oxygen O₂',hi:'ऑक्सीजन O₂'},
+    {x:30,y:60,en:'Shared Electron Pair',hi:'साझा इलेक्ट्रॉन युग्म'},
+    {x:55,y:60,en:'Covalent Bond',hi:'सहसंयोजक बंध'}
+  ]
+ },
+ micelle:{
+  title:'मिसेल निर्माण · Micelle Formation', desc:'साबुन अणु तेल की बूंद को घेरता है — हाइड्रोफिलिक सिर बाहर, हाइड्रोफोबिक पूंछ अंदर। Soap molecule traps grease droplet — hydrophilic head out, hydrophobic tail in.',
+  img:'images/micelle_formation.png',
+  marks:[
+    {x:45,y:45,en:'Micelle',hi:'मिसेल'},
+    {x:45,y:30,en:'Hydrophilic Head',hi:'जल-पीठिक सिरा'},
+    {x:60,y:45,en:'Hydrophobic Tail',hi:'जल-विकर्षी पूंछ'},
+    {x:30,y:45,en:'Grease Droplet',hi:'तेल की बूंद'},
+    {x:50,y:65,en:'Water',hi:'पानी'}
+  ]
+ }
+};
+
+// State
+let state={sub:'combination'};
+
+// Elements
+const mainImg=document.getElementById('mainImg');
+const imgTitle=document.getElementById('imgTitle');
+const imgDesc=document.getElementById('imgDesc');
+const labelsEl=document.getElementById('labels');
+
+function selectTopic(t){
+  document.querySelectorAll('.topic').forEach(el=>el.classList.remove('active'));
+  const tEl=document.querySelector('[data-topic="'+t+'"]');
+  if(tEl)tEl.classList.add('active');
+  let sub=null;
+  let node=tEl;
+  while((node=node.nextElementSibling)&&node.classList.contains('sub')){sub=node;break;}
+  if(sub)selectSub(sub.dataset.sub);
+}
+function selectSub(sub){
+  state.sub=sub;
+  const d=DATA[sub];
+  if(!d)return;
+  mainImg.src=d.img;
+  imgTitle.textContent=d.title;
+  imgDesc.textContent=d.desc;
+  renderLabels();
+  document.querySelectorAll('.sub').forEach(el=>el.classList.remove('active'));
+  const sel=document.querySelector('[data-sub="'+sub+'"]');
+  if(sel)sel.classList.add('active');
+  document.querySelectorAll('.topic').forEach(el=>el.classList.remove('active'));
+  let tEl=sel;
+  while((tEl=tEl.previousElementSibling)&&!tEl.classList.contains('topic')){}
+  if(tEl)tEl.classList.add('active');
+  document.getElementById('sidebar').classList.remove('open');
+}
+function renderLabels(){
+  labelsEl.innerHTML='';
+  const d=DATA[state.sub];
+  if(!d)return;
+  d.marks.forEach((m,i)=>{
+    const wrap=document.createElement('div');
+    wrap.className='mark';
+    wrap.style.left=m.x+'%';wrap.style.top=m.y+'%';
+    wrap.onclick=(e)=>{e.stopPropagation();document.querySelectorAll('.mark').forEach(m=>m.classList.remove('active'));wrap.classList.add('active');};
+    const dot=document.createElement('div');dot.className='dot';wrap.appendChild(dot);
+    const lbl=document.createElement('div');lbl.className='lbl';
+    lbl.innerHTML='<span class="en">'+m.en+'</span><span class="hi">'+m.hi+'</span>';
+    wrap.appendChild(lbl);
+    labelsEl.appendChild(wrap);
+  });
+}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
+
+// Init
+selectSub('combination');
+</script>
+</body>
+</html>

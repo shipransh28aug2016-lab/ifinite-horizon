@@ -9,6 +9,7 @@ Status today: **partially populated.** No external 3D model, texture, image, aud
 | 2D AI images — Class IX Biology (20 images) | In-session generation (this repo) | AI generation tool terms | N/A — generated in-session, no external asset adopted | N/A — created by agent in-session | Yes, per generation tool terms (re-verify before any commercial sale/bundle) | 2026-11-11 | public/2d/class9/biology/images/ |
 | 2D AI images — Class X Biology (15 images) | In-session generation (this repo) | AI generation tool terms | N/A — generated in-session, no external asset adopted | N/A — created by agent in-session | Yes, per generation tool terms (re-verify before any commercial sale/bundle) | 2026-11-11 | public/2d/class10/biology/images/ |
 | 2D AI images — Class IX Chemistry (7 images) | In-session generation (this repo) | AI generation tool terms | N/A — generated in-session, no external asset adopted | N/A — created by agent in-session | Yes, per generation tool terms (re-verify before any commercial sale/bundle) | 2026-11-11 | public/2d/class9/chemistry/images/ |
+| 2D AI images — Class X Chemistry (10 images) | In-session generation (this repo) | AI generation tool terms | N/A — generated in-session, no external asset adopted | N/A — created by agent in-session | Yes, per generation tool terms (re-verify before any commercial sale/bundle) | 2026-11-11 | public/2d/class10/chemistry/images/ |
 | Three.js r160 + addons | npm `three@0.160.0` | MIT | Yes (MIT, npm registry) | Yes (npm / mrdoob/three) | Yes | 2026-11-11 | public/lib/ |
 
 How to add a row:
