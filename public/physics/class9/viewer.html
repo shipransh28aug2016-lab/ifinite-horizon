@@ -110,6 +110,7 @@
 </script>
 <script type="module">
 import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/OrbitControls.js';
 
 // ---------- State ----------
 let state = { exp: 'motion', step: 0 };
@@ -133,7 +134,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 view.appendChild(renderer.domElement);
 
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; controls.dampingFactor = 0.06;
 controls.minDistance = 1.6; controls.maxDistance = 20; controls.autoRotate = false;
 
@@ -204,7 +205,7 @@ function label(id,text,pos,active,hi){
     if(hi)el.classList.add('hi');else el.classList.remove('hi');
   }else{el.classList.remove('show');}
 }
-function clearLabels(){labelEls.forEach(e=>e.classList.remove('show');)}
+function clearLabels(){labelEls.forEach(e=>e.classList.remove('show'));}
 // ---------- Current model ----------
 let currentGroup=null;
 function clearScene(){
@@ -244,7 +245,7 @@ const EXPS={
   conc:'गति के समीकरण: v = u + at, s = ut + ½at², v² = u² + 2as।'
  },
  newton:{
-  title:'न्यूटन के गति के नियम · Newton's Laws', sub:'जड़त्व, F = ma, क्रिया-प्रतिक्रिया',
+  title:"न्यूटन के गति के नियम · Newton's Laws", sub:'जड़त्व, F = ma, क्रिया-प्रतिक्रिया',
   aim:'न्यूटन के तीन गति के नियमों का प्रदर्शन करना।',
   mat:['सिक्का और कार्ड','दो कार्ट','स्प्रिंग बैलेंस'],
   steps:[
@@ -435,7 +436,13 @@ window.addEventListener('resize',()=>{
   camera.updateProjectionMatrix();
   renderer.setSize(view.clientWidth,view.clientHeight);
 });
-buildExp('motion');
+window.selectExp = selectExp;
+window.toggleSidebar = toggleSidebar;
+window.toggleLab = toggleLab;
+
+const _qp=new URLSearchParams(window.location.search);
+const _reqExp=_qp.get('topic')||_qp.get('exp');
+selectExp((_reqExp&&EXPS[_reqExp])?_reqExp:'motion');
 </script>
 </body>
 </html>

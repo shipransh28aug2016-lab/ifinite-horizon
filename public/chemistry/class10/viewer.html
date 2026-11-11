@@ -116,6 +116,7 @@
 </script>
 <script type="module">
 import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/OrbitControls.js';
 
 // ---------- State ----------
 let state = {
@@ -143,7 +144,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 view.appendChild(renderer.domElement);
 
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.06;
 controls.minDistance = 1.6;
@@ -486,18 +487,18 @@ const EXPS={
       bub.position.set(0,0.2,0);g.add(bub);
       label('mg','Mg पट्टी',new THREE.Vector3(0.3,0.85,0),true,true);
     }},
-    {proc:'गैस जार में एकत्रित गैस को ज्वलनशीलता परीक्षण दें।',obs:''पॉप'' ध्वनि के साथ जलती है।',build:(g)=>{
+    {proc:'गैस जार में एकत्रित गैस को ज्वलनशीलता परीक्षण दें।',obs:'"पॉप" ध्वनि के साथ जलती है।',build:(g)=>{
       const jar=new THREE.Mesh(new THREE.CylinderGeometry(0.22,0.22,0.9,24),matLab(0xe0e0e0));jar.material.transparent=true;jar.material.opacity=0.5;jar.position.set(1.1,0.4,0);jar.castShadow=true;g.add(jar);
       const flame=new THREE.Mesh(new THREE.ConeGeometry(0.08,0.35,14),matFire(0xffd54f));flame.position.set(1.1,1.1,0);g.add(flame);
       label('h2','H₂ गैस',new THREE.Vector3(1.1,0.95,0),true,true);
     }}],
-  obs:'मैग्नीशियम पट्टी तेजी से जलती है और हाइड्रोजन गैस निकलती है जो 'पॉप' आवाज के साथ जलती है।',
+  obs:'मैग्नीशियम पट्टी तेजी से जलती है और हाइड्रोजन गैस निकलती है जो "पॉप" आवाज के साथ जलती है।',
   conc:'Mg + 2HCl → MgCl₂ + H₂↑। धातु अम्ल से लवण और हाइड्रोजन बनाती है।'
  },
  reactivity:{
   title:'प्रतिक्रियाशीलता क्रम · Reactivity Series', sub:'क्रोम की तुलना में जिंक अधिक अभिक्रियाशील',
   aim:'विभिन्न धातुओं की अभिक्रियाशीलता की तुलना करना।',
-  mat:['जिंक (Zn),'','लोहा (Fe),'','तांबा (Cu),'','फेरस सल्फेट विलयन','कॉपर सल्फेट विलयन'],
+  mat:['जिंक (Zn)','लोहा (Fe)','तांबा (Cu)','फेरस सल्फेट विलयन','कॉपर सल्फेट विलयन'],
   steps:[
     {proc:'चार नलियों में अलग-अलग धातु की पट्टियां रखें।',obs:'सभी पट्टियां धातु जैसी चमकदार।',build:(g)=>{
       const metals=[-1.2,-0.4,0.4,1.2];
@@ -675,8 +676,14 @@ window.addEventListener('resize',()=>{
   renderer.setSize(view.clientWidth,view.clientHeight);
 });
 
+window.selectExp = selectExp;
+window.toggleSidebar = toggleSidebar;
+window.toggleLab = toggleLab;
+
 // Start
-buildExp('combination');
+const _qp=new URLSearchParams(window.location.search);
+const _reqExp=_qp.get('topic')||_qp.get('exp');
+selectExp((_reqExp&&EXPS[_reqExp])?_reqExp:'combination');
 </script>
 </body>
 </html>

@@ -75,6 +75,7 @@
         <p id="imgDesc">समतल दर्पण पर प्रकाश परावर्तन — आपतित और परावर्तित किरण। Reflection of light on plane mirror — incident and reflected rays — realistic lab image.</p>
       </div>
     </div>
+    <div class="bar"><a class="btn" href="../../../science/index.html#2d" style="text-decoration:none">🏠 Home</a></div>
   </div>
   <div id="labels"></div>
   <div class="hint">चित्र पर डॉट पर क्लिक करें · लेबल अंग्रेजी + हिंदी में · क्लास X NCERT विषय</div>
@@ -227,7 +228,11 @@ function renderLabels(){
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
 
 // Init
-selectSub('reflection');
+const _qp=new URLSearchParams(window.location.search);
+const _sub=_qp.get('sub'),_top=_qp.get('topic');
+if(_sub&&DATA[_sub])selectSub(_sub);
+else if(_top&&document.querySelector('[data-topic="'+_top+'"]'))selectTopic(_top);
+else selectSub('reflection');
 </script>
 </body>
 </html>
