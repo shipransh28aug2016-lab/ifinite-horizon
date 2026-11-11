@@ -7,6 +7,13 @@ Standalone proof-of-concept showing what enriched visuals can look like for Clas
 2. **Anime** — cel shading, gradient map, thick outlines, animated motion/dash lines. Best for waves, ray optics, electron flow, blood-flow arrows.
 3. **Ultra-realistic** — PBR tissue (clearcoat wet look), surgical spotlight + fill + rim lights, bloom, ACES tone mapping. **Biology goal:** look like a doctor viewing inside the body during surgery.
 
+### PBR tissue presets (built-in three.js r160 — no external package)
+In Ultra-realistic mode, the **PBR tissue preset** picker swaps the heart material between built-in `MeshStandardMaterial`/`MeshPhysicalMaterial` presets — no npm install required:
+- **Skin** — `MeshStandardMaterial` with clearcoat sheen approximating subsurface scattering (warm flesh).
+- **Wet mucosa** — `MeshPhysicalMaterial` with strong clearcoat + slight transmission (glossy wet organ surface).
+- **Bone** — `MeshStandardMaterial` matte, non-metallic, porous.
+- **Glass** — `MeshPhysicalMaterial` with transmission + clearcoat + IOR refraction.
+
 ## Features demonstrated
 - **Subjects:** Biology (beating heart), Chemistry (molecule with covalent bonds), Physics (prism dispersion into VIBGYOR).
 - **Cross-section slider:** slice the heart open live like a surgeon's view.
