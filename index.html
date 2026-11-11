@@ -415,7 +415,7 @@ body.noen .chap .ct small{display:block}
  <div id="homeStats"></div>
  <div class="hact"><button class="btn prim" id="homeGo">▶ Start exploring</button><button class="btn" id="myReport">👤 My report (मेरी रिपोर्ट)</button><button class="btn" id="teacherBtn">🧑‍🏫 Teacher dashboard (शिक्षक)</button><button class="btn" id="install" hidden>⬇ Install app (ऐप इंस्टॉल करें)</button></div>
  <div id="homeGrid"></div>
- <div class="hfoot"><span>Developer © 2026 <b>PP Creations</b> by Paras Pranav · Vigyan Atlas v2.0</span><details class="hmore"><summary>Credits &amp; licences</summary><div class="credits"><b>Digestive-system anatomy</b>: BodyParts3D © The Database Center for Life Science, CC BY-SA 2.1 Japan; Z-Anatomy (the open-source atlas of anatomy), CC BY-SA 4.0. Meshes were selected, simplified and compressed for this app (modified). Rectum, bile duct, villi, particles and flow paths are procedural. Three.js (MIT) and the Draco decoder (Apache-2.0) are bundled. Full record: docs/ASSET_LICENSES.md.</div></details><details class="hmore"><summary>Device &amp; data</summary><div><button id="perfQuick">⚡ Quick device test</button><button id="perfFull">Full test</button><button id="homeReset">Reset my progress</button></div></details><span>Class X: NCERT 2026–27 · Class IX: CBSE syllabus 2026–27. Simplified models, not to scale.</span></div>
+ <div class="hfoot"><span>Developer © 2026 <b>PP Creations</b> by Paras Pranav · Vigyan Atlas v2.0</span><details class="hmore"><summary>Credits &amp; licences</summary><div class="credits"><b>Digestive-system and heart/circulation anatomy</b>: BodyParts3D © The Database Center for Life Science, CC BY-SA 2.1 Japan; Z-Anatomy (the open-source atlas of anatomy), CC BY-SA 4.0. Meshes were selected, simplified and compressed for this app (modified). Rectum, bile duct, villi, particles and flow paths are procedural. Three.js (MIT) and the Draco decoder (Apache-2.0) are bundled. Full record: docs/ASSET_LICENSES.md.</div></details><details class="hmore"><summary>Device &amp; data</summary><div><button id="perfQuick">⚡ Quick device test</button><button id="perfFull">Full test</button><button id="homeReset">Reset my progress</button></div></details><span>Class X: NCERT 2026–27 · Class IX: CBSE syllabus 2026–27. Simplified models, not to scale.</span></div>
 </div></div>
 <div id="perfReport" hidden></div>
 <div id="report" hidden></div>
@@ -5542,13 +5542,16 @@ X9.dg={state:"idle",data:null,err:""};
 const FB=()=>Hi.find(h=>h.no===5).topics.find(t=>t.id==="digestion").build;
 function bar(show,p,txt){let el=document.getElementById("assetBar");if(!el){el=document.createElement("div");el.id="assetBar";el.setAttribute("role","status");el.innerHTML='<div class="ab-t"></div><div class="ab-p"><i></i></div>';document.getElementById("stage").appendChild(el)}
  el.hidden=!show;if(show){el.querySelector(".ab-t").textContent=txt;el.querySelector("i").style.width=Math.round(cl(p,0,1)*100)+"%"}}
-function load(){const d=X9.dg;if(d.state==="loading"||d.state==="ready")return;d.state="loading";d.err="";
- if(location.protocol==="file:"){d.state="failed";d.err="3D assets need the page to be served over http(s); a file:// copy uses the built-in model";if(Se&&Se.__tp&&Se.__tp.key==="ch5/digest3d")Rt("Using the built-in model","बिल्ट-इन मॉडल का उपयोग",d.err);return}
- const file=(typeof ts!=="undefined"&&ts.level>=2)?"digestive.glb":"digestive_lo.glb";bar(true,0,"Loading realistic anatomy… · यथार्थ मॉडल लोड हो रहा है…");
- import(new URL("assets/va-assets.js",document.baseURI).href).then(m=>m.loadMeshes("digestive/"+file,{onProgress:f=>bar(true,f,"Loading realistic anatomy… "+Math.round(f*100)+" %")}))
- .then(r=>{d.data=r;d.state="ready";bar(false);if(Se&&Se.__tp&&Se.__tp.key==="ch5/digest3d")window.__atlas.rebuild("ch5/digest3d")})
- .catch(e=>{d.state="failed";d.err=String(e&&e.message||e);bar(false);console.warn("[atlas] realistic digestive model unavailable:",d.err);
-  if(Se&&Se.__tp&&Se.__tp.key==="ch5/digest3d")Rt("Using the built-in model","बिल्ट-इन मॉडल का उपयोग","The detailed anatomy could not be loaded ("+d.err.slice(0,120)+"). The simpler model is shown instead.")})}
+X9.ds={heart:{state:"idle",data:null,err:""}};
+function loadSlot(D,key,dir,base_){if(D.state==="loading"||D.state==="ready")return;D.state="loading";D.err="";
+ const here=()=>Se&&Se.__tp&&Se.__tp.key===key;
+ if(location.protocol==="file:"){D.state="failed";D.err="3D assets need the page to be served over http(s); a file:// copy uses the built-in model";if(here())Rt("Using the built-in model","बिल्ट-इन मॉडल का उपयोग",D.err);return}
+ const file=(typeof ts!=="undefined"&&ts.level>=2)?base_+".glb":base_+"_lo.glb";bar(true,0,"Loading realistic anatomy… · यथार्थ मॉडल लोड हो रहा है…");
+ import(new URL("assets/va-assets.js",document.baseURI).href).then(m=>m.loadMeshes(dir+"/"+file,{onProgress:f=>bar(true,f,"Loading realistic anatomy… "+Math.round(f*100)+" %")}))
+ .then(r=>{D.data=r;D.state="ready";bar(false);if(here())window.__atlas.rebuild(key)})
+ .catch(e=>{D.state="failed";D.err=String(e&&e.message||e);bar(false);console.warn("[atlas] realistic model unavailable:",key,D.err);
+  if(here())Rt("Using the built-in model","बिल्ट-इन मॉडल का उपयोग","The detailed anatomy could not be loaded ("+D.err.slice(0,120)+"). The simpler model is shown instead.")})}
+const load=()=>loadSlot(X9.dg,"ch5/digest3d","digestive","digestive");
 const note=(en,hi,a,b)=>Rt(en,hi,`${a}<br><span class="hi" lang="hi">${b}</span>`);
 const lb=(id,en,hi,p,o={})=>({id,en,hi,at:typeof p==="function"?p:()=>p,...o});
 const V=a=>c(a[0],a[1],a[2]);
@@ -5722,6 +5725,112 @@ function Mdigest(){
    procMat.opacity=lum.has("sigmoid-colon")||s===10?.4:1;procMat.transparent=procMat.opacity<1;
    const i=ST[s];$e(`<b>${i[0]} · ${i[1]}</b> <span style="color:var(--hi)">/ ${i[2]}</span><br><span style="color:#ffd36b">${i[5]}</span> · ${i[3]}<br><span style="color:#9fb3cf;font-size:.82em">Anatomy © BodyParts3D (DBCLS, CC BY-SA 2.1 JP) · Z-Anatomy (CC BY-SA 4.0) — simplified. Rectum, bile duct, villi, food and flow paths are schematic.</span>`)}}}
 const P_=(pts,u)=>{const f=u*(pts.length-1),i=min(pts.length-2,Math.floor(f));return pts[i].clone().lerp(pts[i+1],f-i)};
+/* ===== Realistic heart and double circulation (second topic) =====
+   Anatomy meshes: BodyParts3D / Z-Anatomy (CC BY-SA), simplified. Colour coding (blue = deoxygenated, red = oxygenated) is the NCERT convention, not tissue colour.
+   Procedural: blood particles, the body capillary link, the flow path through the lungs, valve opening (schematic). */
+const HST=[
+["1","The heart in the chest","छाती में हृदय","The heart lies between the lungs, slightly tilted to the left, behind the breastbone. It is about the size of your fist.","हृदय दोनों फेफड़ों के बीच, उरोस्थि के पीछे, कुछ बाईं ओर झुका होता है; आकार लगभग आपकी मुट्ठी जितना।","Anatomical",7],
+["2","Four chambers","चार कक्ष","Two upper chambers (atria) receive blood; two lower chambers (ventricles) pump it out. The left ventricle has the thickest wall because it pumps blood to the whole body.","दो ऊपरी कक्ष (अलिंद) रक्त लेते हैं; दो निचले कक्ष (निलय) रक्त बाहर पंप करते हैं। बायाँ निलय सबसे मोटा है क्योंकि वह पूरे शरीर में रक्त भेजता है।","Anatomical",8],
+["3","Deoxygenated blood enters the right side","ऑक्सीजन-रहित रक्त दाएँ भाग में","Blood from the body enters the right atrium through the vena cavae, then passes to the right ventricle. Valves keep the blood flowing in one direction.","शरीर का रक्त महाशिराओं से दाएँ अलिंद में आता है, फिर दाएँ निलय में जाता है। वाल्व रक्त को एक ही दिशा में बहने देते हैं।","Anatomical (colour = convention)",8],
+["4","To the lungs","फेफड़ों की ओर","The right ventricle pumps the blood into the pulmonary artery, which carries it to the lungs.","दायाँ निलय रक्त को फुफ्फुस धमनी में भेजता है, जो उसे फेफड़ों तक ले जाती है।","Anatomical",8],
+["5","Oxygen is picked up","ऑक्सीजन का अवशोषण","In the lungs the blood takes up oxygen and gives out carbon dioxide, so it becomes oxygenated.","फेफड़ों में रक्त ऑक्सीजन लेता और कार्बन डाइऑक्साइड छोड़ता है, इसलिए वह ऑक्सीजन-युक्त हो जाता है।","Conceptual (gas exchange happens in tiny capillaries)",8],
+["6","Back to the heart","हृदय में वापसी","Pulmonary veins bring the oxygenated blood to the left atrium, which passes it to the left ventricle.","फुफ्फुस शिराएँ ऑक्सीजन-युक्त रक्त बाएँ अलिंद में लाती हैं, जो उसे बाएँ निलय में भेजता है।","Anatomical",8],
+["7","To the whole body","पूरे शरीर में","The left ventricle pumps blood into the aorta, which carries it to all parts of the body. The blood then returns to the right atrium.","बायाँ निलय रक्त को महाधमनी में भेजता है जो उसे शरीर के सभी भागों में ले जाती है; रक्त फिर दाएँ अलिंद में लौटता है।","Anatomical + conceptual (body capillaries not drawn)",9],
+["8","Double circulation","दोहरा परिसंचरण","Blood passes through the heart twice in one complete cycle: once on the way to the lungs and once on the way to the body. This is double circulation.","एक पूरे चक्र में रक्त हृदय से दो बार गुज़रता है — एक बार फेफड़ों के लिए, एक बार शरीर के लिए। यही दोहरा परिसंचरण है।","Conceptual summary",9]];
+const HINFO={
+chamber:["Chamber of the heart","हृदय का कक्ष","Atria (upper) receive blood; ventricles (lower) pump it out. Right side: deoxygenated blood; left side: oxygenated blood.","अलिंद (ऊपर) रक्त लेते हैं, निलय (नीचे) पंप करते हैं। दायाँ भाग: ऑक्सीजन-रहित; बायाँ भाग: ऑक्सीजन-युक्त।"],
+"right-atrium":["Right atrium","दायाँ अलिंद","Receives deoxygenated blood from the body through the superior and inferior vena cava.","ऊर्ध्व व निम्न महाशिरा से शरीर का ऑक्सीजन-रहित रक्त प्राप्त करता है।"],
+"right-ventricle":["Right ventricle","दायाँ निलय","Pumps deoxygenated blood to the lungs through the pulmonary artery.","फुफ्फुस धमनी द्वारा ऑक्सीजन-रहित रक्त फेफड़ों को भेजता है।"],
+"left-atrium":["Left atrium","बायाँ अलिंद","Receives oxygenated blood from the lungs through the pulmonary veins.","फुफ्फुस शिराओं से फेफड़ों का ऑक्सीजन-युक्त रक्त प्राप्त करता है।"],
+"left-ventricle":["Left ventricle","बायाँ निलय","Thickest wall; pumps oxygenated blood into the aorta for the whole body.","सबसे मोटी भित्ति; ऑक्सीजन-युक्त रक्त महाधमनी में भेजता है।"],
+valve:["Valve","वाल्व","Valves between chambers and at the exits of the ventricles keep blood flowing one way only. Their opening and closing is shown schematically.","वाल्व रक्त को केवल एक दिशा में बहने देते हैं। उनका खुलना-बंद होना योजनाबद्ध दिखाया है।"],
+artery:["Artery","धमनी","Carries blood away from the heart. The aorta carries oxygenated blood to the body; the pulmonary artery carries deoxygenated blood to the lungs.","हृदय से रक्त दूर ले जाती है। महाधमनी शरीर को ऑक्सीजन-युक्त रक्त; फुफ्फुस धमनी फेफड़ों को ऑक्सीजन-रहित रक्त ले जाती है।"],
+vein:["Vein","शिरा","Brings blood back to the heart. Vena cavae bring deoxygenated blood from the body; pulmonary veins bring oxygenated blood from the lungs.","हृदय में रक्त वापस लाती है। महाशिराएँ शरीर से ऑक्सीजन-रहित; फुफ्फुस शिराएँ फेफड़ों से ऑक्सीजन-युक्त रक्त लाती हैं।"],
+coronary:["Coronary artery","हृदय धमनी","Supplies blood to the heart muscle itself.","हृदय की पेशी को स्वयं रक्त पहुँचाती है।"],
+lung:["Lung","फेफड़ा","Where blood takes up oxygen and gives out carbon dioxide. Shown transparent so the vessels are visible.","जहाँ रक्त ऑक्सीजन लेता और CO₂ छोड़ता है। वाहिकाएँ दिखें इसलिए पारदर्शी।"],
+airway:["Windpipe and bronchi","श्वासनली व श्वसनी","Carry air to and from the lungs.","फेफड़ों तक वायु ले जाती हैं।"],
+bone:["Rib cage (landmark)","पसली-पिंजर (संदर्भ)","Protects the heart and lungs. Shown only to show where the heart sits.","हृदय व फेफड़ों की रक्षा करता है; केवल स्थिति दिखाने हेतु।"],
+rib:["Rib cage (landmark)","पसली-पिंजर (संदर्भ)","Protects the heart and lungs.","हृदय व फेफड़ों की रक्षा करती हैं।"],
+landmark:["Diaphragm (landmark only)","डायाफ्राम (केवल संदर्भ)","Muscle below the lungs.","फेफड़ों के नीचे की पेशी।"]};
+const hKind=id=>HINFO[id]?id:/^valve/.test(id)?"valve":/^coronary/.test(id)?"coronary":/^lung/.test(id)?"lung":/^(trachea|bronchus)/.test(id)?"airway":/^(sternum|clavicle)/.test(id)?"bone":/^rib/.test(id)?"rib":/vein|vena/.test(id)?"vein":/aorta|aortic|trunk|artery/.test(id)?"artery":"landmark";
+const HBLUE=0x5568d6,HRED=0xd2413f;
+const hCol=id=>/^right-(atrium|ventricle)|vena|^pulmonary-(trunk|artery)/.test(id)?HBLUE:/^(left-|ascending|aortic|thoracic|abdominal|brachio|pulmonary-vein|coronary)/.test(id)?HRED:/^valve/.test(id)?0xe8d9c0:/^lung/.test(id)?0xdfa3a0:/^(trachea|bronchus)/.test(id)?0xe6dac6:/^(sternum|clavicle|rib)/.test(id)?0xe3d3b0:0xa94a3c;
+function Mheart(){
+ const D=X9.ds.heart;if(D.state!=="ready"){loadSlot(D,"ch5/heart3d","heart","heart");return Hi.find(h=>h.no===5).topics.find(t=>t.id==="heart").build()}
+ const d=D.data.parts,Sc=13,C0=[.02,1.3,.03];
+ const n=new Ne;Ge(n);Je(n,-3.2,12,.15);Vt.localClippingEnabled=!0;
+ const root=new J;root.scale.setScalar(Sc);root.position.set(-C0[0]*Sc,-C0[1]*Sc,-C0[2]*Sc);n.add(root);
+ const toW=v=>v.clone().multiplyScalar(Sc).add(root.position);const plane=new Zt(c(0,0,-1),.2);
+ const M={},Mt={},BB={},pick=[];
+ const chambers=["right-atrium","right-ventricle","left-atrium","left-ventricle"];
+ for(const id in d){const p=d[id];BB[id]=bbox(p.position);let pos=p.position;const ch=chambers.includes(id);
+  if(ch){pos=new Float32Array(p.position);const cc=BB[id].c;for(let i=0;i<pos.length;i+=3){pos[i]-=cc.x;pos[i+1]-=cc.y;pos[i+2]-=cc.z}}
+  const g=new zt;g.setAttribute("position",new dn(pos,3));p.normal&&g.setAttribute("normal",new dn(new Float32Array(p.normal),3));p.index&&g.setIndex(new dn(p.index,1));
+  const lung=/^lung/.test(id),bone=/^(sternum|clavicle|rib)/.test(id);
+  const mat=Me(hCol(id),{roughness:bone?.6:lung?.7:.4,clearcoat:bone?.1:lung?.2:.6,clearcoatRoughness:.35,bumpMap:bone?null:$t,bumpScale:.25,sheen:lung?.8:.4,sheenColor:new we(0xffcccc),side:vt,transparent:!0,opacity:1,emissive:0x000000});
+  const m=new N(g,mat);m.userData.part=id;m.frustumCulled=!1;if(ch)m.position.copy(BB[id].c);root.add(m);M[id]=m;Mt[id]=mat;pick.push(m)}
+ /* centre lines for the blood path */
+ const A=id=>axisPts(d[id].position,10);const ctr=id=>BB[id].c.clone();
+ const lungC=s=>{const ids=Object.keys(BB).filter(k=>k.startsWith("lung-"+s));const v=c();ids.forEach(k=>v.add(BB[k].c));return v.multiplyScalar(1/ids.length)};
+ const smooth=(pts,n)=>new It(pts).getPoints(n);
+ const ivc=orient(A("inferior-vena-cava"),c(0,1.0,0)),svc=orient(A("superior-vena-cava"),c(0,1.6,0)),trunk=orient(A("pulmonary-trunk"),ctr("right-ventricle"));
+ const asc=orient(A("ascending-aorta"),ctr("left-ventricle")),arch=orient(A("aortic-arch"),asc[asc.length-1]),thor=orient(A("thoracic-aorta"),arch[arch.length-1]),abd=orient(A("abdominal-aorta"),thor[thor.length-1]);
+ const pa={r:orient(A("pulmonary-artery-r"),trunk[trunk.length-1]),l:orient(A("pulmonary-artery-l"),trunk[trunk.length-1])};
+ const pv={r:orient(A("pulmonary-vein-r1"),lungC("r")),l:orient(A("pulmonary-vein-l1"),lungC("l"))};
+ const build=(first,side)=>{const body=[abd[abd.length-1],V([.005,1.0,.0]),ivc[0]];
+  const segs=[["a",first],["ra",[ctr("right-atrium")]],["rv",[ctr("right-ventricle")]],["tr",trunk],["pa",pa[side]],["lg",[lungC(side)]],["pv",pv[side]],["la",[ctr("left-atrium")]],["lv",[ctr("left-ventricle")]],["as",asc],["ar",arch],["th",thor],["ab",abd],["bd",body]];
+  const pts=[],mk={};let prev=null;for(const [nm,arr] of segs){mk[nm]=pts.length;for(const p of arr)pts.push(p)}mk.end=pts.length-1;
+  const sm=new It(pts).getPoints(pts.length*6);const cum=[0];for(let i=1;i<sm.length;i++)cum.push(cum[i-1]+sm[i].distanceTo(sm[i-1]));const L=cum[cum.length-1];
+  const U={};for(const k in mk){let best=0,bd=1e9;for(let i=0;i<sm.length;i++){const q=pts[mk[k]].distanceToSquared(sm[i]);if(q<bd){bd=q;best=i}}U[k]=cum[best]/L}U.end=1;
+  return{sm,cum,L,U,P(u){u=cl(u,0,1)*L;let lo=0,hi=cum.length-1;while(hi-lo>1){const m=(lo+hi)>>1;cum[m]<=u?lo=m:hi=m}return sm[lo].clone().lerp(sm[hi],(u-cum[lo])/(cum[hi]-cum[lo]||1))}}};
+ const paths=[build(ivc,"r"),build(ivc,"l"),build(svc,"r")];
+ /* particles */
+ const NP=150,food=new Wn(new it(.0048,8,6),new bt({color:0xffffff}),NP);food.frustumCulled=!1;root.add(food);const m4=new gt,col=new we;for(let i=0;i<NP;i++)food.setColorAt(i,col.setHex(0xffffff));
+ const off=Array.from({length:NP},()=>[(rnd()-.5)*.007,(rnd()-.5)*.007,(rnd()-.5)*.007,rnd()]);
+ const put=(i,p,s,hex)=>{if(s<=0)m4.makeScale(0,0,0);else{m4.makeScale(s,s,s);m4.setPosition(p.x,p.y,p.z)}food.setMatrixAt(i,m4);food.setColorAt(i,col.setHex(hex))};
+ const tint=(pa_,u)=>{const U=pa_.U;if(u<U.lg)return HBLUE;if(u<U.pv){const q=cl((u-U.lg)/(U.pv-U.lg)*1.4,0,1);return new we(HBLUE).lerp(new we(HRED),q).getHex()}if(u<U.bd)return HRED;return new we(HRED).lerp(new we(HBLUE),cl((u-U.bd)/(1-U.bd),0,1)).getHex()};
+ const win=[null,null,["a","rv"],["rv","lg"],["lg","pv"],["pv","lv"],["lv","end"],["a","end"]];
+ let lastS=-1,lastT=0,sel=null,trans=0,cut=0,isolate=0,allLab=0,beatOn=1,ribs=1;const hl=new Set();
+ const cam={whole:[c(0,.2,9.2),c(0,-.3,0)],heart:[c(1.6,.6,5.2),c(0,0,0)],lungs:[c(0,.4,7.4),c(0,0,-.2)],aorta:[c(-.4,-1.2,7),c(0,-.6,0)]};
+ const fly=k=>window.__atlas.fly(cam[k][0].toArray(),cam[k][1].toArray(),1.3);
+ const stageCam=["whole","heart","heart","heart","lungs","heart","aorta","whole"];
+ const stOrg=[["right-atrium","left-atrium","right-ventricle","left-ventricle"],[],["right-atrium","right-ventricle","superior-vena-cava","inferior-vena-cava"],["right-ventricle","pulmonary-trunk","pulmonary-artery-l","pulmonary-artery-r"],["lung-l-upper","lung-l-lower","lung-r-upper","lung-r-middle","lung-r-lower"],["left-atrium","left-ventricle","pulmonary-vein-l1","pulmonary-vein-l2","pulmonary-vein-r1","pulmonary-vein-r2"],["left-ventricle","ascending-aorta","aortic-arch","thoracic-aorta","abdominal-aorta"],[]];
+ const ghost=(id,o)=>{const m=Mt[id];m.opacity=o;m.transparent=o<.999;m.depthWrite=o>.6;m.needsUpdate=!0};
+ const lbl=(id,en,hi,fn,st)=>lb(id,en,hi,()=>toW(fn()),{steps:{includes:i=>allLab||st.includes(i),length:1,find:()=>st[0]},up:!0});
+ const ct=id=>()=>BB[id].c;
+ const labels=[lbl("h-rib","Rib cage & breastbone","पसलियाँ व उरोस्थि",ct("sternum-body"),[0]),lbl("h-lung","Lungs","फेफड़े",()=>lungC("l"),[0,4]),lbl("h-tr","Windpipe","श्वासनली",ct("trachea"),[0]),lbl("h-fist","Heart (about the size of a fist)","हृदय (मुट्ठी के बराबर)",ct("left-ventricle"),[0]),
+  lbl("h-ra","Right atrium","दायाँ अलिंद",ct("right-atrium"),[1,2]),lbl("h-rv","Right ventricle","दायाँ निलय",ct("right-ventricle"),[1,2,3]),lbl("h-la","Left atrium","बायाँ अलिंद",ct("left-atrium"),[1,5]),lbl("h-lv","Left ventricle (thickest wall)","बायाँ निलय (सबसे मोटी भित्ति)",ct("left-ventricle"),[1,5,6]),
+  lbl("h-svc","Superior vena cava","ऊर्ध्व महाशिरा",ct("superior-vena-cava"),[2]),lbl("h-ivc","Inferior vena cava","निम्न महाशिरा",ct("inferior-vena-cava"),[2]),lbl("h-v","Valves (schematic action)","वाल्व (योजनाबद्ध)",ct("valve-mitral"),[2,5]),
+  lbl("h-pa","Pulmonary artery","फुफ्फुस धमनी",ct("pulmonary-artery-l"),[3]),lbl("h-gx","Oxygen in, carbon dioxide out (conceptual)","ऑक्सीजन अंदर, CO₂ बाहर (संकल्पनात्मक)",()=>lungC("r"),[4]),lbl("h-pv","Pulmonary vein","फुफ्फुस शिरा",ct("pulmonary-vein-r1"),[5]),
+  lbl("h-ao","Aorta","महाधमनी",ct("aortic-arch"),[6]),lbl("h-ab","To the lower body","शरीर के निचले भाग में",ct("abdominal-aorta"),[6]),lbl("h-cor","Coronary arteries (feed the heart muscle)","हृदय धमनियाँ",ct("coronary-right"),[1]),lbl("h-tw","Blood passes twice through the heart","रक्त दो बार हृदय से गुज़रता है",ct("right-atrium"),[7])];
+ const tools=[...[["whole","Chest"],["heart","Heart"],["lungs","Lungs"],["aorta","Aorta & body"]].map(([k,l],i)=>({label:"📷 "+l,group:"cam",on:i===0,act:()=>fly(k)})),
+  {label:"❤ Heartbeat",on:!0,toggle:()=>(beatOn=beatOn?0:1,!!beatOn)},{label:"Rib cage",on:!0,toggle:()=>(ribs=ribs?0:1,!!ribs)},{label:"Transparent organs",toggle:()=>(trans=trans?0:1,!!trans)},{label:"✂ Cut-away (heart)",toggle:()=>(cut=cut?0:1,!!cut)},{label:"Cut plane ← →",act:()=>{plane.constant=plane.constant>.1?-.3:plane.constant+.25}},{label:"Isolate selected",toggle:()=>(isolate=isolate?0:1,!!isolate)},{label:"All labels",toggle:()=>(allLab=allLab?0:1,!!allLab)}];
+ return{scene:n,view:{pos:cam.whole[0],target:cam.whole[1]},labels,pickables:pick,tools,
+  steps:HST.map(s=>({dur:s[6],en:`${s[0]} · ${s[1]} — ${s[3]}`,hi:`${s[2]} — ${s[4]}`})),
+  predict:{q:"Which chamber of the heart has the thickest wall?",opts:[["Right atrium",!1,"Atria have thin walls; they only receive blood."],["Left ventricle",!0,"Correct — it pumps blood to the whole body."],["Right ventricle",!1,"It pumps blood only to the lungs, so its wall is thinner."]]},
+  onPick(o){const id=o.userData.part,i=HINFO[id]||HINFO[hKind(id)];note(i[0],i[1],i[2],i[3]);sel=id;hl.clear();hl.add(id)},
+  apply(s,k,t){const dt=min(.1,max(0,t-lastT));lastT=t;if(s!==lastS){lastS=s;fly(stageCam[s])}
+   /* heartbeat: atria then ventricles contract */
+   const ph=(t*1.1)%1,bump=(a,b)=>ph<a||ph>b?0:Math.sin((ph-a)/(b-a)*PI);const at_=beatOn?bump(0,.16):0,vt_=beatOn?bump(.16,.46):0;
+   for(const id of chambers){const a=/atrium/.test(id)?at_:vt_;M[id].scale.setScalar(1-.09*a)}
+   const open=(id,o)=>{Mt[id].opacity=o};
+   /* valves: schematic — AV valves open in diastole, semilunar valves open in ventricular systole */
+   const sy=vt_>.05;for(const id in M)if(/^valve-(tricuspid|mitral)/.test(id))M[id].visible=!sy||!beatOn;else if(/^valve-(pulm|aortic)/.test(id))M[id].visible=sy||!beatOn;
+   /* particles */
+   const w=win[s];for(let i=0;i<NP;i++)put(i,c(),0,0xffffff);
+   if(w){const per=s===7?NP:100;for(let i=0;i<per;i++){const pa_=paths[i%3],o=off[i],u0=pa_.U[w[0]],u1=pa_.U[w[1]];const f=((o[3]+t*.09*(1+.2*sin(i)))%1);const u=lerp(u0,u1,f);put(i,pa_.P(u).add(c(o[0],o[1],o[2])),1,tint(pa_,u))}}
+   /* appearance */
+   const act=new Set(stOrg[s]);
+   for(const id in Mt){let o=1;const lung=/^lung/.test(id),bone=/^(sternum|clavicle|rib)/.test(id),land=id==="diaphragm",heart=!lung&&!bone&&!land&&!/^trachea|^bronchus/.test(id);
+    if(lung)o=s===4?.5:s===0?.4:.14;if(bone)o=ribs?(s===0?.9:.12):0;if(land)o=.2;if(trans&&heart)o=.45;if(isolate&&sel&&id!==sel)o=min(o,.06);
+    if(s===1&&!heart&&!bone)o=min(o,.12);
+    ghost(id,o);const m=Mt[id],hi=(act.has(id)||hl.has(id))?.15+.08*sin(t*3):0;m.emissive.setHex(hi>0?(hl.has(id)?0x44aaff:0x3a2a2a):0);m.emissiveIntensity=hi>0?1:0;
+    m.clippingPlanes=cut&&heart?[plane]:null;m.clipShadows=!!(cut&&heart)}
+   const i=HST[s];$e(`<b>${i[0]} · ${i[1]}</b> <span style="color:var(--hi)">/ ${i[2]}</span><br><span style="color:#ffd36b">${i[5]}</span> · ${i[3]}<br><span style="color:#9fb3cf;font-size:.82em"><span style="color:#8d9bff">■</span> deoxygenated · <span style="color:#ff6a68">■</span> oxygenated (convention). Anatomy © BodyParts3D (DBCLS, CC BY-SA 2.1 JP) · Z-Anatomy (CC BY-SA 4.0), simplified. Blood particles, valve action and the body link are schematic.</span>`)}}}
+Q_("ch5/heart3d",[["Which blood vessel carries oxygenated blood from the heart to the body?","शरीर को ऑक्सीजन-युक्त रक्त कौन-सी वाहिका ले जाती है?",["Pulmonary artery","Aorta","Vena cava","Pulmonary vein"],1,"The aorta leaves the left ventricle."],["Why is it called double circulation?","इसे दोहरा परिसंचरण क्यों कहते हैं?",["Blood passes through the heart twice in one cycle","There are two hearts","Blood has two colours","The heart beats twice"],0,"Once for the lungs, once for the body."],["Valves in the heart ensure that blood…","हृदय के वाल्व सुनिश्चित करते हैं कि रक्त…",["Flows in one direction only","Is purified","Moves faster","Mixes"],0,"They prevent backflow."]]);
+Px["ch5/heart3d"]=[["Every throb you feel when a doctor checks your pulse is one heartbeat.","नाड़ी की हर धड़कन एक हृदय स्पंदन है।"],["A resting adult heart beats about 72 times a minute.","विश्राम में वयस्क का हृदय लगभग 72 बार प्रति मिनट धड़कता है।"]];
+
+Hi.find(h=>h.no===5).topics.splice(1,0,{id:"heart3d",title:"Heart & double circulation — realistic 3D",hi:"हृदय व दोहरा परिसंचरण — यथार्थ 3D",build:Mheart,ncert:"Ch 5 · transportation in human beings"});
 Hi.find(h=>h.no===5).topics.splice(2,0,{id:"digest3d",title:"Digestive system — realistic 3D",hi:"पाचन तंत्र — यथार्थ 3D",build:Mdigest,ncert:"Ch 5 · nutrition in human beings"});
 Q_("ch5/digest3d",[["Where does the digestion of food get completed?","पाचन कहाँ पूर्ण होता है?",["Stomach","Small intestine","Large intestine","Oesophagus"],1,"Intestinal juice completes digestion in the small intestine."],["What do the villi do?","दीर्घरोम क्या करते हैं?",["Make bile","Increase the surface area for absorption","Churn food","Make saliva"],1,"Villi are finger-like projections with blood capillaries."],["Which organ makes bile?","पित्त कौन बनाता है?",["Gall bladder","Pancreas","Liver","Stomach"],2,"The gall bladder only stores it."]]);
 Px["ch5/digest3d"]=[["A burning feeling after a heavy, spicy meal is often too much stomach acid — antacids help.","भारी भोजन के बाद जलन अक्सर अधिक अम्ल से होती है।"],["The small intestine is the longest part of the canal — about 6 m in an adult, tightly coiled.","क्षुद्रांत्र आहार नाल का सबसे लंबा भाग — वयस्क में लगभग 6 मीटर।"]];

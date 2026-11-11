@@ -1,4 +1,6 @@
-# Mobile and performance report (Phase 7)
+# Performance report (Phase 7) — target: web browsers and smart boards
+
+Decision (project owner, 2026-11-11): the app runs only on the web and on smart boards / classroom projection PCs. Phone testing and phone-specific work are out of scope and have been removed from the open items below.
 
 All figures come from headless Chromium with **software rendering**. Counts are reliable; frame rate is **not measured** and no real phone was used.
 
@@ -21,10 +23,9 @@ Budget set in the build skill: ≤ 5 MB download, ≤ 300 k / 80 k triangles. Me
 
 Dynamic pixel ratio, auto quality drop, shadow-off on Fast (already in the engine) · lazy loading with a progress bar · cached downloads · LOD by quality level · instanced particles (140 per frame as one draw call) · disposal on eviction · failure fallback.
 
-## Open
+## Open (web and smart board)
 
-* Real-device frame rates (entry-level Android, ordinary laptop, projector PC).
-* Low-memory behaviour: no test on a device with ≤ 2 GB.
-* The "digestive.glb" Draco decode took ~3.4 s in this environment; unknown on a phone. Decoding runs on the main thread (no worker), so the page can stutter while it decodes — worth moving to a worker if the phone test shows it.
-* CPU deformation of the oesophagus and stomach (about 9 k vertices, every second frame) is cheap here but untested on phones.
-* No offline app shell: the page, scripts and assets are cached only if the loader's Cache API is used; the HTML itself is not.
+* Frame rate on a real classroom PC / smart-board computer, which is often an older machine with integrated graphics: not measured. The quality switch (High / Balanced / Fast) and the FPS meter exist; the build uses the Fast files on Balanced and Fast.
+* Decoding runs on the main thread (≈3 s in software rendering); the page can pause briefly while a realistic scene opens. A worker is possible later if a real board shows a visible stall.
+* Touch input on a smart board has not been tested with real hardware (the engine uses pointer events; labels and buttons are the existing large-text-capable UI, A / A+ / A++).
+* No offline app shell: the HTML itself is not cached. Assets are cached by the loader once fetched.

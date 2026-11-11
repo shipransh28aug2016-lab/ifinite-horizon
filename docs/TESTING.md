@@ -1,6 +1,6 @@
-# Testing report (Phase 9) — 2026-11-11
+# Testing report (Phase 9) — 2026-11-11 (updated for the heart scene)
 
-Environment: headless Chromium (Playwright), software WebGL, Linux. **No real phone, no real GPU, no Firefox/Safari, no human reviewer.**
+Environment: headless Chromium (Playwright), software WebGL, Linux. **No real GPU, no real smart board, no Firefox/Safari, no human reviewer.** Target devices: web and smart boards only.
 
 | Check | Result |
 |---|---|
@@ -33,3 +33,10 @@ The check against the official CBSE session syllabus and the NCERT textbook was 
 6. Whether showing the rectum and anal sphincter opening is acceptable for the intended age group.
 
 Each stage is tagged on screen as Anatomical, Conceptual or Microscopic.
+
+## Second topic: `ch5/heart3d` (realistic heart and double circulation)
+
+* `node tests/regression.js http://localhost:8765/index.html`: 120 scenes, 481 control clicks, 0 stopped scenes, 0 console errors.
+* 8 stages and 18 labels render; all stage screenshots were inspected (rib cage, lungs, chambers, vessels visible; blood particles small at screenshot size and were enlarged afterwards, not re-inspected).
+* Not checked: whether valve visibility toggling reads correctly in motion, isolate and transparent modes visually, the cut-away on this scene.
+* Scientific validation: **skipped at the owner's instruction (no subject-teacher review).** Stage text follows the NCERT Class X wording as remembered; it has not been compared with the textbook. Treat as unreviewed.
