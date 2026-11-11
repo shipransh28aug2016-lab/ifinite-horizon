@@ -21,9 +21,11 @@
   #stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,#162432 0%,#070a14 70%);padding:20px;overflow:auto}
   #imageWrap{position:relative;display:inline-block;max-width:92vw;max-height:82vh;box-shadow:0 20px 60px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden}
   #imageWrap img{display:block;max-width:100%;max-height:100%;object-fit:contain}
-  .mark{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10}
+  .mark{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10;pointer-events:auto}
+  #labels{position:absolute;inset:0;pointer-events:none;z-index:10}
   .dot{width:10px;height:10px;background:#ffd54f;border-radius:50%;box-shadow:0 0 12px #ffd54f;border:2px solid #0b1220}
   .lbl{position:absolute;left:calc(50% + 14px);top:50%;transform:translateY(-50%);background:rgba(8,15,26,.92);backdrop-filter:blur(6px);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:6px 10px;font-size:12.5px;line-height:1.35;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .18s;min-width:140px;max-width:260px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+  .mark.flip .lbl{left:auto;right:calc(50% + 14px)}
   .lbl.hi{border-color:#ffd54f;background:rgba(15,30,50,.95);color:#ffd54f}
   .lbl .en{font-weight:700;display:block}
   .lbl .hi{font-size:11.5px;color:#8ee0a7;opacity:.9;display:block;margin-top:2px}
@@ -54,8 +56,8 @@
     <div class="sub" data-sub="diffusion" onclick="selectSub('diffusion')">Copper Sulfate in Water — पानी में तांबा सल्फेट</div>
     <div class="topic" data-topic="evaporation" onclick="selectTopic('evaporation')">वाष्पीकरण · Evaporation <span class="hi">वाष्पीकरण</span></div>
     <div class="sub" data-sub="evaporation" onclick="selectSub('evaporation')">Water to Vapour — पानी से जल वाष्प</div>
-    <div class="topic" data-topic="separation" onclick="selectTopic('separation')">मिश्रण पृथक्करण · Separation of Mixtures <span class="hi">मिश्रण पृथक्करण</span></div>
-    <div class="sub" data-sub="separation" onclick="selectSub('separation')">Filtration — छानना (अवशेष और छानित तरल)</div>
+    <div class="topic" data-topic="mixture" onclick="selectTopic('mixture')">मिश्रण पृथक्करण · Separation of Mixtures <span class="hi">मिश्रण पृथक्करण</span></div>
+    <div class="sub" data-sub="mixture" onclick="selectSub('mixture')">Filtration — छानना (अवशेष और छानित तरल)</div>
     <div class="topic" data-topic="molecule" onclick="selectTopic('molecule')">आणविक मॉडल · Molecular Model <span class="hi">आणविक मॉडल</span></div>
     <div class="sub" data-sub="molecule" onclick="selectSub('molecule')">H₂O, O₂, CO₂ — जल, ऑक्सीजन, कार्बन डाइऑक्साइड</div>
     <div class="topic" data-topic="atom" onclick="selectTopic('atom')">परमाणु संरचना · Atomic Structure <span class="hi">परमाणु संरचना</span></div>
@@ -64,7 +66,7 @@
     <div class="sub" data-sub="tyndall" onclick="selectSub('tyndall')">Light through Colloid — कोलाइड में प्रकाश पथ</div>
   </div>
   <div id="stage">
-    <div id="imageWrap"><img id="mainImg" src="" alt=""></div>
+    <div id="imageWrap"><img id="mainImg" src="" alt=""><div id="labels"></div></div>
   </div>
   <div id="hud">
     <div class="bar">
@@ -75,7 +77,6 @@
     </div>
     <div class="bar"><a class="btn" href="../../../science/index.html#2d" style="text-decoration:none">🏠 Home</a></div>
   </div>
-  <div id="labels"></div>
   <div class="hint">चित्र पर डॉट पर क्लिक करें · लेबल अंग्रेजी + हिंदी में · क्लास IX NCERT विषय</div>
 </div>
 <script>
@@ -115,7 +116,7 @@ const DATA={
     {x:48,y:60,en:'Wire Gauze',hi:'तार जाली'}
   ]
  },
- separation:{
+ mixture:{
   title:'मिश्रण पृथक्करण · Separation of Mixtures', desc:'छानकर अवशेष और छानित तरल अलग करना — वास्तविक फिल्ट्रेशन सेटअप। Filtering to separate residue and filtrate — real filtration setup.',
   img:'images/separation.png',
   marks:[
@@ -203,7 +204,7 @@ function renderLabels(){
   if(!d)return;
   d.marks.forEach((m,i)=>{
     const wrap=document.createElement('div');
-    wrap.className='mark';
+    wrap.className='mark'+(m.x>58?' flip':'');
     wrap.style.left=m.x+'%';wrap.style.top=m.y+'%';
     wrap.onclick=(e)=>{e.stopPropagation();document.querySelectorAll('.mark').forEach(m=>m.classList.remove('active'));wrap.classList.add('active');};
     const dot=document.createElement('div');dot.className='dot';wrap.appendChild(dot);
@@ -216,8 +217,10 @@ function renderLabels(){
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
 
 // Init
+const _ALIASES={separation:'mixture'};
 const _qp=new URLSearchParams(window.location.search);
-const _sub=_qp.get('sub'),_top=_qp.get('topic');
+const _rawSub=_qp.get('sub'),_sub=_ALIASES[_rawSub]||_rawSub;
+const _rawTop=_qp.get('topic'),_top=_ALIASES[_rawTop]||_rawTop;
 if(_sub&&DATA[_sub])selectSub(_sub);
 else if(_top&&document.querySelector('[data-topic="'+_top+'"]'))selectTopic(_top);
 else selectSub('states');

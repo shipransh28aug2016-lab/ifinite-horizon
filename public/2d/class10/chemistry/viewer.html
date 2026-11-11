@@ -21,9 +21,11 @@
   #stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,#162432 0%,#070a14 70%);padding:20px;overflow:auto}
   #imageWrap{position:relative;display:inline-block;max-width:92vw;max-height:82vh;box-shadow:0 20px 60px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden}
   #imageWrap img{display:block;max-width:100%;max-height:100%;object-fit:contain}
-  .mark{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10}
+  .mark{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10;pointer-events:auto}
+  #labels{position:absolute;inset:0;pointer-events:none;z-index:10}
   .dot{width:10px;height:10px;background:#ffd54f;border-radius:50%;box-shadow:0 0 12px #ffd54f;border:2px solid #0b1220}
   .lbl{position:absolute;left:calc(50% + 14px);top:50%;transform:translateY(-50%);background:rgba(8,15,26,.92);backdrop-filter:blur(6px);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:6px 10px;font-size:12.5px;line-height:1.35;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .18s;min-width:140px;max-width:260px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+  .mark.flip .lbl{left:auto;right:calc(50% + 14px)}
   .lbl.hi{border-color:#ffd54f;background:rgba(15,30,50,.95);color:#ffd54f}
   .lbl .en{font-weight:700;display:block}
   .lbl .hi{font-size:11.5px;color:#8ee0a7;opacity:.9;display:block;margin-top:2px}
@@ -54,23 +56,47 @@
     <div class="sub" data-sub="decomposition" onclick="selectSub('decomposition')">Heating ferrous sulphate crystals — हरी क्रिस्टल गरम करना</div>
     <div class="topic" data-topic="displacement" onclick="selectTopic('displacement')">स्थापन अभिक्रिया · Displacement Reaction <span class="hi">स्थापन अभिक्रिया</span></div>
     <div class="sub" data-sub="displacement" onclick="selectSub('displacement')">Zinc in copper sulphate — जिंक तांबा सल्फेट में</div>
-    <div class="topic" data-topic="double_displacement" onclick="selectTopic('double_displacement')">द्वि-संस्थापन · Double Displacement <span class="hi">द्वि-संस्थापन</span></div>
-    <div class="sub" data-sub="double_displacement" onclick="selectSub('double_displacement')">White precipitate — सफेद अवक्षेप</div>
+    <div class="topic" data-topic="doubledisp" onclick="selectTopic('doubledisp')">द्वि-संस्थापन · Double Displacement <span class="hi">द्वि-संस्थापन</span></div>
+    <div class="sub" data-sub="doubledisp" onclick="selectSub('doubledisp')">White precipitate — सफेद अवक्षेप</div>
     <div class="topic" data-topic="ph" onclick="selectTopic('ph')">pH परीक्षण · pH Testing <span class="hi">pH परीक्षण</span></div>
     <div class="sub" data-sub="ph" onclick="selectSub('ph')">Universal indicator — सार्वत्रिक सूचक</div>
     <div class="topic" data-topic="neutralisation" onclick="selectTopic('neutralisation')">उत्क्षेपीकरण · Neutralisation <span class="hi">उत्क्षेपीकरण</span></div>
     <div class="sub" data-sub="neutralisation" onclick="selectSub('neutralisation')">Acid + Base → Salt + Water — अम्ल + क्षार → लवण + जल</div>
-    <div class="topic" data-topic="metal_acid" onclick="selectTopic('metal_acid')">धातु + अम्ल · Metal + Acid <span class="hi">धातु + अम्ल</span></div>
-    <div class="sub" data-sub="metal_acid" onclick="selectSub('metal_acid')">Zinc + dilute HCl, hydrogen gas — जिंक + तनु एचसीएल, हाइड्रोजन गैस</div>
+    <div class="topic" data-topic="metalacid" onclick="selectTopic('metalacid')">धातु + अम्ल · Metal + Acid <span class="hi">धातु + अम्ल</span></div>
+    <div class="sub" data-sub="metalacid" onclick="selectSub('metalacid')">Zinc + dilute HCl, hydrogen gas — जिंक + तनु एचसीएल, हाइड्रोजन गैस</div>
     <div class="topic" data-topic="reactivity" onclick="selectTopic('reactivity')">प्रतिक्रियाशीलता क्रम · Reactivity Series <span class="hi">प्रतिक्रियाशीलता क्रम</span></div>
     <div class="sub" data-sub="reactivity" onclick="selectSub('reactivity')">Metals in acid, decreasing bubbles — धातु अम्ल में, घटते बुलबुले</div>
     <div class="topic" data-topic="covalent" onclick="selectTopic('covalent')">सहसंयोजक बंधन · Covalent Bonding <span class="hi">सहसंयोजक बंधन</span></div>
     <div class="sub" data-sub="covalent" onclick="selectSub('covalent')">CH₄, H₂O, O₂ shared electron pairs — साझा इलेक्ट्रॉन युग्म</div>
     <div class="topic" data-topic="micelle" onclick="selectTopic('micelle')">मिसेल निर्माण · Micelle Formation <span class="hi">मिसेल निर्माण</span></div>
     <div class="sub" data-sub="micelle" onclick="selectSub('micelle')">Soap trapping grease droplet — साबुन ग्रीस बूंद को घेर रहा है</div>
+    <div class="topic" data-topic="balancing" onclick="selectTopic('balancing')">संतुलित समीकरण · Balancing Equations <span class="hi">संतुलित समीकरण</span></div>
+    <div class="sub" data-sub="balancing_equation" onclick="selectSub('balancing_equation')">2H₂ + O₂ → 2H₂O Mass Balance</div>
+    <div class="topic" data-topic="redox" onclick="selectTopic('redox')">ऑक्सीकरण-अपचयन · Redox Reaction <span class="hi">ऑक्सीकरण-अपचयन</span></div>
+    <div class="sub" data-sub="redox_reaction" onclick="selectSub('redox_reaction')">CuO + H₂ → Cu + H₂O</div>
+    <div class="topic" data-topic="corrosion" onclick="selectTopic('corrosion')">संक्षारण · Corrosion & Rancidity <span class="hi">संक्षारण</span></div>
+    <div class="sub" data-sub="corrosion_rancidity" onclick="selectSub('corrosion_rancidity')">Rusting Iron, Copper Patina, Silver</div>
+    <div class="topic" data-topic="indicators" onclick="selectTopic('indicators')">सूचक · Acid-Base Indicators <span class="hi">सूचक</span></div>
+    <div class="sub" data-sub="indicators" onclick="selectSub('indicators')">Litmus, Turmeric & Phenolphthalein</div>
+    <div class="topic" data-topic="salts" onclick="selectTopic('salts')">महत्वपूर्ण लवण · Important Salts <span class="hi">महत्वपूर्ण लवण</span></div>
+    <div class="sub" data-sub="important_salts" onclick="selectSub('important_salts')">NaCl, Baking/Washing Soda, CuSO₄, POP</div>
+    <div class="topic" data-topic="physical" onclick="selectTopic('physical')">धातु व अधातु गुण · Metals vs Non-Metals <span class="hi">भौतिक गुण</span></div>
+    <div class="sub" data-sub="metals_nonmetals" onclick="selectSub('metals_nonmetals')">Conductivity, Malleability & Brittleness</div>
+    <div class="topic" data-topic="ionic" onclick="selectTopic('ionic')">आयनिक बंध · Ionic Bond (NaCl) <span class="hi">आयनिक बंध</span></div>
+    <div class="sub" data-sub="ionic_bond_nacl" onclick="selectSub('ionic_bond_nacl')">Electron Transfer & NaCl Crystal Lattice</div>
+    <div class="topic" data-topic="extraction" onclick="selectTopic('extraction')">धातु निष्कर्षण · Extraction of Metals <span class="hi">धातु निष्कर्षण</span></div>
+    <div class="sub" data-sub="extraction_metals" onclick="selectSub('extraction_metals')">Furnace Roasting & Electrolytic Refining</div>
+    <div class="topic" data-topic="prevent" onclick="selectTopic('prevent')">संक्षारण से बचाव · Preventing Corrosion <span class="hi">संक्षारण से बचाव</span></div>
+    <div class="sub" data-sub="prevent_corrosion" onclick="selectSub('prevent_corrosion')">Galvanisation, Painting, Oiling & Alloying</div>
+    <div class="topic" data-topic="allotropes" onclick="selectTopic('allotropes')">कार्बन के अपररूप · Allotropes of Carbon <span class="hi">कार्बन के अपररूप</span></div>
+    <div class="sub" data-sub="allotropes_carbon" onclick="selectSub('allotropes_carbon')">Diamond, Graphite & Fullerene C₆₀</div>
+    <div class="topic" data-topic="homologous" onclick="selectTopic('homologous')">समजातीय श्रेणी · Homologous Series <span class="hi">समजातीय श्रेणी</span></div>
+    <div class="sub" data-sub="carbon_homologous" onclick="selectSub('carbon_homologous')">Methane to Butane (CH₄–C₄H₁₀)</div>
+    <div class="topic" data-topic="ethanol" onclick="selectTopic('ethanol')">एथेनॉल व एस्टरीकरण · Ethanol & Esterification <span class="hi">एस्टरीकरण</span></div>
+    <div class="sub" data-sub="ethanol_esterification" onclick="selectSub('ethanol_esterification')">Ethanol + Ethanoic Acid → Ester</div>
   </div>
   <div id="stage">
-    <div id="imageWrap"><img id="mainImg" src="" alt=""></div>
+    <div id="imageWrap"><img id="mainImg" src="" alt=""><div id="labels"></div></div>
   </div>
   <div id="hud">
     <div class="bar">
@@ -81,7 +107,6 @@
     </div>
     <div class="bar"><a class="btn" href="../../../science/index.html#2d" style="text-decoration:none">🏠 Home</a></div>
   </div>
-  <div id="labels"></div>
   <div class="hint">चित्र पर डॉट पर क्लिक करें · लेबल अंग्रेजी + हिंदी में · क्लास X NCERT विषय</div>
 </div>
 <script>
@@ -120,7 +145,7 @@ const DATA={
     {x:45,y:70,en:'Beaker',hi:'बीकर'}
   ]
  },
- double_displacement:{
+ doubledisp:{
   title:'द्वि-संस्थापन · Double Displacement', desc:'सोडियम सल्फेट और बेरियम क्लोराइड मिलाकर सफेद बेरियम सल्फेट अवक्षेप बनता है। Sodium sulphate + barium chloride → white barium sulphate precipitate.',
   img:'images/double_displacement.png',
   marks:[
@@ -154,7 +179,7 @@ const DATA={
     {x:70,y:50,en:'Phenolphthalein',hi:'फेनॉल्फ़थेलीन'}
   ]
  },
- metal_acid:{
+ metalacid:{
   title:'धातु + अम्ल · Metal + Acid', desc:'जिंक + तनु एचसीएल → जिंक क्लोराइड + हाइड्रोजन गैस, बुलबुले निकलते हैं। Zinc + dilute HCl → zinc chloride + hydrogen gas, bubbles evolve.',
   img:'images/metal_acid.png',
   marks:[
@@ -196,6 +221,133 @@ const DATA={
     {x:60,y:45,en:'Hydrophobic Tail',hi:'जल-विकर्षी पूंछ'},
     {x:30,y:45,en:'Grease Droplet',hi:'तेल की बूंद'},
     {x:50,y:65,en:'Water',hi:'पानी'}
+  ]
+ },
+ balancing_equation:{
+  title:'संतुलित रासायनिक समीकरण · Balancing Equations', desc:'अभिकारकों और उत्पादों के परमाणुओं का द्रव्यमान संतुलन: 2H₂ + O₂ → 2H₂O। Equal atom count and mass balance between reactants and products.',
+  img:'images/balancing_equation.jpg',
+  marks:[
+    {x:30,y:68,en:'Reactants (2H₂ + O₂)',hi:'अभिकारक (2H₂ + O₂)'},
+    {x:70,y:68,en:'Products (2H₂O)',hi:'उत्पाद (2H₂O)'},
+    {x:50,y:26,en:'Mass Balance Scale',hi:'संतुलित द्रव्यमान तुला'},
+    {x:31,y:66,en:'Oxygen Molecule (O₂)',hi:'ऑक्सीजन अणु (O₂)'},
+    {x:66,y:65,en:'Water Molecule (H₂O)',hi:'जल अणु (H₂O)'}
+  ]
+ },
+ redox_reaction:{
+  title:'ऑक्सीकरण-अपचयन · Redox Reaction', desc:'CuO का हाइड्रोजन द्वारा ताँबे में अपचयन और जल निर्माण। Reduction of CuO to copper metal while H₂ oxidises to H₂O.',
+  img:'images/redox_reaction.jpg',
+  marks:[
+    {x:40,y:47,en:'Copper(II) Oxide (CuO)',hi:'कॉपर ऑक्साइड (CuO)'},
+    {x:57,y:46,en:'Reduced Copper (Cu)',hi:'अपचयित ताँबा (Cu)'},
+    {x:49,y:58,en:'Bunsen Burner',hi:'बन्सन बर्नर'},
+    {x:18,y:48,en:'Hydrogen Gas (H₂)',hi:'हाइड्रोजन गैस (H₂)'},
+    {x:72,y:46,en:'Condensed Water (H₂O)',hi:'जल बूँदें (H₂O)'}
+  ]
+ },
+ corrosion_rancidity:{
+  title:'संक्षारण · Corrosion & Rancidity', desc:'लोहे पर जंग, ताँबे पर हरा क्षारक व चाँदी का काला पड़ना। Rusting of iron, green patina on copper, and silver tarnish.',
+  img:'images/corrosion_rancidity.jpg',
+  marks:[
+    {x:18,y:45,en:'Iron Rust (Fe₂O₃·xH₂O)',hi:'लोहे पर जंग'},
+    {x:51,y:51,en:'Copper Carbonate Patina',hi:'ताँबे पर हरा क्षारक'},
+    {x:77,y:47,en:'Silver Sulphide (Ag₂S)',hi:'चाँदी का काला धब्बा'}
+  ]
+ },
+ indicators:{
+  title:'अम्ल-क्षार सूचक · Acid-Base Indicators', desc:'लिटमस, हल्दी व फिनॉल्फथेलिन द्वारा अम्ल-क्षार की पहचान। Litmus, turmeric, and phenolphthalein colour tests.',
+  img:'images/indicators.jpg',
+  marks:[
+    {x:16,y:56,en:'Red Litmus (Acid)',hi:'लाल लिटमस (अम्ल)'},
+    {x:35,y:56,en:'Blue Litmus (Base)',hi:'नीला लिटमस (क्षार)'},
+    {x:51,y:75,en:'Turmeric Red-Brown in Base',hi:'हल्दी क्षार में लाल-भूरा'},
+    {x:67,y:65,en:'Phenolphthalein (Acid)',hi:'फिनॉल्फथेलिन (अम्ल में रंगहीन)'},
+    {x:84,y:65,en:'Phenolphthalein (Base)',hi:'फिनॉल्फथेलिन (क्षार में गुलाबी)'}
+  ]
+ },
+ important_salts:{
+  title:'महत्वपूर्ण लवण · Important Salts', desc:'साधारण नमक, बेकिंग सोडा, नीला थोथा, धोवन सोडा व प्लास्टर ऑफ पेरिस। NaCl, baking soda, CuSO₄·5H₂O, washing soda, POP.',
+  img:'images/important_salts.jpg',
+  marks:[
+    {x:16,y:63,en:'Sodium Chloride (NaCl)',hi:'साधारण नमक (NaCl)'},
+    {x:33,y:64,en:'Baking Soda (NaHCO₃)',hi:'बेकिंग सोडा'},
+    {x:50,y:62,en:'Copper Sulphate (CuSO₄·5H₂O)',hi:'नीला थोथा'},
+    {x:67,y:64,en:'Washing Soda (Na₂CO₃·10H₂O)',hi:'धोवन सोडा'},
+    {x:84,y:64,en:'Plaster of Paris',hi:'प्लास्टर ऑफ पेरिस'}
+  ]
+ },
+ metals_nonmetals:{
+  title:'धातु बनाम अधातु · Metals vs Non-Metals', desc:'धातुओं की चालकता, आघातवर्ध्यता व तन्यता बनाम अधातुओं की भंगुरता। Metallic lustre, conductivity, malleability vs non-metal brittleness.',
+  img:'images/metals_nonmetals.jpg',
+  marks:[
+    {x:27,y:42,en:'Electrical Conductivity',hi:'विद्युत चालकता'},
+    {x:34,y:70,en:'Malleable Aluminium Foil',hi:'आघातवर्ध्य एल्युमिनियम'},
+    {x:15,y:53,en:'Ductile Copper Wire',hi:'तन्य ताँबा तार'},
+    {x:60,y:52,en:'Sulphur (Non-Metal)',hi:'गंधक (अधातु)'},
+    {x:77,y:62,en:'Brittle Carbon',hi:'भंगुर कोयला'}
+  ]
+ },
+ ionic_bond_nacl:{
+  title:'आयनिक बंध · Ionic Bond (NaCl)', desc:'सोडियम से क्लोरीन को इलेक्ट्रॉन स्थानांतरण व NaCl क्रिस्टल जालक। Electron transfer from Na to Cl forming Na⁺Cl⁻ lattice.',
+  img:'images/ionic_bond_nacl.jpg',
+  marks:[
+    {x:17,y:50,en:'Sodium Atom (Na: 2,8,1)',hi:'सोडियम परमाणु'},
+    {x:32,y:23,en:'Electron Transfer',hi:'इलेक्ट्रॉन स्थानांतरण'},
+    {x:41,y:50,en:'Chlorine Atom (Cl: 2,8,7)',hi:'क्लोरीन परमाणु'},
+    {x:73,y:47,en:'Chloride Ion (Cl⁻)',hi:'क्लोराइड आयन'},
+    {x:78,y:52,en:'Sodium Ion (Na⁺)',hi:'सोडियम आयन'}
+  ]
+ },
+ extraction_metals:{
+  title:'धातुओं का निष्कर्षण · Extraction of Metals', desc:'भट्टी में भर्जन/प्रगलन तथा विद्युत-अपघटनी शोधन। Smelting furnace and electrolytic refining cell.',
+  img:'images/extraction_metals.jpg',
+  marks:[
+    {x:21,y:35,en:'Roasting Furnace',hi:'भर्जन भट्टी'},
+    {x:19,y:77,en:'Molten Metal',hi:'पिघली धातु'},
+    {x:63,y:45,en:'Impure Anode (+)',hi:'अशुद्ध एनोड (+)'},
+    {x:87,y:52,en:'Pure Cathode (-)',hi:'शुद्ध कैथोड (-)'},
+    {x:68,y:84,en:'Anode Mud',hi:'एनोड पंक'}
+  ]
+ },
+ prevent_corrosion:{
+  title:'संक्षारण से बचाव · Preventing Corrosion', desc:'यशदलेपन, रंगाई, तेल लगाना व मिश्रधातु निर्माण। Galvanisation, painting, oiling and alloying.',
+  img:'images/prevent_corrosion.jpg',
+  marks:[
+    {x:14,y:48,en:'Galvanisation (Zinc)',hi:'यशदलेपन (जस्ता)'},
+    {x:32,y:48,en:'Painting',hi:'रंगाई'},
+    {x:54,y:48,en:'Oiling & Greasing',hi:'तेल व ग्रीस'},
+    {x:83,y:52,en:'Alloying (Steel)',hi:'मिश्रधातु'}
+  ]
+ },
+ allotropes_carbon:{
+  title:'कार्बन के अपररूप · Allotropes of Carbon', desc:'हीरा, ग्रेफाइट और फुलेरीन C₆₀ की त्रि-आयामी संरचनाएँ। Diamond, graphite layers, and C₆₀ buckminsterfullerene.',
+  img:'images/allotropes_carbon.jpg',
+  marks:[
+    {x:19,y:48,en:'Diamond (Tetrahedral)',hi:'हीरा (चतुष्फलकीय)'},
+    {x:52,y:46,en:'Graphite (Layers)',hi:'ग्रेफाइट (परतें)'},
+    {x:82,y:48,en:'Fullerene (C₆₀)',hi:'फुलेरीन (C₆₀)'}
+  ]
+ },
+ carbon_homologous:{
+  title:'समजातीय श्रेणी · Homologous Series', desc:'मीथेन से ब्यूटेन तक +CH₂ इकाई वृद्धि वाली एल्केन समजातीय श्रेणी। Alkane homologous series from CH₄ to C₄H₁₀ differing by –CH₂–.',
+  img:'images/carbon_homologous.jpg',
+  marks:[
+    {x:15,y:58,en:'Methane (CH₄)',hi:'मीथेन (CH₄)'},
+    {x:33,y:55,en:'Ethane (C₂H₆)',hi:'एथेन (C₂H₆)'},
+    {x:55,y:55,en:'Propane (C₃H₈)',hi:'प्रोपेन (C₃H₈)'},
+    {x:82,y:55,en:'Butane (C₄H₁₀)',hi:'ब्यूटेन (C₄H₁₀)'},
+    {x:55,y:48,en:'Carbon Backbone (C)',hi:'कार्बन श्रृंखला (C)'}
+  ]
+ },
+ ethanol_esterification:{
+  title:'एथेनॉल व एस्टरीकरण · Ethanol & Esterification', desc:'सांद्र H₂SO₄ उत्प्रेरक की उपस्थिति में एथेनॉल और एथेनोइक अम्ल की जल-ऊष्मक अभिक्रिया। Water-bath esterification of ethanol and ethanoic acid.',
+  img:'images/ethanol_esterification.jpg',
+  marks:[
+    {x:52,y:26,en:'Ethanol + Ethanoic Acid',hi:'एथेनॉल + एथेनोइक अम्ल'},
+    {x:47,y:36,en:'Warm Water Bath',hi:'गर्म जल ऊष्मक'},
+    {x:67,y:74,en:'Conc. H₂SO₄ Dropper',hi:'सांद्र सल्फ्यूरिक अम्ल'},
+    {x:50,y:68,en:'Spirit Lamp Flame',hi:'स्पिरिट लैम्प'},
+    {x:88,y:30,en:'Retort Clamp & Stand',hi:'क्लैम्प व स्टैंड'}
   ]
  }
 };
@@ -241,7 +393,7 @@ function renderLabels(){
   if(!d)return;
   d.marks.forEach((m,i)=>{
     const wrap=document.createElement('div');
-    wrap.className='mark';
+    wrap.className='mark'+(m.x>58?' flip':'');
     wrap.style.left=m.x+'%';wrap.style.top=m.y+'%';
     wrap.onclick=(e)=>{e.stopPropagation();document.querySelectorAll('.mark').forEach(m=>m.classList.remove('active'));wrap.classList.add('active');};
     const dot=document.createElement('div');dot.className='dot';wrap.appendChild(dot);
@@ -254,8 +406,10 @@ function renderLabels(){
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
 
 // Init
+const _ALIASES={double_displacement:'doubledisp',metal_acid:'metalacid'};
 const _qp=new URLSearchParams(window.location.search);
-const _sub=_qp.get('sub'),_top=_qp.get('topic');
+const _rawSub=_qp.get('sub'),_sub=_ALIASES[_rawSub]||_rawSub;
+const _rawTop=_qp.get('topic'),_top=_ALIASES[_rawTop]||_rawTop;
 if(_sub&&DATA[_sub])selectSub(_sub);
 else if(_top&&document.querySelector('[data-topic="'+_top+'"]'))selectTopic(_top);
 else selectSub('combination');
