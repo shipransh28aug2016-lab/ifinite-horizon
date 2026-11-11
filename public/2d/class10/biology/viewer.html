@@ -67,6 +67,16 @@
     <div class="sub" data-sub="excretory_system" onclick="selectSub('excretory_system')">Excretory System — उत्सर्जन तंत्र</div>
     <div class="topic" data-topic="nervous" onclick="selectTopic('nervous')">तंत्रिका तंत्र · Nervous System <span class="hi">तंत्रिका तंत्र</span></div>
     <div class="sub" data-sub="nervous_system" onclick="selectSub('nervous_system')">Nervous System — तंत्रिका तंत्र</div>
+    <div class="topic" data-topic="endocrine" onclick="selectTopic('endocrine')">अंतःस्रावी तंत्र · Endocrine System <span class="hi">अंतःस्रावी तंत्र</span></div>
+    <div class="sub" data-sub="endocrine_system" onclick="selectSub('endocrine_system')">Endocrine System — अंतःस्रावी तंत्र</div>
+    <div class="topic" data-topic="reproductive" onclick="selectTopic('reproductive')">प्रजनन तंत्र · Reproductive System <span class="hi">प्रजनन तंत्र</span></div>
+    <div class="sub" data-sub="reproductive_system" onclick="selectSub('reproductive_system')">Reproductive System — प्रजनन तंत्र</div>
+    <div class="topic" data-topic="population" onclick="selectTopic('population')">जनसंख्या · Population <span class="hi">जनसंख्या</span></div>
+    <div class="sub" data-sub="population" onclick="selectSub('population')">Population — जनसंख्या</div>
+    <div class="topic" data-topic="evolution" onclick="selectTopic('evolution')">मानव विकास · Human Evolution <span class="hi">मानव विकास</span></div>
+    <div class="sub" data-sub="human_evolution" onclick="selectSub('human_evolution')">Human Evolution — मानव विकास</div>
+    <div class="topic" data-topic="pollution" onclick="selectTopic('pollution')">प्रदूषण · Pollution <span class="hi">प्रदूषण</span></div>
+    <div class="sub" data-sub="pollution" onclick="selectSub('pollution')">Pollution — प्रदूषण</div>
   </div>
   <div id="stage">
     <div id="imageWrap"><img id="mainImg" src="" alt=""></div>
@@ -80,7 +90,7 @@
     </div>
   </div>
   <div id="labels"></div>
-  <div class="hint">चित्र पर डॉट पर क्लिक करें · लेबल अंग्रेजी + हिंदी में · क्लास X NCERT विषय</div>
+  <div class="hint">चित्र पर डॉट पर क्लिक करें · लेबल अंग्रेजी + हिंदी में · क्लास X NCERT विषय (15 टॉपिक पूरे)</div>
 </div>
 <script>
 // Label data: subtopic -> {title, desc, img, marks:[{x,y,en,hi}]}
@@ -198,6 +208,63 @@ const DATA={
     {x:75,y:55,en:'Axon',hi:'एक्सॉन'},
     {x:60,y:70,en:'Myelin Sheath',hi:'माइलिन आवरण'},
     {x:85,y:50,en:'Synapse',hi:'सिनैप्स'}
+  ]
+ },
+ endocrine_system:{
+  title:'Endocrine System — अंतःस्रावी तंत्र', desc:'पिट्यूटरी, थायराइड, अधिवृक्क, अग्न्याशय, जनन ग्रंथि, हार्मोन। Pituitary, thyroid, adrenal, pancreas, gonads, hormones.',
+  img:'images/endocrine_system.png',
+  marks:[
+    {x:30,y:30,en:'Pituitary Gland',hi:'पिट्यूटरी ग्रंथि'},
+    {x:50,y:30,en:'Thyroid Gland',hi:'थायराइड ग्रंथि'},
+    {x:70,y:35,en:'Adrenal Glands',hi:'अधिवृक्क ग्रंथियां'},
+    {x:50,y:55,en:'Pancreas',hi:'अग्न्याशय'},
+    {x:30,y:70,en:'Ovaries/Testes',hi:'अंडाशय/वृषण'},
+    {x:60,y:60,en:'Hormones',hi:'हार्मोन'}
+  ]
+ },
+ reproductive_system:{
+  title:'Reproductive System — प्रजनन तंत्र', desc:'पुरुष: वृषण, अंडकोश, शुक्राणु। स्त्री: गर्भाशय, अंडाशय, अंडाणु। Male: testes, scrotum, sperm. Female: uterus, ovaries, egg.',
+  img:'images/reproductive_system.png',
+  marks:[
+    {x:30,y:35,en:'Testes',hi:'वृषण'},
+    {x:30,y:55,en:'Scrotum',hi:'अंडकोश'},
+    {x:70,y:35,en:'Uterus',hi:'गर्भाशय'},
+    {x:70,y:55,en:'Ovaries',hi:'अंडाशय'},
+    {x:20,y:65,en:'Sperm',hi:'शुक्राणु'},
+    {x:80,y:65,en:'Egg/Ovum',hi:'अंडाणु'}
+  ]
+ },
+ population:{
+  title:'Population — जनसंख्या', desc:'लोगों की जनसंख्या, जन्म दर, मृत्यु दर, भोजन और पानी संसाधन। Population, birth rate, death rate, food and water resources.',
+  img:'images/population.png',
+  marks:[
+    {x:35,y:30,en:'Birth Rate',hi:'जन्म दर'},
+    {x:65,y:30,en:'Death Rate',hi:'मृत्यु दर'},
+    {x:30,y:55,en:'Food Resources',hi:'भोजन संसाधन'},
+    {x:70,y:55,en:'Water Resources',hi:'पानी संसाधन'},
+    {x:50,y:80,en:'Population Growth',hi:'जनसंख्या वृद्धि'}
+  ]
+ },
+ human_evolution:{
+  title:'Human Evolution — मानव विकास', desc:'ऑस्ट्रेलोपिथिसिनस → होमो हेबिलिस → होमो इरेक्टस → होमो सेपियंस → आधुनिक मानव। Australopithecus → Homo habilis → Homo erectus → Homo sapiens → Modern Human.',
+  img:'images/human_evolution.png',
+  marks:[
+    {x:20,y:45,en:'Australopithecus',hi:'ऑस्ट्रेलोपिथिसिनस'},
+    {x:40,y:45,en:'Homo habilis',hi:'होमो हेबिलिस'},
+    {x:55,y:45,en:'Homo erectus',hi:'होमो इरेक्टस'},
+    {x:70,y:45,en:'Homo sapiens',hi:'होमो सेपियंस'},
+    {x:85,y:45,en:'Modern Human',hi:'आधुनिक मानव'}
+  ]
+ },
+ pollution:{
+  title:'Pollution — प्रदूषण', desc:'कारखाने का धुआं, कार का निकास, मृत वृक्ष, कचरा — वायु, भूमि प्रदूषण। Factory smoke, car exhaust, dead tree, trash — air, land pollution.',
+  img:'images/pollution.png',
+  marks:[
+    {x:30,y:30,en:'Factory Smoke',hi:'कारखाने का धुआं'},
+    {x:70,y:30,en:'Car Exhaust',hi:'कार का निकास'},
+    {x:30,y:60,en:'Dead Tree',hi:'मृत वृक्ष'},
+    {x:70,y:60,en:'Trash',hi:'कचरा'},
+    {x:50,y:80,en:'Air & Land Pollution',hi:'वायु और भूमि प्रदूषण'}
   ]
  }
 };
