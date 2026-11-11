@@ -76,6 +76,10 @@
     <div class="sub" data-sub="pseudo" onclick="selectSub('pseudo')">Accelerating Bus Pendulum & Lift Scale</div>
     <div class="topic" data-topic="spring" onclick="selectTopic('spring')">हुक का नियम · Hooke's Law & Spring Energy <span class="hi">कमानी व ऊर्जा</span></div>
     <div class="sub" data-sub="spring" onclick="selectSub('spring')">Spring Extension & Elastic Potential Energy</div>
+    <div class="topic" data-topic="heating" onclick="selectTopic('heating')">पृथ्वी का विभेदी तापन · Differential Heating <span class="hi">अक्षांश व ऐल्बीडो</span></div>
+    <div class="sub" data-sub="heating" onclick="selectSub('heating')">Solar Tilt, Latitude & Surface Albedo</div>
+    <div class="topic" data-topic="cycles" onclick="selectTopic('cycles')">जैव-भू-रासायनिक चक्र · Biogeochemical Cycles <span class="hi">जल, कार्बन, नाइट्रोजन</span></div>
+    <div class="sub" data-sub="cycles" onclick="selectSub('cycles')">Water, Carbon, Nitrogen & Oxygen Cycles</div>
   </div>
   <div id="stage">
     <div id="imageWrap"><img id="mainImg" src="" alt=""><div id="labels"></div></div>
@@ -238,6 +242,28 @@ const DATA={
     {x:72,y:54,en:'Hooke\'s Law Line (F = kx)',hi:'हुक का नियम रेखा (F = kx)'},
     {x:79,y:68,en:'Elastic Potential Energy (½kx²)',hi:'प्रत्यास्थ स्थितिज ऊर्जा क्षेत्र'}
   ]
+ },
+ heating:{
+  title:'पृथ्वी का विभेदी तापन · Differential Heating & Albedo', desc:'अक्षीय झुकाव, अक्षांश पर सौर किरणों का कोण तथा जल, वन, मरुस्थल व बर्फ के ऐल्बीडो द्वारा असमान तापन। Solar ray angle by latitude/tilt and surface albedo absorption vs reflection.',
+  img:'images/differential_heating.jpg',
+  marks:[
+    {x:38,y:49,en:'Direct Equatorial Solar Heating',hi:'भूमध्य रेखा पर सीधी सौर किरणें'},
+    {x:59,y:14,en:'Tilted Earth Axis (23.5°)',hi:'पृथ्वी का अक्षीय झुकाव (23.5°)'},
+    {x:44,y:19,en:'Slanted Polar Grazing Rays',hi:'ध्रुवों पर तिरछी किरणें'},
+    {x:86,y:22,en:'Low Albedo (Ocean & Forest)',hi:'कम ऐल्बीडो (समुद्र व वन)'},
+    {x:86,y:86,en:'High Albedo (Snow & Ice)',hi:'उच्च ऐल्बीडो (बर्फ परावर्तन)'}
+  ]
+ },
+ cycles:{
+  title:'जैव-भू-रासायनिक चक्र · Water, Carbon, Nitrogen & Oxygen Cycles', desc:'समुद्र, वायुमंडल, पर्वत, पादप, जंतु व मृदा सूक्ष्मजीवों के बीच जल, कार्बन, नाइट्रोजन और ऑक्सीजन का पुनर्चक्रण। Coupled water, carbon, nitrogen and oxygen recycling across Earth spheres.',
+  img:'images/biogeochemical_cycles.jpg',
+  marks:[
+    {x:16,y:40,en:'Evaporation from Ocean',hi:'समुद्र से वाष्पीकरण'},
+    {x:40,y:22,en:'Condensation & Precipitation',hi:'संघनन व वर्षण'},
+    {x:41,y:79,en:'Groundwater Aquifer & Runoff',hi:'भूजल व अपवाह'},
+    {x:68,y:42,en:'Carbon & Oxygen Cycle (Plants/Animals)',hi:'कार्बन व ऑक्सीजन चक्र'},
+    {x:65,y:76,en:'Nitrogen-Fixing Soil Microbes',hi:'नाइट्रोजन स्थिरीकरण सूक्ष्मजीव'}
+  ]
  }
 };
 
@@ -295,7 +321,7 @@ function renderLabels(){
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
 
 // Init
-const _ALIASES={newton_laws:'newton',work_energy:'energy',frame:'frames',measurement_si_units:'measure',frames_vectors_motion:'frames',pseudo_force:'pseudo',hookes_law_spring:'spring'};
+const _ALIASES={newton_laws:'newton',work_energy:'energy',frame:'frames',measurement_si_units:'measure',frames_vectors_motion:'frames',pseudo_force:'pseudo',hookes_law_spring:'spring',differential_heating:'heating',biogeochemical_cycles:'cycles'};
 const _qp=new URLSearchParams(window.location.search);
 const _rawSub=_qp.get('sub'),_sub=_ALIASES[_rawSub]||_rawSub;
 const _rawTop=_qp.get('topic'),_top=_ALIASES[_rawTop]||_rawTop;

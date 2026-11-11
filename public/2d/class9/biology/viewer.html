@@ -85,6 +85,20 @@
     <div class="sub" data-sub="five_kingdoms" onclick="selectSub('five_kingdoms')">Monera, Protista, Fungi, Plantae, Animalia</div>
     <div class="topic" data-topic="bacteria" onclick="selectTopic('bacteria')">जीवाणु व वायरस · Bacteria & Viruses <span class="hi">सूक्ष्मजीव व विषाणु</span></div>
     <div class="sub" data-sub="bacteriophage_virus" onclick="selectSub('bacteriophage_virus')">Bacteriophage Virus & Rod Bacterium</div>
+    <div class="topic" data-topic="respiration" onclick="selectTopic('respiration')">पादप श्वसन · Respiration in Plants <span class="hi">पादप श्वसन</span></div>
+    <div class="sub" data-sub="plant_respiration" onclick="selectSub('plant_respiration')">Stomata, Mesophyll Mitochondria & Root Hairs</div>
+    <div class="topic" data-topic="fungi" onclick="selectTopic('fungi')">कवक · Fungi <span class="hi">कवक संरचना</span></div>
+    <div class="sub" data-sub="fungi_structure" onclick="selectSub('fungi_structure')">Mushroom Gills, Mycelium, Yeast & Mold</div>
+    <div class="topic" data-topic="diet" onclick="selectTopic('diet')">भोजन और आहार · Food & Balanced Diet <span class="hi">संतुलित आहार</span></div>
+    <div class="sub" data-sub="balanced_diet" onclick="selectSub('balanced_diet')">Carbohydrates, Proteins, Vitamins, Fats & Water</div>
+    <div class="topic" data-topic="microscope" onclick="selectTopic('microscope')">संयुक्त सूक्ष्मदर्शी · Compound Microscope <span class="hi">सूक्ष्मदर्शी प्रकाश पथ</span></div>
+    <div class="sub" data-sub="compound_microscope" onclick="selectSub('compound_microscope')">Condenser, Objective, Eyepiece & Ray Path</div>
+    <div class="topic" data-topic="resolution" onclick="selectTopic('resolution')">विभेदन व इलेक्ट्रॉन सूक्ष्मदर्शी · Resolution & TEM/SEM <span class="hi">आवर्धन व विभेदन</span></div>
+    <div class="sub" data-sub="microscope_resolution" onclick="selectSub('microscope_resolution')">Optical Limit vs Electron Microscope Column</div>
+    <div class="topic" data-topic="fermenter" onclick="selectTopic('fermenter')">बायोरिएक्टर व वृद्धि वक्र · Bioreactor & Growth Curve <span class="hi">जैव प्रौद्योगिकी</span></div>
+    <div class="sub" data-sub="bioreactor_growth_curve" onclick="selectSub('bioreactor_growth_curve')">Stirred Fermenter & Microbial Growth Phases</div>
+    <div class="topic" data-topic="insulin" onclick="selectTopic('insulin')">पुनःसंयोजी इंसुलिन · Recombinant Insulin <span class="hi">जेनेटिक इंजीनियरिंग</span></div>
+    <div class="sub" data-sub="recombinant_insulin" onclick="selectSub('recombinant_insulin')">Gene Cut, Plasmid Ligase & E. coli Synthesis</div>
   </div>
   <div id="stage">
     <div id="imageWrap"><img id="mainImg" src="" alt=""><div id="labels"></div></div>
@@ -367,6 +381,84 @@ const DATA={
     {x:41,y:72,en:'Rod Bacterium (Prokaryote)',hi:'दंडाकार जीवाणु'},
     {x:82,y:74,en:'Bacterial Flagella',hi:'कशाभिका'}
   ]
+ },
+ plant_respiration:{
+  title:'Respiration in Plants — पादप श्वसन', desc:'पत्ती के रंध्र, पर्णमध्योतक कोशिकाओं में माइटोकॉन्ड्रिया व जड़-रोम द्वारा ऑक्सीजन ग्रहण कर कोशिकीय श्वसन। Gas exchange through leaf stomata, mesophyll mitochondria ATP synthesis and root hair O₂ uptake.',
+  img:'images/plant_respiration.jpg',
+  marks:[
+    {x:48,y:25,en:'Leaf Mesophyll & Chloroplasts',hi:'पर्णमध्योतक व हरितलवक'},
+    {x:52,y:42,en:'Mitochondria (Cellular Respiration)',hi:'माइटोकॉन्ड्रिया (कोशिकीय श्वसन)'},
+    {x:58,y:57,en:'Stomata & Guard Cells',hi:'रंध्र व रक्षक कोशिकाएँ'},
+    {x:38,y:59,en:'O₂ Intake & CO₂ Release',hi:'ऑक्सीजन ग्रहण व CO₂ विमोचन'},
+    {x:49,y:77,en:'Root Hair Oxygen Absorption',hi:'मूल रोम द्वारा ऑक्सीजन अवशोषण'}
+  ]
+ },
+ fungi_structure:{
+  title:'Fungi Structure — कवक (मशरूम, यीस्ट व फफूंद)', desc:'मशरूम के छत्र व गिल्स, भूमिगत कवक तंतु (हाइफी/माइसीलियम), मुकुलन यीस्ट व बीजाणुधानी। Mushroom fruiting body, gills & spores, underground mycelium, budding yeast and mold sporangia.',
+  img:'images/fungi_structure.jpg',
+  marks:[
+    {x:35,y:22,en:'Mushroom Cap & Gills',hi:'कवक छत्र व गिल्स'},
+    {x:45,y:36,en:'Released Fungal Spores',hi:'मुक्त कवक बीजाणु'},
+    {x:34,y:78,en:'Hyphae & Mycelium Network',hi:'कवक तंतु व कवकजाल'},
+    {x:85,y:25,en:'Budding Yeast Cells',hi:'मुकुलन यीस्ट कोशिकाएँ'},
+    {x:85,y:72,en:'Mold Sporangium',hi:'फफूंद बीजाणुधानी'}
+  ]
+ },
+ balanced_diet:{
+  title:'Food & Balanced Diet — भोजन और संतुलित आहार', desc:'कार्बोहाइड्रेट, प्रोटीन, विटामिन-खनिज, स्वस्थ वसा और शुद्ध जल के संतुलित अनुपात वाली आहार थाली। Nutritional plate balancing carbohydrates, proteins, vitamins & minerals, healthy fats and water.',
+  img:'images/balanced_diet.jpg',
+  marks:[
+    {x:39,y:32,en:'Carbohydrates (Roti, Bread, Rice)',hi:'कार्बोहाइड्रेट (रोटी, ब्रेड, चावल)'},
+    {x:61,y:32,en:'Proteins (Eggs, Pulses, Paneer)',hi:'प्रोटीन (अंडे, दालें, पनीर)'},
+    {x:39,y:68,en:'Vitamins & Minerals (Veg & Fruits)',hi:'विटामिन व खनिज (सब्ज़ी व फल)'},
+    {x:60,y:66,en:'Healthy Fats (Oil, Butter, Nuts)',hi:'स्वस्थ वसा (तेल, मक्खन, बादाम)'},
+    {x:77,y:21,en:'Clean Drinking Water',hi:'शुद्ध पेयजल'}
+  ]
+ },
+ compound_microscope:{
+  title:'Compound Microscope & Ray Path — संयुक्त सूक्ष्मदर्शी', desc:'प्रकाश स्रोत, कंडेनसर, स्लाइड मंच, अभिदृश्यक लेंस व नेत्रिका द्वारा द्वि-चरणीय आवर्धन प्रकाश पथ। Illumination, Abbe condenser, stage slide, objective and ocular ray path.',
+  img:'images/compound_microscope.jpg',
+  marks:[
+    {x:44,y:83,en:'Base Illuminator & Mirror',hi:'प्रकाश स्रोत व दर्पण'},
+    {x:50,y:62,en:'Iris Diaphragm & Condenser',hi:'डायफ्राम व कंडेनसर लेंस'},
+    {x:52,y:50,en:'Mechanical Stage & Slide',hi:'मंच व नमूना स्लाइड'},
+    {x:48,y:41,en:'Nosepiece & Objective Lens',hi:'अभिदृश्यक लेंस'},
+    {x:62,y:11,en:'Ocular Eyepiece Lens',hi:'नेत्रिका लेंस'},
+    {x:36,y:56,en:'Coarse & Fine Focus Knobs',hi:'स्थूल व सूक्ष्म समंजन घुंडी'}
+  ]
+ },
+ microscope_resolution:{
+  title:'Resolution & Electron Microscopes — विभेदन व इलेक्ट्रॉन सूक्ष्मदर्शी', desc:'लघु इलेक्ट्रॉन तरंगदैर्ध्य से उच्च विभेदन (~0.2 nm) बनाम प्रकाश सूक्ष्मदर्शी (~0.2 µm) व TEM/SEM स्तंभ। Optical diffraction limit vs short-wavelength electron beam TEM/SEM nanoscale imaging.',
+  img:'images/microscope_resolution.jpg',
+  marks:[
+    {x:24,y:30,en:'Low Resolution (Blurred Light Wave)',hi:'कम विभेदन (प्रकाश तरंग सीमा)'},
+    {x:24,y:72,en:'High Resolution (Short Electron Beam)',hi:'उच्च विभेदन (इलेक्ट्रॉन किरण)'},
+    {x:55,y:74,en:'Compound Light Microscope',hi:'प्रकाश सूक्ष्मदर्शी'},
+    {x:70,y:44,en:'Electron Microscope Column (TEM/SEM)',hi:'इलेक्ट्रॉन सूक्ष्मदर्शी स्तंभ'},
+    {x:86,y:67,en:'Nanoscale Virus Display',hi:'नैनो-स्तरीय विषाणु प्रतिबिंब'}
+  ]
+ },
+ bioreactor_growth_curve:{
+  title:'Bioreactor & Microbial Growth Curve — बायोरिएक्टर व वृद्धि वक्र', desc:'शीतलन जैकेट, विलोडक, एयर स्पार्जर व संवेदक युक्त बायोरिएक्टर तथा लैग, लॉग, स्थिर व ह्रास वृद्धि चरण। Stirred-tank bioreactor components paired with the four-phase microbial growth curve.',
+  img:'images/bioreactor_growth_curve.jpg',
+  marks:[
+    {x:14,y:52,en:'Outer Cooling Water Jacket',hi:'बाहरी शीतलन जल जैकेट'},
+    {x:26,y:48,en:'Motor Impeller & Nutrient Broth',hi:'मोटर विलोडक व पोषक माध्यम'},
+    {x:25,y:77,en:'Ring Air Sparger & O₂ Bubbles',hi:'वायु स्पार्जर व ऑक्सीजन बुलबुले'},
+    {x:28,y:18,en:'Feed Ports & pH/Temp Sensor',hi:'पोषक प्रवेश व pH संवेदक'},
+    {x:74,y:35,en:'Growth Curve (Lag, Log, Stationary, Decline)',hi:'वृद्धि वक्र (लैग, लॉग, स्थिर, ह्रास)'}
+  ]
+ },
+ recombinant_insulin:{
+  title:'Recombinant Human Insulin — पुनःसंयोजी इंसुलिन निर्माण', desc:'प्रतिबंधन एंजाइम से मानव इंसुलिन जीन काटकर DNA लाइगेज द्वारा प्लाज्मिड में जोड़ना व ई. कोलाई किण्वन से इंसुलिन उत्पादन। Restriction cutting, DNA ligase plasmid insertion, E. coli fermentation and insulin purification.',
+  img:'images/recombinant_insulin.jpg',
+  marks:[
+    {x:34,y:24,en:'Human Insulin Gene & Restriction Cut',hi:'मानव इंसुलिन जीन व प्रतिबंधन काट'},
+    {x:34,y:74,en:'Bacterial Circular Plasmid DNA',hi:'जीवाणु प्लाज्मिड DNA'},
+    {x:60,y:50,en:'DNA Ligase & Recombinant Plasmid',hi:'DNA लाइगेज व पुनःसंयोजी प्लाज्मिड'},
+    {x:84,y:53,en:'Transformed E. coli in Fermenter',hi:'किण्वक में रूपांतरित ई. कोलाई'},
+    {x:93,y:56,en:'Purified Recombinant Insulin',hi:'शुद्ध पुनःसंयोजी इंसुलिन'}
+  ]
  }
 };
 
@@ -425,8 +517,10 @@ function renderLabels(){
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
 
 // Init
+const _ALIASES={respiration:'plant_respiration',fungi:'fungi_structure',diet:'balanced_diet',microscope:'compound_microscope',resolution:'microscope_resolution',fermenter:'bioreactor_growth_curve',insulin:'recombinant_insulin'};
 const _qp=new URLSearchParams(window.location.search);
-const _sub=_qp.get('sub'),_top=_qp.get('topic');
+const _rawSub=_qp.get('sub'),_sub=_ALIASES[_rawSub]||_rawSub;
+const _top=_qp.get('topic');
 if(_sub&&DATA[_sub])selectSub(_sub);
 else if(_top&&document.querySelector('[data-topic="'+_top+'"]'))selectTopic(_top);
 else selectSub('cell_animal');
