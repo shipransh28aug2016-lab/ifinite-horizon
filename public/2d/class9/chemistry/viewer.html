@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vigyan Atlas — Class IX Chemistry: Realistic 2D Images (NCERT)</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0a0f1a;color:#e8eef2;font:14px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Noto Sans,Nirmala UI,"Noto Sans Devanagari",Arial,sans-serif;overflow:hidden}
+  #view{position:relative;width:100vw;height:100vh;background:linear-gradient(180deg,#0f1b33 0%,#070a14 100%);overflow:hidden;display:flex}
+  canvas{display:block}
+  #sidebar{position:absolute;top:0;left:0;width:300px;height:100%;background:rgba(8,15,26,0.95);backdrop-filter:blur(8px);border-right:1px solid rgba(255,255,255,0.08);z-index:25;overflow-y:auto;transform:translateX(-102%);transition:transform .25s}
+  #sidebar.open{transform:translateX(0)}
+  #sidebar h2{font-size:15px;color:#ffd54f;padding:14px;border-bottom:1px solid rgba(255,255,255,0.1)}
+  .topic{padding:8px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;color:#c9d6df;transition:all .15s;display:flex;justify-content:space-between;align-items:center}
+  .topic:hover{background:rgba(255,255,255,0.04);color:#fff}
+  .topic.active{background:linear-gradient(90deg,rgba(255,213,79,0.12),transparent);color:#ffd54f;border-left:3px solid #ffd54f}
+  .sub{padding:6px 14px 6px 34px;font-size:12.5px;color:#9fb3c8;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.03);transition:all .15s;display:flex;justify-content:space-between;align-items:center}
+  .sub:hover{background:rgba(255,255,255,0.03);color:#fff}
+  .sub.active{background:rgba(255,213,79,0.08);color:#ffd54f;border-left:2px solid #ffd54f}
+  #stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,#162432 0%,#070a14 70%);padding:20px;overflow:auto}
+  #imageWrap{position:relative;display:inline-block;max-width:92vw;max-height:82vh;box-shadow:0 20px 60px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden}
+  #imageWrap img{display:block;max-width:100%;max-height:100%;object-fit:contain}
+  .mark{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10}
+  .dot{width:10px;height:10px;background:#ffd54f;border-radius:50%;box-shadow:0 0 12px #ffd54f;border:2px solid #0b1220}
+  .lbl{position:absolute;left:calc(50% + 14px);top:50%;transform:translateY(-50%);background:rgba(8,15,26,.92);backdrop-filter:blur(6px);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:6px 10px;font-size:12.5px;line-height:1.35;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .18s;min-width:140px;max-width:260px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+  .lbl.hi{border-color:#ffd54f;background:rgba(15,30,50,.95);color:#ffd54f}
+  .lbl .en{font-weight:700;display:block}
+  .lbl .hi{font-size:11.5px;color:#8ee0a7;opacity:.9;display:block;margin-top:2px}
+  .mark.active .lbl{opacity:1}
+  .mark.active .dot{background:#ffd54f;box-shadow:0 0 16px #ffd54f}
+  #hud{position:absolute;top:12px;left:320px;right:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;z-index:25;pointer-events:none}
+  #hud>*{pointer-events:auto}
+  .bar{background:rgba(10,16,28,0.8);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:9px 13px;display:flex;gap:11px;align-items:center;flex-wrap:wrap}
+  .bar h2{font-size:15px;color:#ffd54f;margin:0 0 4px 0;letter-spacing:.3px}
+  .bar p{font-size:12px;color:#9fb3c8;margin:0;line-height:1.45}
+  .btn{border:none;background:#1d3a5a;color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:6px 12px;font-size:12.5px;cursor:pointer;transition:all .15s}
+  .btn:hover{background:#2a527e;border-color:#6fb3d8}
+  .btn.active{background:#ffd54f;color:#0b1220;border-color:#ffd54f}
+  .openBtn{position:absolute;top:12px;left:12px;z-index:35}
+  .hint{position:absolute;bottom:14px;left:320px;right:12px;color:#8aa3b8;font-size:12px;z-index:25;text-align:center;pointer-events:none}
+  @media (max-width:900px){#sidebar{width:250px}#hud{left:12px;right:12px}.hint{left:12px;right:12px}}
+  @media (max-width:640px){#sidebar{width:220px}}
+</style>
+</head>
+<body>
+<div id="view">
+  <button class="openBtn btn" onclick="toggleSidebar()">☰ Topics</button>
+  <div id="sidebar">
+    <h2>कक्षा 9 रसायन विज्ञान · Class IX Chemistry</h2>
+    <div class="topic active" data-topic="states" onclick="selectTopic('states')">पदार्थ की अवस्थाएँ · States of Matter <span class="hi">पदार्थ की अवस्थाएँ</span></div>
+    <div class="sub active" data-sub="states" onclick="selectSub('states')">Solid, Liquid, Gas — ठोस, द्रव, गैस</div>
+    <div class="topic" data-topic="diffusion" onclick="selectTopic('diffusion')">विसरण · Diffusion <span class="hi">विसरण</span></div>
+    <div class="sub" data-sub="diffusion" onclick="selectSub('diffusion')">Copper Sulfate in Water — पानी में तांबा सल्फेट</div>
+    <div class="topic" data-topic="evaporation" onclick="selectTopic('evaporation')">वाष्पीकरण · Evaporation <span class="hi">वाष्पीकरण</span></div>
+    <div class="sub" data-sub="evaporation" onclick="selectSub('evaporation')">Water to Vapour — पानी से जल वाष्प</div>
+    <div class="topic" data-topic="separation" onclick="selectTopic('separation')">मिश्रण पृथक्करण · Separation of Mixtures <span class="hi">मिश्रण पृथक्करण</span></div>
+    <div class="sub" data-sub="separation" onclick="selectSub('separation')">Filtration — छानना (अवशेष और छानित तरल)</div>
+    <div class="topic" data-topic="molecule" onclick="selectTopic('molecule')">आणविक मॉडल · Molecular Model <span class="hi">आणविक मॉडल</span></div>
+    <div class="sub" data-sub="molecule" onclick="selectSub('molecule')">H₂O, O₂, CO₂ — जल, ऑक्सीजन, कार्बन डाइऑक्साइड</div>
+    <div class="topic" data-topic="atom" onclick="selectTopic('atom')">परमाणु संरचना · Atomic Structure <span class="hi">परमाणु संरचना</span></div>
+    <div class="sub" data-sub="atom" onclick="selectSub('atom')">Bohr Model — बोर मॉडल (नाभिक और इलेक्ट्रॉन)</div>
+    <div class="topic" data-topic="tyndall" onclick="selectTopic('tyndall')">टिंडल प्रभाव · Tyndall Effect <span class="hi">टिंडल प्रभाव</span></div>
+    <div class="sub" data-sub="tyndall" onclick="selectSub('tyndall')">Light through Colloid — कोलाइड में प्रकाश पथ</div>
+  </div>
+  <div id="stage">
+    <div id="imageWrap"><img id="mainImg" src="" alt=""></div>
+  </div>
+  <div id="hud">
+    <div class="bar">
+      <div>
+        <h2 id="imgTitle">पदार्थ की अवस्थाएँ · States of Matter</h2>
+        <p id="imgDesc">ठोस, द्रव और गैस में कणों की व्यवस्था — वास्तविक प्रयोगशाला चित्र। Particle arrangement in solid, liquid and gas — realistic lab image.</p>
+      </div>
+    </div>
+  </div>
+  <div id="labels"></div>
+  <div class="hint">चित्र पर डॉट पर क्लिक करें · लेबल अंग्रेजी + हिंदी में · क्लास IX NCERT विषय</div>
+</div>
+<script>
+// Label data: subtopic -> {title, desc, img, marks:[{x,y,en,hi}]}
+const DATA={
+ states:{
+  title:'पदार्थ की अवस्थाएँ · States of Matter', desc:'ठोस, द्रव और गैस में कणों की व्यवस्था — वास्तविक प्रयोगशाला चित्र। Particle arrangement in solid, liquid and gas — realistic lab image.',
+  img:'images/states_of_matter.png',
+  marks:[
+    {x:26,y:40,en:'Solid — Tightly Packed',hi:'ठोस — सघन कण'},
+    {x:26,y:52,en:'Particles Vibrate in Place',hi:'कण अपनी जगह कंपन करते हैं'},
+    {x:50,y:40,en:'Liquid — Close but Moving',hi:'द्रव — कण पास लेकिन गतिशील'},
+    {x:50,y:55,en:'Particles Flow',hi:'कण बहते हैं'},
+    {x:80,y:40,en:'Gas — Spread Far Apart',hi:'गैस — कण दूर-दूर'},
+    {x:80,y:52,en:'Particles Move Fast',hi:'कण तेज़ गति से चलते हैं'}
+  ]
+ },
+ diffusion:{
+  title:'विसरण · Diffusion', desc:'तांबा सल्फेट पानी में घुलकर नीला रंग फैलाता है — वास्तविक विसरण प्रयोग। Copper sulfate dissolving in water, colour spreading — real diffusion experiment.',
+  img:'images/diffusion.png',
+  marks:[
+    {x:47,y:42,en:'Beaker',hi:'बीकर'},
+    {x:45,y:62,en:'Water',hi:'पानी'},
+    {x:38,y:30,en:'Copper Sulfate Crystals',hi:'तांबा सल्फेट क्रिस्टल'},
+    {x:62,y:45,en:'Blue Colour Spreading',hi:'नीला रंग फैलता है'},
+    {x:55,y:58,en:'Diffusing Particles',hi:'फैलते कण'}
+  ]
+ },
+ evaporation:{
+  title:'वाष्पीकरण · Evaporation', desc:'पानी गरम करने पर वाष्प बनकर उड़ता है — वास्तविक वाष्पीकरण चित्र। Water turns to vapour on heating — real evaporation image.',
+  img:'images/evaporation.png',
+  marks:[
+    {x:45,y:32,en:'Evaporating Dish',hi:'वाष्पीकरण पात्र'},
+    {x:48,y:50,en:'Water',hi:'पानी'},
+    {x:56,y:30,en:'Water Vapour',hi:'जल वाष्प'},
+    {x:48,y:72,en:'Bunsen Burner Flame',hi:'बंसेन बर्नर लपट'},
+    {x:48,y:60,en:'Wire Gauze',hi:'तार जाली'}
+  ]
+ },
+ separation:{
+  title:'मिश्रण पृथक्करण · Separation of Mixtures', desc:'छानकर अवशेष और छानित तरल अलग करना — वास्तविक फिल्ट्रेशन सेटअप। Filtering to separate residue and filtrate — real filtration setup.',
+  img:'images/separation.png',
+  marks:[
+    {x:47,y:33,en:'Filter Paper',hi:'फिल्टर पेपर'},
+    {x:42,y:27,en:'Funnel',hi:'फनल'},
+    {x:64,y:62,en:'Conical Flask',hi:'शंक्वाकार पात्र'},
+    {x:47,y:44,en:'Residue',hi:'अवशेष'},
+    {x:68,y:56,en:'Filtrate',hi:'छानित तरल'},
+    {x:30,y:45,en:'Iron Stand',hi:'आयरन स्टैंड'}
+  ]
+ },
+ molecule:{
+  title:'आणविक मॉडल · Molecular Model', desc:'H₂O, O₂, CO₂ अणुओं के बॉल-एंड-स्टिक मॉडल — वास्तविक रसायन विज्ञान चित्र। Ball-and-stick models of H₂O, O₂, CO₂ — real chemistry image.',
+  img:'images/molecule.png',
+  marks:[
+    {x:34,y:40,en:'Water Molecule H₂O',hi:'जल अणु H₂O'},
+    {x:55,y:40,en:'Oxygen Molecule O₂',hi:'ऑक्सीजन अणु O₂'},
+    {x:72,y:42,en:'Carbon Dioxide CO₂',hi:'कार्बन डाइऑक्साइड अणु CO₂'},
+    {x:30,y:58,en:'Atom',hi:'परमाणु'},
+    {x:45,y:50,en:'Chemical Bond',hi:'रासायनिक बंध'}
+  ]
+ },
+ atom:{
+  title:'परमाणु संरचना · Atomic Structure', desc:'बोर मॉडल — नाभिक में प्रोटॉन और न्यूट्रॉन, कक्षाओं में इलेक्ट्रॉन — वास्तविक परमाणु चित्र। Bohr model — protons and neutrons in nucleus, electrons in shells — real atom image.',
+  img:'images/atom.png',
+  marks:[
+    {x:45,y:44,en:'Nucleus',hi:'नाभिक'},
+    {x:37,y:40,en:'Proton',hi:'प्रोटॉन'},
+    {x:53,y:48,en:'Neutron',hi:'न्यूट्रॉन'},
+    {x:70,y:44,en:'Electron',hi:'इलेक्ट्रॉन'},
+    {x:65,y:30,en:'Shell / Orbit',hi:'कक्षा / कक्षा पथ'}
+  ]
+ },
+ tyndall:{
+  title:'टिंडल प्रभाव · Tyndall Effect', desc:'कोलाइड में प्रकाश किरण का दृश्य पथ — वास्तविक टिंडल प्रभाव चित्र। Visible path of light beam through colloid — real Tyndall effect image.',
+  img:'images/tyndall.png',
+  marks:[
+    {x:40,y:44,en:'Light Beam',hi:'प्रकाश किरण'},
+    {x:55,y:52,en:'Colloid',hi:'कोलाइड'},
+    {x:66,y:40,en:'Scattered Light',hi:'बिखरा प्रकाश'},
+    {x:48,y:36,en:'Light Path',hi:'प्रकाश पथ'},
+    {x:58,y:56,en:'Particles',hi:'कण'}
+  ]
+ }
+};
+
+// State
+let state={sub:'states'};
+
+// Elements
+const mainImg=document.getElementById('mainImg');
+const imgTitle=document.getElementById('imgTitle');
+const imgDesc=document.getElementById('imgDesc');
+const labelsEl=document.getElementById('labels');
+
+function selectTopic(t){
+  document.querySelectorAll('.topic').forEach(el=>el.classList.remove('active'));
+  const tEl=document.querySelector('[data-topic="'+t+'"]');
+  if(tEl)tEl.classList.add('active');
+  let sub=null;
+  let node=tEl;
+  while((node=node.nextElementSibling)&&node.classList.contains('sub')){sub=node;break;}
+  if(sub)selectSub(sub.dataset.sub);
+}
+function selectSub(sub){
+  state.sub=sub;
+  const d=DATA[sub];
+  if(!d)return;
+  mainImg.src=d.img;
+  imgTitle.textContent=d.title;
+  imgDesc.textContent=d.desc;
+  renderLabels();
+  document.querySelectorAll('.sub').forEach(el=>el.classList.remove('active'));
+  const sel=document.querySelector('[data-sub="'+sub+'"]');
+  if(sel)sel.classList.add('active');
+  document.querySelectorAll('.topic').forEach(el=>el.classList.remove('active'));
+  let tEl=sel;
+  while((tEl=tEl.previousElementSibling)&&!tEl.classList.contains('topic')){}
+  if(tEl)tEl.classList.add('active');
+  document.getElementById('sidebar').classList.remove('open');
+}
+function renderLabels(){
+  labelsEl.innerHTML='';
+  const d=DATA[state.sub];
+  if(!d)return;
+  d.marks.forEach((m,i)=>{
+    const wrap=document.createElement('div');
+    wrap.className='mark';
+    wrap.style.left=m.x+'%';wrap.style.top=m.y+'%';
+    wrap.onclick=(e)=>{e.stopPropagation();document.querySelectorAll('.mark').forEach(m=>m.classList.remove('active'));wrap.classList.add('active');};
+    const dot=document.createElement('div');dot.className='dot';wrap.appendChild(dot);
+    const lbl=document.createElement('div');lbl.className='lbl';
+    lbl.innerHTML='<span class="en">'+m.en+'</span><span class="hi">'+m.hi+'</span>';
+    wrap.appendChild(lbl);
+    labelsEl.appendChild(wrap);
+  });
+}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
+
+// Init
+selectSub('states');
+</script>
+</body>
+</html>
