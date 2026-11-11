@@ -60,6 +60,14 @@
     <div class="sub" data-sub="energy" onclick="selectSub('energy')">Swinging Pendulum — दोलन करता पेंडुलम</div>
     <div class="topic" data-topic="sound" onclick="selectTopic('sound')">ध्वनि · Sound <span class="hi">ध्वनि</span></div>
     <div class="sub" data-sub="sound" onclick="selectSub('sound')">Vibrating Tuning Fork — कंपन करता ट्यूनिंग फोर्क</div>
+    <div class="topic" data-topic="circular" onclick="selectTopic('circular')">वृत्तीय गति · Circular Motion <span class="hi">एकसमान वृत्तीय गति</span></div>
+    <div class="sub" data-sub="circular" onclick="selectSub('circular')">Centripetal Force & Tangential Velocity</div>
+    <div class="topic" data-topic="machines" onclick="selectTopic('machines')">सरल मशीनें · Simple Machines <span class="hi">सरल मशीनें</span></div>
+    <div class="sub" data-sub="machines" onclick="selectSub('machines')">Lever, Pulley & Inclined Plane</div>
+    <div class="topic" data-topic="spheres" onclick="selectTopic('spheres')">पृथ्वी के मंडल · Earth's Spheres <span class="hi">पृथ्वी के पाँच मंडल</span></div>
+    <div class="sub" data-sub="spheres" onclick="selectSub('spheres')">Atmosphere, Hydrosphere, Cryosphere, Geosphere, Biosphere</div>
+    <div class="topic" data-topic="breeze" onclick="selectTopic('breeze')">समुद्री पवन · Sea & Land Breeze <span class="hi">समुद्री व स्थलीय पवन</span></div>
+    <div class="sub" data-sub="breeze" onclick="selectSub('breeze')">Coastal Convection Loop — तटीय संवहन चक्र</div>
   </div>
   <div id="stage">
     <div id="imageWrap"><img id="mainImg" src="" alt=""><div id="labels"></div></div>
@@ -133,6 +141,50 @@ const DATA={
     {x:70,y:45,en:'Sound Waves',hi:'ध्वनि तरंगें'},
     {x:50,y:55,en:'Compression',hi:'संपीडन'},
     {x:50,y:65,en:'Rarefaction',hi:'विरलन'}
+  ]
+ },
+ circular:{
+  title:'एकसमान वृत्तीय गति · Uniform Circular Motion', desc:'वृत्ताकार पथ पर घूमते पिंड पर केंद्र की ओर अभिकेंद्रीय बल व स्पर्शरेखीय वेग। Revolving mass with inward centripetal tension and tangential velocity.',
+  img:'images/circular_motion.jpg',
+  marks:[
+    {x:84,y:49,en:'Revolving Mass',hi:'घूमता हुआ पिंड'},
+    {x:69,y:51,en:'Centripetal Force (Inward)',hi:'अभिकेंद्रीय बल (अंदर की ओर)'},
+    {x:73,y:62,en:'Tangential Velocity',hi:'स्पर्शरेखीय वेग'},
+    {x:23,y:50,en:'Circular Orbit Path',hi:'वृत्ताकार पथ'},
+    {x:50,y:48,en:'Central Pivot',hi:'केंद्रीय धुरी'}
+  ]
+ },
+ machines:{
+  title:'सरल मशीनें · Simple Machines', desc:'उत्तोलक व आलंब, घिरनी तंत्र और आनत तल द्वारा यांत्रिक लाभ। Lever with fulcrum, pulley lift, and inclined ramp.',
+  img:'images/simple_machines.jpg',
+  marks:[
+    {x:20,y:66,en:'Lever Beam',hi:'उत्तोलक दंड'},
+    {x:26,y:73,en:'Triangular Fulcrum',hi:'आलंब'},
+    {x:50,y:31,en:'Pulley & Hanging Load',hi:'घिरनी व भार'},
+    {x:71,y:61,en:'Inclined Plane Ramp',hi:'आनत तल'},
+    {x:73,y:55,en:'Wheeled Cart',hi:'पहिएदार गाड़ी'}
+  ]
+ },
+ spheres:{
+  title:'पृथ्वी के पाँच मंडल · Earth\'s Five Spheres', desc:'वायुमंडल, जलमंडल, हिममंडल, स्थलमंडल व जीवमंडल की परस्पर जुड़ी संरचना। Atmosphere, hydrosphere, cryosphere, geosphere and biosphere.',
+  img:'images/earth_spheres.jpg',
+  marks:[
+    {x:25,y:32,en:'Atmosphere (Air Layer)',hi:'वायुमंडल'},
+    {x:50,y:12,en:'Cryosphere (Polar Ice)',hi:'हिममंडल (ध्रुवीय बर्फ)'},
+    {x:31,y:56,en:'Hydrosphere (Oceans)',hi:'जलमंडल (महासागर)'},
+    {x:24,y:72,en:'Biosphere (Forests & Life)',hi:'जीवमंडल'},
+    {x:49,y:46,en:'Geosphere (Crust & Mantle)',hi:'स्थलमंडल (भूपर्पटी व मेंटल)'}
+  ]
+ },
+ breeze:{
+  title:'समुद्री व स्थलीय पवन · Sea & Land Breeze', desc:'दिन में भूमि के शीघ्र गर्म होने से ठंडी समुद्री हवा का तट की ओर संवहन प्रवाह। Daytime coastal convection: cool sea air flowing onto warm land.',
+  img:'images/sea_land_breeze.jpg',
+  marks:[
+    {x:23,y:60,en:'Cool Ocean Water',hi:'ठंडा महासागर'},
+    {x:44,y:61,en:'Onshore Sea Breeze',hi:'समुद्री पवन (समुद्र से भूमि)'},
+    {x:74,y:59,en:'Warm Sunlit Land',hi:'गर्म तटीय भूमि'},
+    {x:76,y:37,en:'Rising Warm Air',hi:'ऊपर उठती गर्म वायु'},
+    {x:52,y:8,en:'Upper Return Convection',hi:'ऊपरी वापसी संवहन'}
   ]
  }
 };

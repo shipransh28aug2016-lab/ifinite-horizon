@@ -81,8 +81,10 @@
     <div class="sub" data-sub="population" onclick="selectSub('population')">Population — जनसंख्या</div>
     <div class="topic" data-topic="evolution" onclick="selectTopic('evolution')">मानव विकास · Human Evolution <span class="hi">मानव विकास</span></div>
     <div class="sub" data-sub="human_evolution" onclick="selectSub('human_evolution')">Human Evolution — मानव विकास</div>
-    <div class="topic" data-topic="pollution" onclick="selectTopic('pollution')">प्रदूषण · Pollution <span class="hi">प्रदूषण</span></div>
+    <div class="topic" data-topic="pollution" onclick="selectTopic('pollution')">पारिस्थितिकी व प्रदूषण · Ecology & Pollution <span class="hi">प्रदूषण व खाद्य श्रृंखला</span></div>
     <div class="sub" data-sub="pollution" onclick="selectSub('pollution')">Pollution — प्रदूषण</div>
+    <div class="sub" data-sub="food_pyramid" onclick="selectSub('food_pyramid')">Energy Pyramid (10% Law) — ऊर्जा पिरामिड</div>
+    <div class="sub" data-sub="food_web" onclick="selectSub('food_web')">Food Web & Biomagnification — खाद्य जाल</div>
   </div>
   <div id="stage">
     <div id="imageWrap"><img id="mainImg" src="" alt=""><div id="labels"></div></div>
@@ -304,6 +306,27 @@ const DATA={
     {x:44,y:68,en:'Adventitious Roots',hi:'अपस्थानिक जड़ें'},
     {x:66,y:63,en:'Bryophyllum Leaf',hi:'ब्रायोफिलम पत्ती'},
     {x:75,y:51,en:'Leaf-Margin Plantlets',hi:'पत्ती से नए पौधे'}
+  ]
+ },
+ food_pyramid:{
+  title:'Energy Pyramid (10% Law) — पारिस्थितिक ऊर्जा पिरामिड', desc:'उत्पादक से शीर्ष मांसाहारी तक प्रत्येक पोषी स्तर पर केवल ~10% ऊर्जा आगे जाती है। Only ~10% energy transfers up each trophic tier from producers to apex predators.',
+  img:'images/food_pyramid.jpg',
+  marks:[
+    {x:48,y:82,en:'Producers (Plants — Level 1)',hi:'उत्पादक (हरे पौधे)'},
+    {x:48,y:61,en:'Primary Consumers (Deer & Grasshoppers)',hi:'प्राथमिक उपभोक्ता (शाकाहारी)'},
+    {x:48,y:41,en:'Secondary Consumers (Snakes & Frogs)',hi:'द्वितीयक उपभोक्ता'},
+    {x:49,y:19,en:'Apex Predator (Tiger — Level 4)',hi:'शीर्ष उपभोक्ता (बाघ)'}
+  ]
+ },
+ food_web:{
+  title:'Food Web — खाद्य जाल', desc:'पारिस्थितिकी तंत्र में परस्पर जुड़ी खाद्य श्रृंखलाएँ व जैव आवर्धन। Interconnected food chains showing multi-path energy flow.',
+  img:'images/food_web.jpg',
+  marks:[
+    {x:18,y:76,en:'Producers (Grass & Berries)',hi:'उत्पादक (घास व पौधे)'},
+    {x:60,y:77,en:'Primary Consumers (Rabbit & Insects)',hi:'शाकाहारी (खरगोश व टिड्डा)'},
+    {x:41,y:56,en:'Frog (Secondary Consumer)',hi:'मेंढक'},
+    {x:65,y:53,en:'Snake (Tertiary Consumer)',hi:'साँप'},
+    {x:56,y:20,en:'Apex Predators (Eagle & Fox)',hi:'शीर्ष शिकारी (बाज़ व लोमड़ी)'}
   ]
  }
 };

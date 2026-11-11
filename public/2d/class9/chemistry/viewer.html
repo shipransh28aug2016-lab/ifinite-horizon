@@ -64,6 +64,8 @@
     <div class="sub" data-sub="atom" onclick="selectSub('atom')">Bohr Model — बोर मॉडल (नाभिक और इलेक्ट्रॉन)</div>
     <div class="topic" data-topic="tyndall" onclick="selectTopic('tyndall')">टिंडल प्रभाव · Tyndall Effect <span class="hi">टिंडल प्रभाव</span></div>
     <div class="sub" data-sub="tyndall" onclick="selectSub('tyndall')">Light through Colloid — कोलाइड में प्रकाश पथ</div>
+    <div class="topic" data-topic="conserve" onclick="selectTopic('conserve')">द्रव्यमान संरक्षण · Conservation of Mass <span class="hi">द्रव्यमान संरक्षण</span></div>
+    <div class="sub" data-sub="conserve" onclick="selectSub('conserve')">Sealed Flask Reaction on Balance — बंद फ्लास्क व तुला</div>
   </div>
   <div id="stage">
     <div id="imageWrap"><img id="mainImg" src="" alt=""><div id="labels"></div></div>
@@ -159,6 +161,17 @@ const DATA={
     {x:66,y:40,en:'Scattered Light',hi:'बिखरा प्रकाश'},
     {x:48,y:36,en:'Light Path',hi:'प्रकाश पथ'},
     {x:58,y:56,en:'Particles',hi:'कण'}
+  ]
+ },
+ conserve:{
+  title:'द्रव्यमान संरक्षण का नियम · Conservation of Mass', desc:'बंद शंक्वाकार फ्लास्क में अभिक्रिया से पहले व बाद कुल द्रव्यमान स्थिर रहता है। Total mass in sealed flask remains constant before and after reaction.',
+  img:'images/conservation_of_mass.jpg',
+  marks:[
+    {x:50,y:17,en:'Rubber Cork (Sealed System)',hi:'रबर कॉर्क (बंद पात्र)'},
+    {x:50,y:46,en:'Inner Ignition Tube',hi:'आंतरिक प्रज्वलन नली'},
+    {x:50,y:58,en:'White Precipitate (BaSO₄)',hi:'सफेद अवक्षेप (BaSO₄)'},
+    {x:45,y:36,en:'Conical Flask',hi:'शंक्वाकार फ्लास्क'},
+    {x:50,y:77,en:'Digital Weighing Scale',hi:'डिजिटल तुला'}
   ]
  }
 };

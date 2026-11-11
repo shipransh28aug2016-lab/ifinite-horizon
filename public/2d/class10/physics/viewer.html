@@ -76,6 +76,8 @@
     <div class="sub" data-sub="magnetic_field_lines" onclick="selectSub('magnetic_field_lines')">Bar Magnet Iron Filings & Compasses</div>
     <div class="topic" data-topic="induction" onclick="selectTopic('induction')">विद्युतचुंबकीय प्रेरण · Induction <span class="hi">विद्युतचुंबकीय प्रेरण</span></div>
     <div class="sub" data-sub="electromagnetic_induction" onclick="selectSub('electromagnetic_induction')">Moving Magnet, Coil & Galvanometer</div>
+    <div class="topic" data-topic="domestic" onclick="selectTopic('domestic')">घरेलू परिपथ · Domestic Circuit <span class="hi">घरेलू परिपथ</span></div>
+    <div class="sub" data-sub="domestic_circuit" onclick="selectSub('domestic_circuit')">Meter, MCB, Live/Neutral/Earth & Parallel Sockets</div>
   </div>
   <div id="stage">
     <div id="imageWrap"><img id="mainImg" src="" alt=""><div id="labels"></div></div>
@@ -238,6 +240,20 @@ const DATA={
     {x:56,y:50,en:'Copper Solenoid Coil',hi:'ताँबे की परिनालिका'},
     {x:26,y:59,en:'Deflected Galvanometer',hi:'विक्षेपित गैल्वेनोमीटर'},
     {x:38,y:66,en:'Connecting Leads',hi:'संयोजक तार'}
+  ]
+ },
+ domestic_circuit:{
+  title:'घरेलू विद्युत परिपथ · Domestic Electric Circuit', desc:'220 V AC मुख्य आपूर्ति: अर्थिंग, मीटर, MCB फ्यूज, लाल फेज़, काला न्यूट्रल व हरा अर्थ तार समानांतर जुड़ाव में। Meter, MCB fuse, live/neutral/earth wires in parallel.',
+  img:'images/domestic_circuit.jpg',
+  marks:[
+    {x:9,y:53,en:'Earth Copper Electrode',hi:'भू-संपर्कन (अर्थ रॉड)'},
+    {x:30,y:27,en:'Electricity Meter',hi:'विद्युत मीटर'},
+    {x:31,y:61,en:'Main Fuse / MCB Box',hi:'मुख्य फ्यूज / एमसीबी'},
+    {x:48,y:63,en:'Live Wire (Red)',hi:'विद्युन्मय तार (लाल)'},
+    {x:48,y:68,en:'Neutral Wire (Black)',hi:'उदासीन तार (काला)'},
+    {x:48,y:72,en:'Earth Wire (Green)',hi:'भूसंपर्क तार (हरा)'},
+    {x:57,y:30,en:'Parallel Lamp Holders',hi:'समानांतर बल्ब'},
+    {x:89,y:52,en:'3-Pin Wall Socket',hi:'३-पिन सॉकेट'}
   ]
  }
 };
