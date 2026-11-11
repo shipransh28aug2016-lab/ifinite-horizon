@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vigyan Atlas — Class IX Biology: Realistic 2D Images (NCERT)</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0a0f1a;color:#e8eef2;font:14px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Noto Sans,Nirmala UI,"Noto Sans Devanagari",Arial,sans-serif;overflow:hidden}
+  #view{position:relative;width:100vw;height:100vh;background:linear-gradient(180deg,#0f1b33 0%,#070a14 100%);overflow:hidden;display:flex}
+  canvas{display:block}
+  #sidebar{position:absolute;top:0;left:0;width:300px;height:100%;background:rgba(8,15,26,0.95);backdrop-filter:blur(8px);border-right:1px solid rgba(255,255,255,0.08);z-index:25;overflow-y:auto;transform:translateX(-102%);transition:transform .25s}
+  #sidebar.open{transform:translateX(0)}
+  #sidebar h2{font-size:15px;color:#ffd54f;padding:14px;border-bottom:1px solid rgba(255,255,255,0.1)}
+  .topic{padding:8px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;color:#c9d6df;transition:all .15s;display:flex;justify-content:space-between;align-items:center}
+  .topic:hover{background:rgba(255,255,255,0.04);color:#fff}
+  .topic.active{background:linear-gradient(90deg,rgba(255,213,79,0.12),transparent);color:#ffd54f;border-left:3px solid #ffd54f}
+  .sub{padding:6px 14px 6px 34px;font-size:12.5px;color:#9fb3c8;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.03);transition:all .15s;display:flex;justify-content:space-between;align-items:center}
+  .sub:hover{background:rgba(255,255,255,0.03);color:#fff}
+  .sub.active{background:rgba(255,213,79,0.08);color:#ffd54f;border-left:2px solid #ffd54f}
+  #stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,#162432 0%,#070a14 70%);padding:20px;overflow:auto}
+  #imageWrap{position:relative;display:inline-block;max-width:92vw;max-height:82vh;box-shadow:0 20px 60px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden}
+  #imageWrap img{display:block;max-width:100%;max-height:100%;object-fit:contain}
+  .mark{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10}
+  .dot{width:10px;height:10px;background:#ffd54f;border-radius:50%;box-shadow:0 0 12px #ffd54f;border:2px solid #0b1220}
+  .lbl{position:absolute;left:calc(50% + 14px);top:50%;transform:translateY(-50%);background:rgba(8,15,26,.92);backdrop-filter:blur(6px);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:6px 10px;font-size:12.5px;line-height:1.35;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .18s;min-width:140px;max-width:260px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+  .lbl.hi{border-color:#ffd54f;background:rgba(15,30,50,.95);color:#ffd54f}
+  .lbl .en{font-weight:700;display:block}
+  .lbl .hi{font-size:11.5px;color:#8ee0a7;opacity:.9;display:block;margin-top:2px}
+  .mark.active .lbl{opacity:1}
+  .mark.active .dot{background:#ffd54f;box-shadow:0 0 16px #ffd54f}
+  #hud{position:absolute;top:12px;left:320px;right:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;z-index:25;pointer-events:none}
+  #hud>*{pointer-events:auto}
+  .bar{background:rgba(10,16,28,0.8);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:9px 13px;display:flex;gap:11px;align-items:center;flex-wrap:wrap}
+  .bar h2{font-size:15px;color:#ffd54f;margin:0 0 4px 0;letter-spacing:.3px}
+  .bar p{font-size:12px;color:#9fb3c8;margin:0;line-height:1.45}
+  .btn{border:none;background:#1d3a5a;color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:6px 12px;font-size:12.5px;cursor:pointer;transition:all .15s}
+  .btn:hover{background:#2a527e;border-color:#6fb3d8}
+  .btn.active{background:#ffd54f;color:#0b1220;border-color:#ffd54f}
+  .openBtn{position:absolute;top:12px;left:12px;z-index:35}
+  .hint{position:absolute;bottom:14px;left:320px;right:12px;color:#8aa3b8;font-size:12px;z-index:25;text-align:center;pointer-events:none}
+  @media (max-width:900px){#sidebar{width:250px}#hud{left:12px;right:12px}.hint{left:12px;right:12px}}
+  @media (max-width:640px){#sidebar{width:220px}}
+</style>
+</head>
+<body>
+<div id="view">
+  <button class="openBtn btn" onclick="toggleSidebar()">☰ Topics</button>
+  <div id="sidebar">
+    <h2>कक्षा 9 जीव विज्ञान · Class IX Biology</h2>
+    <div class="topic active" data-topic="cell" onclick="selectTopic('cell')">कोशिका · Cell <span class="hi">कोशिका</span></div>
+    <div class="sub active" data-sub="cell_animal" onclick="selectSub('cell_animal')">Animal Cell — पशु कोशिका</div>
+    <div class="sub" data-sub="cell_plant" onclick="selectSub('cell_plant')">Plant Cell — पादप कोशिका</div>
+    <div class="sub" data-sub="cell_nucleus" onclick="selectSub('cell_nucleus')">Nucleus — नाभिक</div>
+    <div class="sub" data-sub="cell_mitochondria" onclick="selectSub('cell_mitochondria')">Mitochondria — माइटोकॉन्ड्रिया</div>
+    <div class="sub" data-sub="cell_membrane" onclick="selectSub('cell_membrane')">Cell Membrane — कोशिका झिल्ली</div>
+    <div class="sub" data-sub="cell_organelles" onclick="selectSub('cell_organelles')">All Organelles — सभी ऑर्गेनेल्स</div>
+    <div class="topic" data-topic="tissues" onclick="selectTopic('tissues')">ऊतक · Tissues <span class="hi">ऊतक</span></div>
+    <div class="sub" data-sub="tissue_epithelial" onclick="selectSub('tissue_epithelial')">Epithelial Tissue — उपकला ऊतक</div>
+    <div class="sub" data-sub="tissue_muscular" onclick="selectSub('tissue_muscular')">Muscular Tissue — मांसपेशी ऊतक</div>
+    <div class="sub" data-sub="tissue_connective" onclick="selectSub('tissue_connective')">Connective Tissue — संयोजी ऊतक</div>
+    <div class="sub" data-sub="tissue_nervous" onclick="selectSub('tissue_nervous')">Nervous Tissue — तंत्रिका ऊतक</div>
+  </div>
+  <div id="stage">
+    <div id="imageWrap"><img id="mainImg" src="" alt=""></div>
+  </div>
+  <div id="hud">
+    <div class="bar">
+      <div>
+        <h2 id="imgTitle">Animal Cell — पशु कोशिका</h2>
+        <p id="imgDesc">वास्तविक पशु कोशिका — ऑर्गेनेल्स सहित विस्तृत PBR चित्र। Realistic animal cell with detailed organelles.</p>
+      </div>
+    </div>
+  </div>
+  <div id="labels"></div>
+  <div class="hint">चित्र पर डॉट पर क्लिक करें · लेबल अंग्रेजी + हिंदी में · क्लास IX NCERT विषय</div>
+</div>
+<script>
+// Label data: subtopic -> {title, desc, marks:[{x,y,en,hi}], img}
+const DATA={
+ cell_animal:{
+  title:'Animal Cell — पशु कोशिका', desc:'वास्तविक पशु कोशिका विस्तृत ऑर्गेनेल्स सहित। Realistic animal cell with detailed organelles.',
+  img:'images/cell_animal.png',
+  marks:[
+    {x:50,y:30,en:'Nucleus',hi:'नाभिक'},
+    {x:65,y:45,en:'Mitochondria',hi:'माइटोकॉन्ड्रिया'},
+    {x:35,y:55,en:'Endoplasmic Reticulum',hi:'एंडोप्लाज्मिक रेटिकुलम'},
+    {x:55,y:65,en:'Golgi Apparatus',hi:'गॉल्गी उपकरण'},
+    {x:72,y:35,en:'Ribosomes',hi:'राइबोसोम'},
+    {x:42,y:72,en:'Lysosomes',hi:'लाइसोसोम'},
+    {x:28,y:48,en:'Cell Membrane',hi:'कोशिका झिल्ली'},
+    {x:60,y:80,en:'Cytoplasm',hi:'साइटोप्लाज्म'}
+  ]
+ },
+ cell_plant:{
+  title:'Plant Cell — पादप कोशिका', desc:'वास्तविक पादप कोशिका कोशिका भित्ति और क्लोरोप्लास्ट सहित। Realistic plant cell with cell wall and chloroplasts.',
+  img:'images/cell_plant.png',
+  marks:[
+    {x:48,y:30,en:'Cell Wall',hi:'कोशिका भित्ति'},
+    {x:50,y:38,en:'Cell Membrane',hi:'कोशिका झिल्ली'},
+    {x:68,y:40,en:'Chloroplast',hi:'क्लोरोप्लास्ट'},
+    {x:50,y:62,en:'Central Vacuole',hi:'केंद्रीय रसकोष'},
+    {x:42,y:48,en:'Nucleus',hi:'नाभिक'},
+    {x:62,y:68,en:'Cytoplasm',hi:'साइटोप्लाज्म'}
+  ]
+ },
+ cell_nucleus:{
+  title:'Nucleus — नाभिक', desc:'कोशिका नाभिक का विस्तृत क्रॉस-सेक्शन। Detailed cell nucleus cross-section.',
+  img:'images/cell_nucleus.png',
+  marks:[
+    {x:50,y:30,en:'Nuclear Envelope',hi:'नाभिक आवरण'},
+    {x:50,y:40,en:'Nucleolus',hi:'नाभिक केंद्रक'},
+    {x:65,y:50,en:'Chromatin',hi:'क्रोमेटिन'},
+    {x:35,y:60,en:'Nuclear Pore',hi:'नाभिक छिद्र'},
+    {x:50,y:75,en:'Nucleoplasm',hi:'नाभिकद्रव्य'}
+  ]
+ },
+ cell_mitochondria:{
+  title:'Mitochondria — माइटोकॉन्ड्रिया', desc:'ऊर्जा उत्पादक ऑर्गेनेल विस्तृत क्रिस्टेई सहित। Powerhouse mitochondrion with detailed cristae.',
+  img:'images/cell_mitochondria.png',
+  marks:[
+    {x:45,y:35,en:'Outer Membrane',hi:'बाहरी झिल्ली'},
+    {x:50,y:50,en:'Inner Membrane (Cristae)',hi:'आंतरिक झिल्ली (क्रिस्टे)'},
+    {x:50,y:65,en:'Matrix',hi:'मैट्रिक्स'},
+    {x:68,y:45,en:'Cristae Folds',hi:'क्रिस्टे तहें'}
+  ]
+ },
+ cell_membrane:{
+  title:'Cell Membrane — कोशिका झिल्ली', desc:'फॉस्फोलिपिड द्विस्तर और एम्बेडेड प्रोटीन चैनल। Phospholipid bilayer with embedded protein channels.',
+  img:'images/cell_membrane.png',
+  marks:[
+    {x:45,y:40,en:'Phospholipid Bilayer',hi:'फॉस्फोलिपिड द्विस्तर'},
+    {x:60,y:45,en:'Protein Channel',hi:'प्रोटीन चैनल'},
+    {x:35,y:60,en:'Cholesterol',hi:'कोलेस्ट्रॉल'},
+    {x:50,y:75,en:'Carbohydrate Chain',hi:'कार्बोहाइड्रेट श्रृंखला'}
+  ]
+ },
+ cell_organelles:{
+  title:'All Organelles — सभी ऑर्गेनेल्स', desc:'कोशिका के सभी ऑर्गेनेल्स का अवलोकन। Overview of all cell organelles.',
+  img:'images/cell_organelles.png',
+  marks:[
+    {x:30,y:35,en:'Nucleus',hi:'नाभिक'},
+    {x:60,y:30,en:'Mitochondria',hi:'माइटोकॉन्ड्रिया'},
+    {x:45,y:60,en:'Endoplasmic Reticulum',hi:'एंडोप्लाज्मिक रेटिकुलम'},
+    {x:70,y:55,en:'Golgi Apparatus',hi:'गॉल्गी उपकरण'},
+    {x:35,y:75,en:'Lysosome',hi:'लाइसोसोम'},
+    {x:65,y:70,en:'Ribosomes',hi:'राइबोसोम'},
+    {x:50,y:85,en:'Vacuole',hi:'रसकोष'}
+  ]
+ },
+ tissue_epithelial:{
+  title:'Epithelial Tissue — उपकला ऊतक', desc:'घनिष्ठ रूप से पैक्ड कोशिकाएं परतें बनाती हैं। Closely packed cells forming layers.',
+  img:'images/tissue_epithelial.png',
+  marks:[
+    {x:35,y:35,en:'Squamous Cells',hi:'स्क्वैमस कोशिकाएं'},
+    {x:55,y:35,en:'Cuboidal Cells',hi:'क्यूबोइडल कोशिकाएं'},
+    {x:72,y:35,en:'Columnar Cells',hi:'कॉलमर कोशिकाएं'},
+    {x:50,y:65,en:'Basement Membrane',hi:'बेसमेंट झिल्ली'}
+  ]
+ },
+ tissue_muscular:{
+  title:'Muscular Tissue — मांसपेशी ऊतक', desc:'स्केलेटल, स्मूथ और कार्डियक मांसपेशी फाइबर। Skeletal, smooth and cardiac muscle fibers.',
+  img:'images/tissue_muscular.png',
+  marks:[
+    {x:30,y:40,en:'Skeletal Muscle',hi:'स्केलेटल मांसपेशी'},
+    {x:50,y:40,en:'Smooth Muscle',hi:'स्मूथ मांसपेशी'},
+    {x:70,y:40,en:'Cardiac Muscle',hi:'कार्डियक मांसपेशी'}
+  ]
+ },
+ tissue_connective:{
+  title:'Connective Tissue — संयोजी ऊतक', desc:'कोलेजन फाइबर, फाइब्रोब्लास्ट, वसा कोशिकाएं। Collagen fibers, fibroblasts, adipocytes.',
+  img:'images/tissue_connective.png',
+  marks:[
+    {x:30,y:35,en:'Collagen Fibers',hi:'कोलेजन फाइबर'},
+    {x:55,y:35,en:'Fibroblasts',hi:'फाइब्रोब्लास्ट'},
+    {x:30,y:65,en:'Adipocytes (Fat)',hi:'वसा कोशिकाएं'},
+    {x:70,y:55,en:'Cartilage',hi:'कार्टिलेज'},
+    {x:70,y:80,en:'Bone',hi:'हड्डी'}
+  ]
+ },
+ tissue_nervous:{
+  title:'Nervous Tissue — तंत्रिका ऊतक', desc:'न्यूरॉन, डेंड्राइट, एक्सॉन, माइलिन आवरण। Neuron, dendrites, axon, myelin sheath.',
+  img:'images/tissue_nervous.png',
+  marks:[
+    {x:35,y:40,en:'Cell Body (Soma)',hi:'कोशिका शरीर'},
+    {x:20,y:30,en:'Dendrites',hi:'डेंड्राइट'},
+    {x:75,y:45,en:'Axon',hi:'एक्सॉन'},
+    {x:65,y:60,en:'Myelin Sheath',hi:'माइलिन आवरण'},
+    {x:85,y:40,en:'Synapse',hi:'सिनैप्स'}
+  ]
+ }
+};
+
+// State
+let state={sub:'cell_animal'};
+
+// Elements
+const mainImg=document.getElementById('mainImg');
+const imgTitle=document.getElementById('imgTitle');
+const imgDesc=document.getElementById('imgDesc');
+const labelsEl=document.getElementById('labels');
+
+function selectTopic(t){
+  // mark topic active (visual only; sub handles actual load)
+  document.querySelectorAll('.topic').forEach(el=>el.classList.remove('active'));
+  const tEl=document.querySelector('[data-topic="'+t+'"]');
+  if(tEl)tEl.classList.add('active');
+  // load first sub of topic
+  const firstSub=document.querySelector('[data-topic="'+t+'"]+.sub, [data-topic="'+t+'"] ~ .sub');
+  // fallback: find first sub after this topic
+  let sub=null;
+  let node=tEl;
+  while((node=node.nextElementSibling)&&node.classList.contains('sub')){sub=node;break;}
+  if(sub)selectSub(sub.dataset.sub);
+}
+function selectSub(sub){
+  state.sub=sub;
+  const d=DATA[sub];
+  if(!d)return;
+  mainImg.src=d.img;
+  imgTitle.textContent=d.title;
+  imgDesc.textContent=d.desc;
+  renderLabels();
+  // sidebar active states
+  document.querySelectorAll('.sub').forEach(el=>el.classList.remove('active'));
+  const sel=document.querySelector('[data-sub="'+sub+'"]');
+  if(sel)sel.classList.add('active');
+  // topic active
+  document.querySelectorAll('.topic').forEach(el=>el.classList.remove('active'));
+  // find topic by scanning backwards
+  let tEl=sel;
+  while((tEl=tEl.previousElementSibling)&&!tEl.classList.contains('topic')){}
+  if(tEl)tEl.classList.add('active');
+  // close sidebar on mobile-ish
+  document.getElementById('sidebar').classList.remove('open');
+}
+function renderLabels(){
+  labelsEl.innerHTML='';
+  const d=DATA[state.sub];
+  if(!d)return;
+  d.marks.forEach((m,i)=>{
+    const wrap=document.createElement('div');
+    wrap.className='mark';
+    wrap.style.left=m.x+'%';wrap.style.top=m.y+'%';
+    wrap.onclick=(e)=>{e.stopPropagation();document.querySelectorAll('.mark').forEach(m=>m.classList.remove('active'));wrap.classList.add('active');};
+    const dot=document.createElement('div');dot.className='dot';wrap.appendChild(dot);
+    const lbl=document.createElement('div');lbl.className='lbl';
+    lbl.innerHTML='<span class="en">'+m.en+'</span><span class="hi">'+m.hi+'</span>';
+    wrap.appendChild(lbl);
+    labelsEl.appendChild(wrap);
+  });
+}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
+
+// Init
+selectSub('cell_animal');
+</script>
+</body>
+</html>
