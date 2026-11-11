@@ -60,6 +60,23 @@
     <div class="sub" data-sub="tissue_muscular" onclick="selectSub('tissue_muscular')">Muscular Tissue — मांसपेशी ऊतक</div>
     <div class="sub" data-sub="tissue_connective" onclick="selectSub('tissue_connective')">Connective Tissue — संयोजी ऊतक</div>
     <div class="sub" data-sub="tissue_nervous" onclick="selectSub('tissue_nervous')">Nervous Tissue — तंत्रिका ऊतक</div>
+    <div class="topic" data-topic="digestive" onclick="selectTopic('digestive')">पाचन तंत्र · Digestive System <span class="hi">पाचन तंत्र</span></div>
+    <div class="sub" data-sub="digestive_mouth" onclick="selectSub('digestive_mouth')">Mouth & Oral Cavity — मुंह और लार ग्रंथि</div>
+    <div class="sub" data-sub="digestive_stomach" onclick="selectSub('digestive_stomach')">Stomach — पेट</div>
+    <div class="sub" data-sub="digestive_intestine" onclick="selectSub('digestive_intestine')">Intestines — छोटी और बड़ी आंत</div>
+    <div class="sub" data-sub="digestive_liver" onclick="selectSub('digestive_liver')">Liver & Pancreas — यकृत और अग्न्याशय</div>
+    <div class="topic" data-topic="flower" onclick="selectTopic('flower')">फूल · Flower <span class="hi">फूल</span></div>
+    <div class="sub" data-sub="flower" onclick="selectSub('flower')">Flower Parts — फूल के अंग</div>
+    <div class="topic" data-topic="seeds" onclick="selectTopic('seeds')">बीज और अंकुरण · Seeds & Germination <span class="hi">बीज और अंकुरण</span></div>
+    <div class="sub" data-sub="seeds_germination" onclick="selectSub('seeds_germination')">Seed & Germination — बीज और अंकुरण</div>
+    <div class="topic" data-topic="respiratory" onclick="selectTopic('respiratory')">श्वसन तंत्र · Respiratory System <span class="hi">श्वसन तंत्र</span></div>
+    <div class="sub" data-sub="respiratory_system" onclick="selectSub('respiratory_system')">Respiratory System — श्वसन तंत्र</div>
+    <div class="topic" data-topic="skeleton" onclick="selectTopic('skeleton')">कंकाल और जोड़ · Skeleton & Joints <span class="hi">कंकाल और जोड़</span></div>
+    <div class="sub" data-sub="skeleton_joint" onclick="selectSub('skeleton_joint')">Skeleton & Joints — कंकाल और जोड़</div>
+    <div class="topic" data-topic="skin" onclick="selectTopic('skin')">त्वचा · Skin <span class="hi">त्वचा</span></div>
+    <div class="sub" data-sub="skin" onclick="selectSub('skin')">Skin Layers — त्वचा की परतें</div>
+    <div class="topic" data-topic="teeth" onclick="selectTopic('teeth')">दांत · Teeth <span class="hi">दांत</span></div>
+    <div class="sub" data-sub="teeth" onclick="selectSub('teeth')">Teeth Types — दांत के प्रकार</div>
   </div>
   <div id="stage">
     <div id="imageWrap"><img id="mainImg" src="" alt=""></div>
@@ -76,7 +93,7 @@
   <div class="hint">चित्र पर डॉट पर क्लिक करें · लेबल अंग्रेजी + हिंदी में · क्लास IX NCERT विषय</div>
 </div>
 <script>
-// Label data: subtopic -> {title, desc, marks:[{x,y,en,hi}], img}
+// Label data: subtopic -> {title, desc, img, marks:[{x,y,en,hi}]}
 const DATA={
  cell_animal:{
   title:'Animal Cell — पशु कोशिका', desc:'वास्तविक पशु कोशिका विस्तृत ऑर्गेनेल्स सहित। Realistic animal cell with detailed organelles.',
@@ -188,6 +205,126 @@ const DATA={
     {x:65,y:60,en:'Myelin Sheath',hi:'माइलिन आवरण'},
     {x:85,y:40,en:'Synapse',hi:'सिनैप्स'}
   ]
+ },
+ digestive_mouth:{
+  title:'Mouth & Oral Cavity — मुंह और लार ग्रंथि', desc:'मुंह, दांत, जीभ, लार ग्रंथि विस्तृत संरचना। Mouth, teeth, tongue, salivary glands detailed structure.',
+  img:'images/digestive_mouth.png',
+  marks:[
+    {x:45,y:30,en:'Teeth',hi:'दांत'},
+    {x:50,y:55,en:'Tongue',hi:'जीभ'},
+    {x:30,y:45,en:'Salivary Gland',hi:'लार ग्रंथि'},
+    {x:70,y:45,en:'Hard Palate',hi:'कठोर तालु'},
+    {x:50,y:70,en:'Oral Mucosa',hi:'मुख श्लेष्मला'},
+    {x:60,y:30,en:'Tonsil',hi:'टॉन्सिल'}
+  ]
+ },
+ digestive_stomach:{
+  title:'Stomach — पेट', desc:'पेट का विस्तृत क्रॉस-सेक्शन, रूगे फोल्ड्स और गैस्ट्रिक ग्रंथियां। Detailed stomach cross-section with rugae folds.',
+  img:'images/digestive_stomach.png',
+  marks:[
+    {x:40,y:25,en:'Fundus',hi:'फंडस'},
+    {x:50,y:45,en:'Body',hi:'पेट का शरीर'},
+    {x:65,y:60,en:'Pylorus',hi:'पाइलोरस'},
+    {x:35,y:60,en:'Rugae Folds',hi:'रूगे तहें'},
+    {x:20,y:45,en:'Esophagus',hi:'भोजन नली'},
+    {x:75,y:65,en:'Duodenum',hi:'डुओडेनम'}
+  ]
+ },
+ digestive_intestine:{
+  title:'Intestines — छोटी और बड़ी आंत', desc:'छोटी आंत में विilli, बड़ी आंत में haustra। Small intestine villi, large intestine haustra.',
+  img:'images/digestive_intestine.png',
+  marks:[
+    {x:40,y:40,en:'Small Intestine',hi:'छोटी आंत'},
+    {x:30,y:60,en:'Villi',hi:'विilli'},
+    {x:70,y:45,en:'Large Intestine',hi:'बड़ी आंत'},
+    {x:75,y:65,en:'Appendix',hi:'अपेंडिक्स'},
+    {x:55,y:75,en:'Rectum',hi:'मलाशय'},
+    {x:40,y:75,en:'Microvilli',hi:'सूक्ष्म विilli'}
+  ]
+ },
+ digestive_liver:{
+  title:'Liver & Pancreas — यकृत और अग्न्याशय', desc:'यकृत के पाल्व, अग्न्याशय, पित्ताशय। Liver lobes, pancreas, gallbladder.',
+  img:'images/digestive_liver.png',
+  marks:[
+    {x:35,y:35,en:'Right Lobe',hi:'दाहिना पाल्व'},
+    {x:50,y:35,en:'Left Lobe',hi:'बायां पाल्व'},
+    {x:45,y:55,en:'Gallbladder',hi:'पित्ताशय'},
+    {x:65,y:50,en:'Pancreas',hi:'अग्न्याशय'},
+    {x:30,y:65,en:'Bile Duct',hi:'पित्त नलिका'}
+  ]
+ },
+ flower:{
+  title:'Flower Parts — फूल के अंग', desc:'फूल के सभी अंग विस्तृत — पुंकेसर, स्त्रीकेसर, पुष्पपत्र, दलपत्र। All flower parts detailed.',
+  img:'images/flower.png',
+  marks:[
+    {x:50,y:30,en:'Petal',hi:'पुष्पपत्र'},
+    {x:30,y:45,en:'Sepal',hi:'दलपत्र'},
+    {x:65,y:45,en:'Stamen (Anther)',hi:'पुंकेसर (परागकोष)'},
+    {x:50,y:60,en:'Pistil (Stigma)',hi:'स्त्रीकेसर (कलंक)'},
+    {x:50,y:72,en:'Ovary',hi:'अंडाशय'},
+    {x:50,y:80,en:'Ovule',hi:'अंडाणु'}
+  ]
+ },
+ seeds_germination:{
+  title:'Seed & Germination — बीज और अंकुरण', desc:'बीज कोट, भ्रूण, मूलांकुर, अग्रांकुर, बीजपत्र। Seed coat, embryo, radicle, plumule, cotyledons.',
+  img:'images/seeds_germination.png',
+  marks:[
+    {x:45,y:35,en:'Seed Coat',hi:'बीज आवरण'},
+    {x:50,y:50,en:'Embryo',hi:'भ्रूण'},
+    {x:35,y:65,en:'Radicle',hi:'मूलांकुर'},
+    {x:65,y:65,en:'Plumule',hi:'अग्रांकुर'},
+    {x:35,y:45,en:'Cotyledon',hi:'बीजपत्र'},
+    {x:60,y:30,en:'Seedling',hi:'अंकुरित पौधा'}
+  ]
+ },
+ respiratory_system:{
+  title:'Respiratory System — श्वसन तंत्र', desc:'ट्रेकिया, ब्रॉंकी, फेफड़े, वायुकोष, डायाफ्राम। Trachea, bronchi, lungs, alveoli, diaphragm.',
+  img:'images/respiratory_system.png',
+  marks:[
+    {x:30,y:35,en:'Trachea',hi:'श्वासनली'},
+    {x:45,y:45,en:'Bronchus',hi:'ब्रॉंकी'},
+    {x:30,y:65,en:'Left Lung',hi:'बायां फेफड़ा'},
+    {x:70,y:65,en:'Right Lung',hi:'दायां फेफड़ा'},
+    {x:50,y:82,en:'Diaphragm',hi:'डायाफ्राम'},
+    {x:55,y:55,en:'Alveoli',hi:'वायुकोष'}
+  ]
+ },
+ skeleton_joint:{
+  title:'Skeleton & Joints — कंकाल और जोड़', desc:'हड्डियां, कोहनी, घुटना, कूल्हा जोड़। Bones, elbow, knee, hip joints.',
+  img:'images/skeleton_joint.png',
+  marks:[
+    {x:30,y:30,en:'Skull',hi:'खोपड़ी'},
+    {x:30,y:45,en:'Rib Cage',hi:'पसली पिंजरा'},
+    {x:20,y:60,en:'Humerus',hi:'ह्यूमरस'},
+    {x:45,y:60,en:'Elbow Joint',hi:'कोहनी जोड़'},
+    {x:50,y:40,en:'Pelvis',hi:'पेल्विस'},
+    {x:45,y:70,en:'Knee Joint',hi:'घुटना जोड़'},
+    {x:35,y:80,en:'Femur',hi:'फीमर'}
+  ]
+ },
+ skin:{
+  title:'Skin Layers — त्वचा की परतें', desc:'एपिडर्मिस, डर्मिस, हाइपोडर्मिस, बाल कूप, पसीना ग्रंथि। Epidermis, dermis, hypodermis, sweat gland.',
+  img:'images/skin.png',
+  marks:[
+    {x:50,y:25,en:'Epidermis',hi:'एपिडर्मिस'},
+    {x:50,y:50,en:'Dermis',hi:'डर्मिस'},
+    {x:50,y:75,en:'Hypodermis (Fat)',hi:'हाइपोडर्मिस'},
+    {x:30,y:50,en:'Hair Follicle',hi:'रोम कूप'},
+    {x:70,y:50,en:'Sweat Gland',hi:'पसीना ग्रंथि'},
+    {x:50,y:65,en:'Blood Vessel',hi:'रक्त वाहिका'}
+  ]
+ },
+ teeth:{
+  title:'Teeth Types — दांत के प्रकार', desc:'इनसाइजर, कैनाइन, प्रीमोलर, मोलर। Incisor, canine, premolar, molar.',
+  img:'images/teeth.png',
+  marks:[
+    {x:25,y:50,en:'Incisor',hi:'काटने वाला दांत'},
+    {x:45,y:45,en:'Canine',hi:'कैनाइन दांत'},
+    {x:65,y:55,en:'Premolar',hi:'प्रीमोलर'},
+    {x:85,y:60,en:'Molar',hi:'मोलर दांत'},
+    {x:50,y:25,en:'Enamel',hi:'इनेमल'},
+    {x:50,y:75,en:'Gum',hi:'मसूड़ा'}
+  ]
  }
 };
 
@@ -201,13 +338,10 @@ const imgDesc=document.getElementById('imgDesc');
 const labelsEl=document.getElementById('labels');
 
 function selectTopic(t){
-  // mark topic active (visual only; sub handles actual load)
   document.querySelectorAll('.topic').forEach(el=>el.classList.remove('active'));
   const tEl=document.querySelector('[data-topic="'+t+'"]');
   if(tEl)tEl.classList.add('active');
   // load first sub of topic
-  const firstSub=document.querySelector('[data-topic="'+t+'"]+.sub, [data-topic="'+t+'"] ~ .sub');
-  // fallback: find first sub after this topic
   let sub=null;
   let node=tEl;
   while((node=node.nextElementSibling)&&node.classList.contains('sub')){sub=node;break;}
@@ -221,17 +355,13 @@ function selectSub(sub){
   imgTitle.textContent=d.title;
   imgDesc.textContent=d.desc;
   renderLabels();
-  // sidebar active states
   document.querySelectorAll('.sub').forEach(el=>el.classList.remove('active'));
   const sel=document.querySelector('[data-sub="'+sub+'"]');
   if(sel)sel.classList.add('active');
-  // topic active
   document.querySelectorAll('.topic').forEach(el=>el.classList.remove('active'));
-  // find topic by scanning backwards
   let tEl=sel;
   while((tEl=tEl.previousElementSibling)&&!tEl.classList.contains('topic')){}
   if(tEl)tEl.classList.add('active');
-  // close sidebar on mobile-ish
   document.getElementById('sidebar').classList.remove('open');
 }
 function renderLabels(){
