@@ -76,6 +76,7 @@
 </script>
 <script type="module">
 import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/OrbitControls.js';
 
 // ---------- State ----------
 let state = { topic: 'cellcycle', playing: true, isolate: false };
@@ -99,7 +100,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 view.appendChild(renderer.domElement);
 
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.06;
 controls.minDistance = 1.5;
@@ -860,8 +861,13 @@ document.getElementById('btnIso').addEventListener('click',()=>{
   document.getElementById('btnIso').textContent=state.isolate?'Show All':'Isolate';
 });
 
+window.selectTopic = selectTopic;
+window.toggleSidebar = toggleSidebar;
+
 // Start
-selectTopic('cellcycle');
+const _qp = new URLSearchParams(window.location.search);
+const _reqTopic = _qp.get('topic');
+selectTopic((_reqTopic && TOPICS[_reqTopic]) ? _reqTopic : 'cellcycle');
 </script>
 </body>
 </html>

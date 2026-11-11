@@ -113,6 +113,7 @@
 </script>
 <script type="module">
 import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/OrbitControls.js';
 
 // ---------- State ----------
 let state = { exp: 'reflection', step: 0 };
@@ -136,7 +137,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 view.appendChild(renderer.domElement);
 
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; controls.dampingFactor = 0.06;
 controls.minDistance = 1.6; controls.maxDistance = 20; controls.autoRotate = false;
 
@@ -208,7 +209,7 @@ function label(id,text,pos,active,hi){
     if(hi)el.classList.add('hi');else el.classList.remove('hi');
   }else{el.classList.remove('show');}
 }
-function clearLabels(){labelEls.forEach(e=>e.classList.remove('show');)}
+function clearLabels(){labelEls.forEach(e=>e.classList.remove('show'));}
 // ---------- Current model ----------
 let currentGroup=null;
 function clearScene(){
@@ -310,7 +311,7 @@ const EXPS={
   conc:'उत्तल लेंस द्वारा वास्तविक और आभासी दोनों प्रकार के प्रतिबिम्ब बन सकते हैं।'
  },
  ohm:{
-  title:'ओम का नियम · Ohm's Law', sub:'V = IR — विभवान्तर और धारा',
+  title:"ओम का नियम · Ohm's Law", sub:'V = IR — विभवान्तर और धारा',
   aim:'चालक में विभवान्तर और धारा के बीच संबंध ज्ञात करना।',
   mat:['बैटरी','एम्मीटर','वोल्टमीटर','प्रतिरोधक','की','तार'],
   steps:[
@@ -516,7 +517,13 @@ window.addEventListener('resize',()=>{
   camera.updateProjectionMatrix();
   renderer.setSize(view.clientWidth,view.clientHeight);
 });
-buildExp('reflection');
+window.selectExp = selectExp;
+window.toggleSidebar = toggleSidebar;
+window.toggleLab = toggleLab;
+
+const _qp=new URLSearchParams(window.location.search);
+const _reqExp=_qp.get('topic')||_qp.get('exp');
+selectExp((_reqExp&&EXPS[_reqExp])?_reqExp:'reflection');
 </script>
 </body>
 </html>
