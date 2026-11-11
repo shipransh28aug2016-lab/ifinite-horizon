@@ -21,9 +21,11 @@
   #stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,#162432 0%,#070a14 70%);padding:20px;overflow:auto}
   #imageWrap{position:relative;display:inline-block;max-width:92vw;max-height:82vh;box-shadow:0 20px 60px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden}
   #imageWrap img{display:block;max-width:100%;max-height:100%;object-fit:contain}
-  .mark{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10}
+  .mark{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10;pointer-events:auto}
+  #labels{position:absolute;inset:0;pointer-events:none;z-index:10}
   .dot{width:10px;height:10px;background:#ffd54f;border-radius:50%;box-shadow:0 0 12px #ffd54f;border:2px solid #0b1220}
   .lbl{position:absolute;left:calc(50% + 14px);top:50%;transform:translateY(-50%);background:rgba(8,15,26,.92);backdrop-filter:blur(6px);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:6px 10px;font-size:12.5px;line-height:1.35;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .18s;min-width:140px;max-width:260px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+  .mark.flip .lbl{left:auto;right:calc(50% + 14px)}
   .lbl.hi{border-color:#ffd54f;background:rgba(15,30,50,.95);color:#ffd54f}
   .lbl .en{font-weight:700;display:block}
   .lbl .hi{font-size:11.5px;color:#8ee0a7;opacity:.9;display:block;margin-top:2px}
@@ -48,8 +50,9 @@
   <button class="openBtn btn" onclick="toggleSidebar()">☰ Topics</button>
   <div id="sidebar">
     <h2>कक्षा 10 जीव विज्ञान · Class X Biology</h2>
-    <div class="topic active" data-topic="cell_cycle" onclick="selectTopic('cell_cycle')">कोशिका चक्र · Cell Cycle <span class="hi">कोशिका चक्र</span></div>
+    <div class="topic active" data-topic="cellcycle" onclick="selectTopic('cellcycle')">कोशिका चक्र · Cell Cycle <span class="hi">कोशिका चक्र</span></div>
     <div class="sub active" data-sub="cell_cycle_division" onclick="selectSub('cell_cycle_division')">Cell Cycle & Division — कोशिका चक्र</div>
+    <div class="topic" data-topic="chromosome" onclick="selectTopic('chromosome')">क्रोमोसोम · Chromosome <span class="hi">क्रोमोसोम</span></div>
     <div class="sub" data-sub="chromosome_structure" onclick="selectSub('chromosome_structure')">Chromosome Structure — क्रोमोसोम संरचना</div>
     <div class="topic" data-topic="genetics" onclick="selectTopic('genetics')">अनुवंशिकी · Genetics <span class="hi">अनुवंशिकी</span></div>
     <div class="sub" data-sub="genetics_dna" onclick="selectSub('genetics_dna')">DNA & Inheritance — डीएनए और विरासत</div>
@@ -71,6 +74,9 @@
     <div class="sub" data-sub="endocrine_system" onclick="selectSub('endocrine_system')">Endocrine System — अंतःस्रावी तंत्र</div>
     <div class="topic" data-topic="reproductive" onclick="selectTopic('reproductive')">प्रजनन तंत्र · Reproductive System <span class="hi">प्रजनन तंत्र</span></div>
     <div class="sub" data-sub="reproductive_system" onclick="selectSub('reproductive_system')">Reproductive System — प्रजनन तंत्र</div>
+    <div class="sub" data-sub="binary_fission" onclick="selectSub('binary_fission')">Binary Fission (Amoeba) — द्वि-विभाजन</div>
+    <div class="sub" data-sub="budding_hydra" onclick="selectSub('budding_hydra')">Budding (Hydra) — मुकुलन</div>
+    <div class="sub" data-sub="vegetative_propagation" onclick="selectSub('vegetative_propagation')">Vegetative Propagation — कायिक प्रवर्धन</div>
     <div class="topic" data-topic="population" onclick="selectTopic('population')">जनसंख्या · Population <span class="hi">जनसंख्या</span></div>
     <div class="sub" data-sub="population" onclick="selectSub('population')">Population — जनसंख्या</div>
     <div class="topic" data-topic="evolution" onclick="selectTopic('evolution')">मानव विकास · Human Evolution <span class="hi">मानव विकास</span></div>
@@ -79,7 +85,7 @@
     <div class="sub" data-sub="pollution" onclick="selectSub('pollution')">Pollution — प्रदूषण</div>
   </div>
   <div id="stage">
-    <div id="imageWrap"><img id="mainImg" src="" alt=""></div>
+    <div id="imageWrap"><img id="mainImg" src="" alt=""><div id="labels"></div></div>
   </div>
   <div id="hud">
     <div class="bar">
@@ -90,7 +96,6 @@
     </div>
     <div class="bar"><a class="btn" href="../../../science/index.html#2d" style="text-decoration:none">🏠 Home</a></div>
   </div>
-  <div id="labels"></div>
   <div class="hint">चित्र पर डॉट पर क्लिक करें · लेबल अंग्रेजी + हिंदी में · क्लास X NCERT विषय (15 टॉपिक पूरे)</div>
 </div>
 <script>
@@ -267,6 +272,39 @@ const DATA={
     {x:70,y:60,en:'Trash',hi:'कचरा'},
     {x:50,y:80,en:'Air & Land Pollution',hi:'वायु और भूमि प्रदूषण'}
   ]
+ },
+ binary_fission:{
+  title:'Binary Fission in Amoeba — अमीबा में द्वि-विभाजन', desc:'एकल अमीबा कोशिका का केंद्रक व कोशिकाद्रव्य विभाजन द्वारा दो पुत्री कोशिकाओं में विभाजन। Amoeba parent cell dividing into two daughter cells.',
+  img:'images/binary_fission.jpg',
+  marks:[
+    {x:54,y:31,en:'Dividing Nucleus 1',hi:'विभाजित केंद्रक १'},
+    {x:49,y:68,en:'Dividing Nucleus 2',hi:'विभाजित केंद्रक २'},
+    {x:52,y:51,en:'Cytoplasmic Constriction',hi:'कोशिकाद्रव्य संकुचन'},
+    {x:61,y:25,en:'Contractile Vacuole',hi:'संकुचनशील रिक्तिका'},
+    {x:35,y:62,en:'Pseudopodia',hi:'कूटपाद'}
+  ]
+ },
+ budding_hydra:{
+  title:'Budding in Hydra — हाइड्रा में मुकुलन', desc:'जनक हाइड्रा के शरीर से नया मुकुल विकसित होकर स्वतंत्र जीव बनता है। Outgrowth bud developing tentacles on parent Hydra.',
+  img:'images/budding_hydra.jpg',
+  marks:[
+    {x:45,y:56,en:'Parent Hydra Body',hi:'जनक हाइड्रा'},
+    {x:48,y:25,en:'Parent Tentacles',hi:'स्पर्शक'},
+    {x:54,y:68,en:'Growing Daughter Bud',hi:'विकसित मुकुल'},
+    {x:59,y:60,en:'Bud Tentacles',hi:'मुकुल स्पर्शक'},
+    {x:43,y:84,en:'Basal Disc',hi:'आधार चक्रिका'}
+  ]
+ },
+ vegetative_propagation:{
+  title:'Vegetative Propagation — कायिक प्रवर्धन', desc:'आलू के कंद की आँख व ब्रायोफिलम की पत्ती के किनारों से नए पौधे उगना। Plantlets sprouting from potato tuber eyes and Bryophyllum leaf margins.',
+  img:'images/vegetative_propagation.jpg',
+  marks:[
+    {x:24,y:62,en:'Potato Tuber',hi:'आलू का कंद'},
+    {x:30,y:32,en:'Sprouting Shoot from Eye',hi:'कंद की आँख से प्ररोह'},
+    {x:44,y:68,en:'Adventitious Roots',hi:'अपस्थानिक जड़ें'},
+    {x:66,y:63,en:'Bryophyllum Leaf',hi:'ब्रायोफिलम पत्ती'},
+    {x:75,y:51,en:'Leaf-Margin Plantlets',hi:'पत्ती से नए पौधे'}
+  ]
  }
 };
 
@@ -311,7 +349,7 @@ function renderLabels(){
   if(!d)return;
   d.marks.forEach((m,i)=>{
     const wrap=document.createElement('div');
-    wrap.className='mark';
+    wrap.className='mark'+(m.x>58?' flip':'');
     wrap.style.left=m.x+'%';wrap.style.top=m.y+'%';
     wrap.onclick=(e)=>{e.stopPropagation();document.querySelectorAll('.mark').forEach(m=>m.classList.remove('active'));wrap.classList.add('active');};
     const dot=document.createElement('div');dot.className='dot';wrap.appendChild(dot);
@@ -324,8 +362,9 @@ function renderLabels(){
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
 
 // Init
+const _ALIASES={cell_cycle:'cellcycle',chromosome_structure:'chromosome'};
 const _qp=new URLSearchParams(window.location.search);
-const _sub=_qp.get('sub'),_top=_qp.get('topic');
+const _sub=_qp.get('sub'),_rawTop=_qp.get('topic'),_top=_ALIASES[_rawTop]||_rawTop;
 if(_sub&&DATA[_sub])selectSub(_sub);
 else if(_top&&document.querySelector('[data-topic="'+_top+'"]'))selectTopic(_top);
 else selectSub('cell_cycle_division');

@@ -21,9 +21,11 @@
   #stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,#162432 0%,#070a14 70%);padding:20px;overflow:auto}
   #imageWrap{position:relative;display:inline-block;max-width:92vw;max-height:82vh;box-shadow:0 20px 60px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden}
   #imageWrap img{display:block;max-width:100%;max-height:100%;object-fit:contain}
-  .mark{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10}
+  .mark{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10;pointer-events:auto}
+  #labels{position:absolute;inset:0;pointer-events:none;z-index:10}
   .dot{width:10px;height:10px;background:#ffd54f;border-radius:50%;box-shadow:0 0 12px #ffd54f;border:2px solid #0b1220}
   .lbl{position:absolute;left:calc(50% + 14px);top:50%;transform:translateY(-50%);background:rgba(8,15,26,.92);backdrop-filter:blur(6px);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:6px 10px;font-size:12.5px;line-height:1.35;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .18s;min-width:140px;max-width:260px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+  .mark.flip .lbl{left:auto;right:calc(50% + 14px)}
   .lbl.hi{border-color:#ffd54f;background:rgba(15,30,50,.95);color:#ffd54f}
   .lbl .en{font-weight:700;display:block}
   .lbl .hi{font-size:11.5px;color:#8ee0a7;opacity:.9;display:block;margin-top:2px}
@@ -64,9 +66,19 @@
     <div class="sub" data-sub="motor" onclick="selectSub('motor')">DC Motor — डीसी मोटर, घुमाव</div>
     <div class="topic" data-topic="dispersion" onclick="selectTopic('dispersion')">विपथन · Dispersion <span class="hi">विपथन</span></div>
     <div class="sub" data-sub="dispersion" onclick="selectSub('dispersion')">Prism Spectrum — प्रिज्म स्पेक्ट्रम, सात रंग</div>
+    <div class="topic" data-topic="eyeparts" onclick="selectTopic('eyeparts')">मानव नेत्र · Human Eye <span class="hi">मानव नेत्र</span></div>
+    <div class="sub" data-sub="human_eye_anatomy" onclick="selectSub('human_eye_anatomy')">Cornea, Lens, Retina & Optic Nerve</div>
+    <div class="topic" data-topic="scatter" onclick="selectTopic('scatter')">प्रकाश प्रकीर्णन · Scattering of Light <span class="hi">प्रकाश प्रकीर्णन</span></div>
+    <div class="sub" data-sub="scattering_light" onclick="selectSub('scattering_light')">Tyndall Beam & Red Transmission</div>
+    <div class="topic" data-topic="heating" onclick="selectTopic('heating')">जूल तापन · Joule Heating <span class="hi">विद्युत तापन</span></div>
+    <div class="sub" data-sub="joule_heating" onclick="selectSub('joule_heating')">Nichrome Coil & Calorimeter (H = I²Rt)</div>
+    <div class="topic" data-topic="magnetic_field" onclick="selectTopic('magnetic_field')">चुंबकीय क्षेत्र · Magnetic Field Lines <span class="hi">चुंबकीय क्षेत्र रेखाएँ</span></div>
+    <div class="sub" data-sub="magnetic_field_lines" onclick="selectSub('magnetic_field_lines')">Bar Magnet Iron Filings & Compasses</div>
+    <div class="topic" data-topic="induction" onclick="selectTopic('induction')">विद्युतचुंबकीय प्रेरण · Induction <span class="hi">विद्युतचुंबकीय प्रेरण</span></div>
+    <div class="sub" data-sub="electromagnetic_induction" onclick="selectSub('electromagnetic_induction')">Moving Magnet, Coil & Galvanometer</div>
   </div>
   <div id="stage">
-    <div id="imageWrap"><img id="mainImg" src="" alt=""></div>
+    <div id="imageWrap"><img id="mainImg" src="" alt=""><div id="labels"></div></div>
   </div>
   <div id="hud">
     <div class="bar">
@@ -77,7 +89,6 @@
     </div>
     <div class="bar"><a class="btn" href="../../../science/index.html#2d" style="text-decoration:none">🏠 Home</a></div>
   </div>
-  <div id="labels"></div>
   <div class="hint">चित्र पर डॉट पर क्लिक करें · लेबल अंग्रेजी + हिंदी में · क्लास X NCERT विषय</div>
 </div>
 <script>
@@ -171,6 +182,63 @@ const DATA={
     {x:55,y:55,en:'VIBGYOR Colors',hi:'सात रंग'},
     {x:30,y:50,en:'Screen',hi:'स्क्रीन'}
   ]
+ },
+ human_eye_anatomy:{
+  title:'मानव नेत्र संरचना · Human Eye Anatomy', desc:'कॉर्निया, परितारिका, पुतली, क्रिस्टलीय लेंस, सिलियरी पेशियाँ, रेटिना व दृष्टि तंत्रिका। Cornea, iris, pupil, lens, ciliary muscles, retina, optic nerve.',
+  img:'images/human_eye_anatomy.jpg',
+  marks:[
+    {x:26,y:48,en:'Cornea',hi:'कॉर्निया (स्वच्छ मंडल)'},
+    {x:31,y:41,en:'Iris & Pupil',hi:'परितारिका व पुतली'},
+    {x:37,y:49,en:'Crystalline Lens',hi:'क्रिस्टलीय लेंस'},
+    {x:36,y:26,en:'Ciliary Muscles',hi:'पक्ष्माभी पेशियाँ'},
+    {x:53,y:50,en:'Vitreous Humour',hi:'काचाभ द्रव'},
+    {x:61,y:42,en:'Retina',hi:'दृष्टिपटल (रेटिना)'},
+    {x:78,y:61,en:'Optic Nerve',hi:'दृष्टि तंत्रिका'}
+  ]
+ },
+ scattering_light:{
+  title:'प्रकाश प्रकीर्णन · Scattering of Light (Tyndall)', desc:'कोलॉइडी विलयन में नीला प्रकीर्णित प्रकाश और पर्दे पर नारंगी-लाल संचरित किरण। Blue side-scattered beam and red-orange transmitted beam.',
+  img:'images/scattering_light.jpg',
+  marks:[
+    {x:17,y:59,en:'White Light Source',hi:'श्वेत प्रकाश स्रोत'},
+    {x:42,y:41,en:'Colloidal Glass Tank',hi:'कोलॉइडी काँच पात्र'},
+    {x:52,y:52,en:'Scattered Blue Beam',hi:'प्रकीर्णित नीला प्रकाश'},
+    {x:87,y:46,en:'Red-Orange Transmitted Spot',hi:'संचरित लाल-नारंगी बिंदु'},
+    {x:87,y:29,en:'Projection Screen',hi:'प्रक्षेपण पर्दा'}
+  ]
+ },
+ joule_heating:{
+  title:'विद्युत धारा का तापीय प्रभाव · Joule Heating', desc:'नाइक्रोम कुंडली में धारा प्रवाह से ऊष्मा उत्पन्न होना (H = I²Rt)। Glowing nichrome coil heating water in calorimeter beaker.',
+  img:'images/joule_heating.jpg',
+  marks:[
+    {x:52,y:61,en:'Glowing Nichrome Coil',hi:'चमकती नाइक्रोम कुंडली'},
+    {x:47,y:50,en:'Water Calorimeter Beaker',hi:'जल कैलोरीमीटर बीकर'},
+    {x:59,y:36,en:'Thermometer',hi:'थर्मामीटर'},
+    {x:23,y:64,en:'Rheostat',hi:'धारा नियंत्रक'},
+    {x:35,y:78,en:'Switch Key',hi:'स्विच कुंजी'},
+    {x:84,y:62,en:'DC Battery Pack',hi:'डीसी बैटरी'}
+  ]
+ },
+ magnetic_field_lines:{
+  title:'चुंबकीय क्षेत्र रेखाएँ · Magnetic Field Lines', desc:'दंड चुंबक के चारों ओर लौह चूर्ण द्वारा बनी बंद चुंबकीय बल रेखाएँ व कम्पास विक्षेप। Closed field loops of bar magnet mapped by iron filings and compasses.',
+  img:'images/magnetic_field_lines.jpg',
+  marks:[
+    {x:43,y:49,en:'Magnetic Pole (Left)',hi:'चुंबकीय ध्रुव (बायाँ)'},
+    {x:57,y:49,en:'Magnetic Pole (Right)',hi:'चुंबकीय ध्रुव (दायाँ)'},
+    {x:50,y:34,en:'Iron Filings Field Loops',hi:'लौह चूर्ण क्षेत्र रेखाएँ'},
+    {x:50,y:21,en:'Compass Needle (Top)',hi:'कम्पास सुई (ऊपर)'},
+    {x:74,y:67,en:'Compass Needle (Right)',hi:'कम्पास सुई (दायाँ)'}
+  ]
+ },
+ electromagnetic_induction:{
+  title:'विद्युतचुंबकीय प्रेरण · Electromagnetic Induction', desc:'ताँबे की कुंडली में चुंबक की गति से प्रेरित धारा और गैल्वेनोमीटर सुई का विक्षेप। Relative motion between magnet and solenoid inducing current.',
+  img:'images/electromagnetic_induction.jpg',
+  marks:[
+    {x:76,y:48,en:'Moving Bar Magnet',hi:'गतिमान दंड चुंबक'},
+    {x:56,y:50,en:'Copper Solenoid Coil',hi:'ताँबे की परिनालिका'},
+    {x:26,y:59,en:'Deflected Galvanometer',hi:'विक्षेपित गैल्वेनोमीटर'},
+    {x:38,y:66,en:'Connecting Leads',hi:'संयोजक तार'}
+  ]
  }
 };
 
@@ -215,7 +283,7 @@ function renderLabels(){
   if(!d)return;
   d.marks.forEach((m,i)=>{
     const wrap=document.createElement('div');
-    wrap.className='mark';
+    wrap.className='mark'+(m.x>58?' flip':'');
     wrap.style.left=m.x+'%';wrap.style.top=m.y+'%';
     wrap.onclick=(e)=>{e.stopPropagation();document.querySelectorAll('.mark').forEach(m=>m.classList.remove('active'));wrap.classList.add('active');};
     const dot=document.createElement('div');dot.className='dot';wrap.appendChild(dot);

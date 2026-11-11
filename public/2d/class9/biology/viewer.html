@@ -21,9 +21,11 @@
   #stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,#162432 0%,#070a14 70%);padding:20px;overflow:auto}
   #imageWrap{position:relative;display:inline-block;max-width:92vw;max-height:82vh;box-shadow:0 20px 60px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden}
   #imageWrap img{display:block;max-width:100%;max-height:100%;object-fit:contain}
-  .mark{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10}
+  .mark{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10;pointer-events:auto}
+  #labels{position:absolute;inset:0;pointer-events:none;z-index:10}
   .dot{width:10px;height:10px;background:#ffd54f;border-radius:50%;box-shadow:0 0 12px #ffd54f;border:2px solid #0b1220}
   .lbl{position:absolute;left:calc(50% + 14px);top:50%;transform:translateY(-50%);background:rgba(8,15,26,.92);backdrop-filter:blur(6px);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:6px 10px;font-size:12.5px;line-height:1.35;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .18s;min-width:140px;max-width:260px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+  .mark.flip .lbl{left:auto;right:calc(50% + 14px)}
   .lbl.hi{border-color:#ffd54f;background:rgba(15,30,50,.95);color:#ffd54f}
   .lbl .en{font-weight:700;display:block}
   .lbl .hi{font-size:11.5px;color:#8ee0a7;opacity:.9;display:block;margin-top:2px}
@@ -65,21 +67,23 @@
     <div class="sub" data-sub="digestive_stomach" onclick="selectSub('digestive_stomach')">Stomach — पेट</div>
     <div class="sub" data-sub="digestive_intestine" onclick="selectSub('digestive_intestine')">Intestines — छोटी और बड़ी आंत</div>
     <div class="sub" data-sub="digestive_liver" onclick="selectSub('digestive_liver')">Liver & Pancreas — यकृत और अग्न्याशय</div>
-    <div class="topic" data-topic="flower" onclick="selectTopic('flower')">फूल · Flower <span class="hi">फूल</span></div>
-    <div class="sub" data-sub="flower" onclick="selectSub('flower')">Flower Parts — फूल के अंग</div>
-    <div class="topic" data-topic="seeds" onclick="selectTopic('seeds')">बीज और अंकुरण · Seeds & Germination <span class="hi">बीज और अंकुरण</span></div>
-    <div class="sub" data-sub="seeds_germination" onclick="selectSub('seeds_germination')">Seed & Germination — बीज और अंकुरण</div>
+    <div class="topic" data-topic="heart" onclick="selectTopic('heart')">हृदय · Heart <span class="hi">हृदय</span></div>
+    <div class="sub" data-sub="heart" onclick="selectSub('heart')">Heart & Circulation — हृदय और परिसंचरण</div>
     <div class="topic" data-topic="respiratory" onclick="selectTopic('respiratory')">श्वसन तंत्र · Respiratory System <span class="hi">श्वसन तंत्र</span></div>
     <div class="sub" data-sub="respiratory_system" onclick="selectSub('respiratory_system')">Respiratory System — श्वसन तंत्र</div>
     <div class="topic" data-topic="skeleton" onclick="selectTopic('skeleton')">कंकाल और जोड़ · Skeleton & Joints <span class="hi">कंकाल और जोड़</span></div>
     <div class="sub" data-sub="skeleton_joint" onclick="selectSub('skeleton_joint')">Skeleton & Joints — कंकाल और जोड़</div>
     <div class="topic" data-topic="skin" onclick="selectTopic('skin')">त्वचा · Skin <span class="hi">त्वचा</span></div>
     <div class="sub" data-sub="skin" onclick="selectSub('skin')">Skin Layers — त्वचा की परतें</div>
+    <div class="topic" data-topic="flower" onclick="selectTopic('flower')">फूल · Flower <span class="hi">फूल</span></div>
+    <div class="sub" data-sub="flower" onclick="selectSub('flower')">Flower Parts — फूल के अंग</div>
     <div class="topic" data-topic="teeth" onclick="selectTopic('teeth')">दांत · Teeth <span class="hi">दांत</span></div>
     <div class="sub" data-sub="teeth" onclick="selectSub('teeth')">Teeth Types — दांत के प्रकार</div>
+    <div class="topic" data-topic="seeds" onclick="selectTopic('seeds')">बीज और अंकुरण · Seeds & Germination <span class="hi">बीज और अंकुरण</span></div>
+    <div class="sub" data-sub="seeds_germination" onclick="selectSub('seeds_germination')">Seed & Germination — बीज और अंकुरण</div>
   </div>
   <div id="stage">
-    <div id="imageWrap"><img id="mainImg" src="" alt=""></div>
+    <div id="imageWrap"><img id="mainImg" src="" alt=""><div id="labels"></div></div>
   </div>
   <div id="hud">
     <div class="bar">
@@ -90,7 +94,6 @@
     </div>
     <div class="bar"><a class="btn" href="../../../science/index.html#2d" style="text-decoration:none">🏠 Home</a></div>
   </div>
-  <div id="labels"></div>
   <div class="hint">चित्र पर डॉट पर क्लिक करें · लेबल अंग्रेजी + हिंदी में · क्लास IX NCERT विषय</div>
 </div>
 <script>
@@ -326,6 +329,18 @@ const DATA={
     {x:50,y:25,en:'Enamel',hi:'इनेमल'},
     {x:50,y:75,en:'Gum',hi:'मसूड़ा'}
   ]
+ },
+ heart:{
+  title:'Heart & Circulation — हृदय और परिसंचरण', desc:'चार कक्षीय हृदय, महाधमनी, फुफ्फुस धमनी, वेनाकावा। Four-chambered heart, aorta, pulmonary artery, vena cava.',
+  img:'../../class10/biology/images/circulatory_system.png',
+  marks:[
+    {x:52,y:56,en:'Heart',hi:'हृदय'},
+    {x:52,y:34,en:'Aorta',hi:'महाधमनी'},
+    {x:62,y:46,en:'Pulmonary Artery',hi:'फुफ्फुस धमनी'},
+    {x:46,y:42,en:'Vena Cava',hi:'वेनाकावा'},
+    {x:56,y:66,en:'Ventricles',hi:'निलय'},
+    {x:48,y:48,en:'Atria',hi:'अलिंद'}
+  ]
  }
 };
 
@@ -371,7 +386,7 @@ function renderLabels(){
   if(!d)return;
   d.marks.forEach((m,i)=>{
     const wrap=document.createElement('div');
-    wrap.className='mark';
+    wrap.className='mark'+(m.x>58?' flip':'');
     wrap.style.left=m.x+'%';wrap.style.top=m.y+'%';
     wrap.onclick=(e)=>{e.stopPropagation();document.querySelectorAll('.mark').forEach(m=>m.classList.remove('active'));wrap.classList.add('active');};
     const dot=document.createElement('div');dot.className='dot';wrap.appendChild(dot);
