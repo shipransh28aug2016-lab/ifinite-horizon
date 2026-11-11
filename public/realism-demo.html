@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vigyan Atlas — Realism Demo: Ultra-Realistic &amp; Anime 3D Science Visuals (Class IX &amp; X)</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0b1220;color:#e8eef2;font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Noto Sans,Nirmala UI,"Noto Sans Devanagari",Arial,sans-serif;overflow:hidden}
+  #view{position:relative;width:100vw;height:100vh;background:linear-gradient(180deg,#0f1b33 0%,#070a14 100%);overflow:hidden}
+  canvas{display:block;width:100%;height:100%}
+  #hud{position:absolute;top:12px;left:12px;right:12px;display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;z-index:10;pointer-events:none}
+  #hud>*{pointer-events:auto}
+  .bar{background:rgba(10,16,28,0.75);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .bar h2{font-size:15px;color:#ffd54f;margin:0 0 6px 0;letter-spacing:0.4px}
+  .bar p{font-size:12.5px;color:#9fb3c8;margin:0;line-height:1.45}
+  .chip{display:inline-flex;align-items:center;gap:8px}
+  .tag{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#b9cfd3}
+  .btn{border:none;background:#1d3a5a;color:#fff;border:1px solid rgba(255,255,255,0.25);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;transition:all .15s}
+  .btn:hover{background:#2a527e;border-color:#6fb3d8}
+  .btn.active{background:#ffd54f;color:#0b1220;border-color:#ffd54f}
+  .btn.row{background:#162940}
+  .btn.row.active{background:#ffd54f;color:#0b1220}
+  .row label{font-size:12px;color:#9fb3c8;cursor:pointer;white-space:nowrap}
+  .row input{accent-color:#ffd54f;width:110px}
+  .fps{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:#8ee0a7}
+  #labels{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5}
+  .lab{position:absolute;transform:translate(-50%,-10px);font:bold 12.5px/1.2 system-ui;color:#fff;text-shadow:0 0 10px rgba(0,0,0,.85),0 0 4px #000;padding:2px 8px;border-radius:6px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.35);white-space:nowrap;opacity:0;transition:opacity .15s}
+  .lab.show{opacity:1}
+  .lab.hi{border-color:#ffd54f;background:rgba(15,30,50,.85);color:#ffd54f}
+  .hint{position:absolute;bottom:14px;left:14px;right:14px;color:#8aa3b8;font-size:12.5px;z-index:10;text-align:center;pointer-events:none}
+  .hi{color:#ffd54f}
+  @media (max-width:720px){.bar{font-size:12.5px;padding:8px 10px}.btn{font-size:12px;padding:5px 10px}}
+</style>
+</head>
+<body>
+<div id="view">
+  <div id="hud">
+    <div class="bar">
+      <div>
+        <h2>Vigyan Atlas — Visual Realism Demo</h2>
+        <p>Same lesson, three ways to see it — <span class="hi">Schematic</span> (today's app) · <span class="hi">Anime</span> (clear, stylised, motion lines) · <span class="hi">Ultra-realistic</span> (PBR tissue, surgical light, cross-section — like a doctor viewing inside). Class IX &amp; X: Biology · Chemistry · Physics.</p>
+      </div>
+    </div>
+    <div class="bar" style="align-items:flex-end">
+      <div class="chip"><span class="tag">Subject</span>
+        <button class="btn row active" data-sub="heart">❤ Biology — Beating Heart</button>
+        <button class="btn row" data-sub="mol">🧪 Chemistry — Molecule</button>
+        <button class="btn row" data-sub="prism">🔬 Physics — Ray Optics</button>
+      </div>
+      <div class="chip"><span class="tag">Style</span>
+        <button class="btn active" data-style="schematic">Schematic</button>
+        <button class="btn" data-style="anime">Anime</button>
+        <button class="btn" data-style="realistic">Ultra-realistic</button>
+      </div>
+      <div class="chip"><span class="tag">PBR tissue preset</span>
+        <button class="btn row active" data-preset="skin">Skin</button>
+        <button class="btn row" data-preset="wet">Wet mucosa</button>
+        <button class="btn row" data-preset="bone">Bone</button>
+        <button class="btn row" data-preset="glass">Glass</button>
+      </div>
+      <div class="chip">
+        <label>Cross-section <span id="valX">0%</span></label>
+        <input type="range" id="sec" min="-130" max="130" value="0">
+      </div>
+      <div class="chip">
+        <label>Organ transparency <span id="valT">60%</span></label>
+        <input type="range" id="tr" min="0" max="100" value="60">
+      </div>
+      <div class="chip">
+        <button class="btn" id="btnPlay">▶ Play</button>
+        <button class="btn" id="btnIso">Isolate organ</button>
+        <div class="fps" id="fps">60 fps</div>
+      </div>
+    </div>
+  </div>
+  <div id="labels"></div>
+  <div class="hint">Drag to rotate · Pinch to zoom · Cross-section slice = surgeon's view · PBR tissue presets: Skin / Wet mucosa / Bone / Glass · Built with three.js r160 · Demo only — assets are procedural, no external models</div>
+</div>
+<script type="importmap">
+{"imports":{"three":"./lib/three.module.js","three/addons/":"./lib/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { CopyShader } from 'three/addons/shaders/CopyShader.js';
+import { LuminosityHighPassShader } from 'three/addons/shaders/LuminosityHighPassShader.js';
+
+// ---------------- Labels (2D overlay tracking 3D points) ----------------
+const labelsEl = document.getElementById('labels');
+const labelEls = new Map();
+function label(id, text, worldPos, active, hi) {
+  let el = labelEls.get(id);
+  if (!el) {
+    el = document.createElement('div');
+    el.className = 'lab' + (hi ? ' hi' : '');
+    el.textContent = text;
+    labelsEl.appendChild(el);
+    labelEls.set(id, el);
+  }
+  el.dataset.active = active ? '1' : '0';
+  if (active) {
+    const v = worldPos.clone().project(camera);
+    const x = (v.x * 0.5 + 0.5) * view.clientWidth;
+    const y = (1 - (v.y * 0.5 + 0.5)) * view.clientHeight;
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    el.classList.add('show');
+    if (hi) el.classList.add('hi'); else el.classList.remove('hi');
+  } else {
+    el.classList.remove('show');
+  }
+}
+function clearLabels() { labelEls.forEach(e => e.classList.remove('show')); }
+
+// ---------------- Scene, camera, renderer ----------------
+const view = document.getElementById('view');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x070a14);
+scene.fog = new THREE.FogExp2(0x070a14, 0.18);
+
+const camera = new THREE.PerspectiveCamera(45, view.clientWidth / view.clientHeight, 0.1, 200);
+camera.position.set(0, 0.6, 4.6);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.setSize(view.clientWidth, view.clientHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+view.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance = 1.2;
+controls.maxDistance = 14;
+controls.autoRotate = false;
+controls.autoRotateSpeed = 0.8;
+
+// Lights: surgical spotlight + fill + rim
+const amb = new THREE.AmbientLight(0xffffff, 0.25);
+scene.add(amb);
+const spot = new THREE.SpotLight(0xffffff, 60, 28, 0.35, 0.5, 1);
+spot.position.set(1.6, 2.6, 2.2);
+spot.target.position.set(0, 0, 0);
+spot.castShadow = true;
+spot.shadow.mapSize.width = 2048;
+spot.shadow.mapSize.height = 2048;
+spot.shadow.bias = -0.0001;
+scene.add(spot);
+scene.add(spot.target);
+const fill = new THREE.PointLight(0x6fb3d8, 12, 14);
+fill.position.set(-2.2, 0.2, 1.6);
+scene.add(fill);
+const rim = new THREE.PointLight(0xffd54f, 15, 14);
+rim.position.set(1.4, -1.4, -2.2);
+scene.add(rim);
+const gloe = new THREE.PointLight(0xa855f7, 10, 10);
+gloe.position.set(-0.8, 1.8, -1.6);
+scene.add(gloe);
+
+// Cross-section plane (surgeon slice)
+const clipPlane = new THREE.Plane(new THREE.Vector3(1, 0, 0), 0);
+const capPlane = new THREE.Plane(new THREE.Vector3(-1, 0, 0), 0);
+
+// ---------------- Bloom composer ----------------
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(view.clientWidth, view.clientHeight), 1.4, 0.45, 0.05);
+composer.addPass(bloom);
+const copy = new ShaderPass(CopyShader);
+composer.addPass(copy);
+
+// ---------------- Style state ----------------
+let state = {
+  subject: 'heart',   // heart | mol | prism
+  style: 'realistic', // schematic | anime | realistic
+  section: 0,         // -130..130
+  transparency: 0.6,
+  isolate: false,
+  playing: true,
+  speed: 1,
+  tissuePreset: 'skin', // skin | wet | bone | glass  (PBR preset applied to the organ)
+};
+let heartBodyMesh; // reference to the main heart mesh for preset swaps
+
+// Parts registry: { id, mesh, geo, color, kind, toon, edges, labelPos, labelText, labelHi, cap }
+const parts = [];
+let heartBeatGroup;   // the beating transform group (outside)
+let heartCapGroup;    // the inner cap mesh group (clipped opposite)
+let molecule, prismRays;
+const clock = new THREE.Clock();
+
+// Material factories per style
+function matStandard(color, opts = {}) {
+  return new THREE.MeshStandardMaterial(Object.assign({
+    color, roughness: 0.5, metalness: 0.1, clearcoat: 0.6, clearcoatRoughness: 0.2,
+    transparent: opts.transparent === true, opacity: opts.opacity !== undefined ? opts.opacity : 1,
+    clippingPlanes: [clipPlane], clipIntersection: true, clipShadows: true,
+  }, opts));
+}
+function matCap(color) {
+  return new THREE.MeshStandardMaterial({ color, roughness: 0.6, metalness: 0.05, clippingPlanes: [capPlane], clipIntersection: true, clipShadows: true });
+}
+function matToon(color) {
+  const grad = document.createElement('canvas'); grad.width = 4; grad.height = 1;
+  const c = grad.getContext('2d');
+  const g = c.createLinearGradient(0, 0, 4, 0);
+  g.addColorStop(0, '#1a2536');
+  g.addColorStop(0.5, '#2d4a6e');
+  g.addColorStop(1, '#5aa9e6');
+  c.fillStyle = g; c.fillRect(0, 0, 4, 1);
+  const map = new THREE.CanvasTexture(grad);
+  return new THREE.MeshToonMaterial({ color, gradientMap: map });
+}
+function matBasic(color, opts = {}) {
+  return new THREE.MeshBasicMaterial(Object.assign({ color, transparent: opts.transparent, opacity: opts.opacity !== undefined ? opts.opacity : 1 }, opts));
+}
+
+// ---------------- PBR tissue presets (built-in three.js r160, no external package) ----------------
+// Skin: clearcoat sheen approximates subsurface scattering; warm, slightly rough flesh
+function presetSkin(color) {
+  return new THREE.MeshStandardMaterial({
+    color, roughness: 0.62, metalness: 0.04,
+    clearcoat: 0.35, clearcoatRoughness: 0.45,
+  });
+}
+// Wet mucosa / organ surface: glossy wet look via strong clearcoat + slight transmission
+function presetWetMucosa(color) {
+  return new THREE.MeshPhysicalMaterial({
+    color, roughness: 0.22, metalness: 0.0,
+    clearcoat: 1.0, clearcoatRoughness: 0.10,
+    transmission: 0.12, thickness: 0.35,
+  });
+}
+// Bone: matte, non-metallic, porous look
+function presetBone(color) {
+  return new THREE.MeshStandardMaterial({
+    color, roughness: 0.85, metalness: 0.02,
+  });
+}
+// Glass / clear organ cover: transmission + clearcoat + IOR refraction
+function presetGlass() {
+  return new THREE.MeshPhysicalMaterial({
+    color: 0xffffff, roughness: 0.04, metalness: 0.0,
+    transmission: 0.92, thickness: 0.9, attenuationDistance: 1.2, attenuationColor: 0xffffff,
+    clearcoat: 1.0, clearcoatRoughness: 0.08,
+    ior: 1.5,
+  });
+}
+
+const PRESETS = {
+  skin: { label: 'चमड़ी / Skin', fn: presetSkin, color: 0xe8a58a },
+  wet:  { label: 'गीला अंग / Wet mucosa', fn: presetWetMucosa, color: 0xa83232 },
+  bone: { label: 'हड्डी / Bone', fn: presetBone, color: 0xe6e2d0 },
+  glass:{ label: 'कांच / Glass', fn: presetGlass, color: 0xffffff },
+};
+
+function edgesFor(mesh, color = 0x11182a) {
+  const geo = new THREE.EdgesGeometry(mesh.geometry);
+  const mat = new THREE.LineSegmentsMaterial({ color, linewidth: 1.5 });
+  const edges = new THREE.LineSegments(geo, mat);
+  edges.renderOrder = mesh.renderOrder + 1;
+  return edges;
+}
+
+// ---------------- Biology: beating heart ----------------
+function buildHeart() {
+  const group = new THREE.Group();
+  const capGroup = new THREE.Group();
+  const base = 0xa83232;      // deep tissue red
+  const dark = 0x701818;      // inside/cap
+  const vessel = 0x942626;
+
+  const bodyMat = matStandard(base, { transparent: true, opacity: state.transparency });
+  const bodyCap = matCap(dark);
+
+  // Main heart body: ellipsoid
+  const bodyGeo = new THREE.SphereGeometry(1.0, 64, 48);
+  const body = new THREE.Mesh(bodyGeo, bodyMat);
+  heartBodyMesh = body;
+  body.scale.set(1, 0.82, 0.7);
+  body.position.set(0, 0.05, 0);
+  body.castShadow = true; body.receiveShadow = true;
+  group.add(body);
+  const bodyC = body.clone(); bodyC.material = bodyCap; bodyC.scale.copy(body.scale); bodyC.position.copy(body.position);
+  capGroup.add(bodyC);
+  register('heart-body', body, bodyMat, base, new THREE.Vector3(0, 0.15, 0), 'Main body (ventricles)', false);
+
+  // Auricles (atria)
+  ['left-auricle', 'right-auricle'].forEach((id, i) => {
+    const aur = new THREE.Mesh(new THREE.SphereGeometry(0.42, 40, 32), bodyMat);
+    aur.position.set(i === 0 ? -0.52 : 0.52, 0.72, i === 0 ? -0.18 : 0.18);
+    aur.scale.set(0.9, 0.85, 0.75);
+    aur.castShadow = true; aur.receiveShadow = true;
+    group.add(aur);
+    const aurC = aur.clone(); aurC.material = bodyCap; capGroup.add(aurC);
+    register(id, aur, bodyMat, base, aur.position.clone(), i === 0 ? 'Right atrium' : 'Left atrium', i === 0);
+  });
+
+  // Aorta arch
+  const aorta = new THREE.Mesh(new THREE.TorusGeometry(0.72, 0.13, 16, 60, Math.PI), matStandard(vessel));
+  aorta.rotation.set(Math.PI / 2, 0, 0);
+  aorta.position.set(0, 1.18, -0.05);
+  aorta.castShadow = true; group.add(aorta);
+  const aortaC = aorta.clone(); aortaC.material = matCap(0x5a1212); capGroup.add(aortaC);
+  register('aorta', aorta, matStandard(vessel), vessel, new THREE.Vector3(0, 1.3, 0.25), 'Aorta (oxygen-rich blood out)', true);
+
+  // Aorta root / ascending tube
+  const root = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.55, 24), bodyMat);
+  root.rotation.set(Math.PI / 2, 0, 0);
+  root.position.set(0, 0.95, 0);
+  root.castShadow = true; group.add(root);
+  const rootC = root.clone(); rootC.material = bodyCap; capGroup.add(rootC);
+  register('aorta-root', root, bodyMat, base, new THREE.Vector3(0, 1.0, 0.3), 'Aortic root / valve', false);
+
+  // Pulmonary trunk (splits left/right)
+  const pulm = new THREE.Group();
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.5, 24), bodyMat);
+  trunk.rotation.set(-Math.PI / 2.3, 0.3, 0);
+  trunk.position.set(0, 0.85, -0.12);
+  const leftBr = trunk.clone(); leftBr.position.set(-0.35, 1.12, -0.28); leftBr.rotation.set(-Math.PI / 3, 0.5, 0);
+  const rightBr = trunk.clone(); rightBr.position.set(0.35, 1.12, -0.28); rightBr.rotation.set(-Math.PI / 3, -0.5, 0);
+  pulm.add(trunk, leftBr, rightBr);
+  trunk.castShadow = true; leftBr.castShadow = true; rightBr.castShadow = true;
+  group.add(pulm);
+  [trunk, leftBr, rightBr].forEach(m => {
+    const c = m.clone(); c.material = bodyCap; capGroup.add(c);
+  });
+  register('pulmonary', trunk, bodyMat, base, new THREE.Vector3(0, 0.95, -0.05), 'Pulmonary artery (to lungs)', false);
+
+  // Superior / inferior vena cava
+  const up = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.75, 24), bodyMat);
+  up.rotation.set(Math.PI / 2, 0, 0); up.position.set(-0.55, 0.5, -0.3);
+  const down = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.7, 24), bodyMat);
+  down.rotation.set(Math.PI / 2, 0, 0); down.position.set(0.05, -0.42, -0.15);
+  [up, down].forEach(m => { m.castShadow = true; m.receiveShadow = true; group.add(m); const c = m.clone(); c.material = bodyCap; capGroup.add(c); });
+  register('vena-cava', down, bodyMat, base, new THREE.Vector3(0.1, -0.4, 0.2), 'Vena cava (body blood in)', false);
+
+  // Coronary vessels on surface (thin torus arcs)
+  const corona = new THREE.Group();
+  for (let a = -0.9; a <= 0.9; a += 0.9) {
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.88, 0.045, 10, 40, 1.3 + (a < 0 ? -0.2 : 0.2)), bodyMat);
+    ring.rotation.set(Math.PI / 2 + a * 0.25, 0.4, 0);
+    ring.position.set(0, 0.75, a * 0.28);
+    ring.castShadow = true; corona.add(ring);
+  }
+  group.add(corona);
+  corona.children.forEach(m => { const c = m.clone(); c.material = bodyCap; capGroup.add(c); });
+  register('coronary', corona.children[0], bodyMat, base, new THREE.Vector3(-0.35, 0.85, 0.2), 'Coronary vessels feed the heart muscle', false);
+
+  heartBeatGroup = group;
+  heartCapGroup = capGroup;
+  scene.add(group);
+  scene.add(capGroup);
+}
+
+// ---------------- Chemistry: molecule (anime-friendly) ----------------
+function buildMolecule() {
+  const group = new THREE.Group();
+  // element -> color (CPK-ish)
+  const el = { C: 0x333333, O: 0xd02020, H: 0xf0f0f0, N: 0x2040d0 };
+  const atomMat = (kind) => matToon(el[kind]);
+  const bondMat = matToon(0x556078);
+  const bondGeo = new THREE.CylinderGeometry(0.07, 0.07, 0.6, 12);
+
+  const atoms = [
+    { kind: 'C', pos: [-0.85, 0, 0] },
+    { kind: 'O', pos: [-0.3, 0.55, 0] },
+    { kind: 'O', pos: [-0.3, -0.6, 0] },
+    { kind: 'O', pos: [0.3, 0.45, 0] },
+    { kind: 'C', pos: [0.95, 0, 0] },
+    { kind: 'H', pos: [1.55, 0.35, 0] },
+    { kind: 'H', pos: [1.55, -0.35, 0] },
+  ];
+  atoms.forEach((a, i) => {
+    const r = a.kind === 'H' ? 0.22 : 0.42;
+    const m = new THREE.Mesh(new THREE.SphereGeometry(r, 40, 32), atomMat(a.kind));
+    m.position.set(...a.pos);
+    m.castShadow = true; m.receiveShadow = true;
+    group.add(m);
+    const edges = edgesFor(m, 0x101820); group.add(edges);
+    register('atom-' + i, m, atomMat(a.kind), el[a.kind], new THREE.Vector3(...a.pos), a.kind + ' atom', a.kind !== 'H');
+  });
+  // bonds
+  const bonds = [[0, 1], [0, 2], [0, 3], [3, 4], [4, 5], [4, 6]];
+  bonds.forEach(([i, j], k) => {
+    const a = new THREE.Vector3(...atoms[i].pos), b = new THREE.Vector3(...atoms[j].pos);
+    const m = new THREE.Mesh(bondGeo, bondMat);
+    m.position.copy(a).lerp(b, 0.5);
+    m.lookAt(b);
+    m.rotateX(Math.PI / 2);
+    m.castShadow = true; group.add(m);
+    register('bond-' + k, m, bondMat, 0x556078, m.position.clone(), 'Covalent bond', false);
+  });
+  molecule = group;
+  scene.add(group);
+}
+
+// ---------------- Physics: prism & rays (anime motion lines) ----------------
+function buildPrism() {
+  const group = new THREE.Group();
+  // Triangular prism: cylinder with 3 sides
+  const prism = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.9, 1.6, 3), new THREE.MeshStandardMaterial({
+    color: 0xffffff, metalness: 0, roughness: 0.08, transmission: 0.55, thickness: 1.6,
+    clearcoat: 1.0, clearcoatRoughness: 0.1, side: THREE.DoubleSide,
+    clippingPlanes: [clipPlane], clipIntersection: true,
+  }));
+  prism.rotation.z = Math.PI / 6;
+  prism.castShadow = true; prism.receiveShadow = true;
+  group.add(prism);
+  register('prism', prism, prism.material, 0xffffff, new THREE.Vector3(0, 0, 0), 'Glass prism — white light splits', true);
+
+  const screen = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 1.2), new THREE.MeshBasicMaterial({ color: 0x0a1220 }));
+  screen.position.set(2.5, 0, 0);
+  group.add(screen);
+
+  // Rays: in, inside, outsides (red/green/blue)
+  const rayMat = (c) => new THREE.LineBasicMaterial({ color: c, linewidth: 2.5 });
+  const ptsIn = [new THREE.Vector3(-2.6, 0.05, 0), new THREE.Vector3(-0.95, 0.05, 0)];
+  const ptsInL = new THREE.Line(new THREE.BufferGeometry().setFromPoints(ptsIn), rayMat(0xffd54f));
+  group.add(ptsInL);
+
+  const ptsMid = [new THREE.Vector3(-0.95, 0.05, 0), new THREE.Vector3(0.95, 0.14, 0)];
+  const midL = new THREE.Line(new THREE.BufferGeometry().setFromPoints(ptsMid), rayMat(0xffffff));
+  group.add(midL);
+
+  const outs = [
+    { c: 0xff4444, end: [2.15, -0.42, 0] },
+    { c: 0x44ff88, end: [2.15, 0.06, 0] },
+    { c: 0x4488ff, end: [2.15, 0.55, 0] },
+  ];
+  const outLs = outs.map(o => {
+    const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0.95, 0.14, 0), new THREE.Vector3(...o.end)]), rayMat(o.c));
+    group.add(l);
+    return l;
+  });
+  prismRays = { group, in: ptsInL, mid: midL, outs: outLs };
+
+  // Anime motion lines (short dashes along each ray path)
+  function motionLine(p0, p1, color, count = 10) {
+    const g = new THREE.BufferGeometry();
+    const poss = [];
+    const dashLen = p0.distanceTo(p1) / (count * 2);
+    for (let i = 0; i < count; i++) {
+      const t0 = (i * 2) / count, t1 = t0 + 0.35 / count;
+      const a = new THREE.Vector3().lerpVectors(p0, p1, t0);
+      const b = new THREE.Vector3().lerpVectors(p0, p1, t1);
+      poss.push(a.x, a.y, a.z, b.x, b.y, b.z);
+    }
+    g.setAttribute('position', new THREE.Float32BufferAttribute(poss, 3));
+    const l = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.7 }));
+    group.add(l);
+    return { line: l, p0, p1, count, offset: 0 };
+  }
+  const motions = [
+    motionLine(ptsIn[0], ptsIn[1], 0xffd54f),
+    motionLine(ptsMid[0], ptsMid[1], 0xffffff),
+    ...outs.map(o => motionLine(new THREE.Vector3(0.95, 0.14, 0), new THREE.Vector3(...o.end), o.c)),
+  ];
+  prismRays.motions = motions;
+  scene.add(group);
+}
+
+// ---------------- Parts registry ----------------
+function register(id, mesh, material, color, pos, text, hi) {
+  parts.push({ id, mesh, material, baseColor: color, kind: 'mesh', labelPos: pos, labelText: text, labelHi: hi });
+}
+
+// ---------------- Style application ----------------
+function applyStyle(style) {
+  const toon = style === 'anime';
+  const basic = style === 'schematic';
+  const real = style === 'realistic';
+  bloom.enabled = real || style === 'anime';
+  copy.enabled = real || style === 'anime';
+
+  parts.forEach(p => {
+    if (basic) {
+      p.mesh.material = matBasic(p.baseColor, { transparent: p.material.transparent, opacity: p.material.opacity });
+    } else if (toon) {
+      p.mesh.material = matToon(p.baseColor);
+      p.mesh.material.clippingPlanes = [clipPlane];
+      p.mesh.material.clipIntersection = true;
+    } else {
+      let m;
+      if (p.mesh === heartBodyMesh && state.tissuePreset && PRESETS[state.tissuePreset]) {
+        m = PRESETS[state.tissuePreset].fn(state.tissuePreset === 'glass' ? 0xffffff : p.baseColor);
+      } else {
+        m = matStandard(p.baseColor, { transparent: p.material.transparent, opacity: p.material.opacity });
+      }
+      p.mesh.material = m;
+      p.mesh.material.clippingPlanes = [clipPlane];
+      p.mesh.material.clipIntersection = true;
+    }
+    // edges for anime only
+    if (p.edges) {
+      if (toon) { if (!p.edges.parent) p.mesh.parent.add(p.edges); }
+      else { if (p.edges.parent) p.edges.parent.remove(p.edges); }
+    }
+  });
+
+  // subject-specific tweaks
+  if (heartBeatGroup) {
+    heartBeatGroup.traverse(m => {
+      if (m.isMesh && m !== /* placeholder */ null) { /* materials already set above via parts */ }
+    });
+    heartCapGroup.traverse(m => {
+      if (m.isMesh) {
+        m.material = basic ? matBasic(0x501212) : (toon ? matToon(0x501212) : matCap(0x501212));
+        m.material.clippingPlanes = basic ? [] : [capPlane];
+        m.material.clipIntersection = true;
+        m.material.transparent = state.isolate ? true : m.material.transparent;
+        m.material.opacity = state.transparency;
+      }
+    });
+  }
+  if (molecule) molecule.traverse(m => { if (m.isLine) m.material.linewidth = 2; });
+  if (prismRays) {
+    const pMat = basic ? 0xffffff : (toon ? 0xffffff : 0xffffff);
+    prismRays.in.material.color.set(pMat);
+    prismRays.mid.material.color.set(pMat);
+    prismRays.outs.forEach((l, i) => l.material.color.set([0xff4444, 0x44ff88, 0x4488ff][i]));
+    prismRays.motions.forEach(mo => { mo.line.material.color.set(toon ? 0xffffff : 0xffffff); mo.line.material.opacity = toon ? 0.85 : 0.6; });
+  }
+  renderer.setClearColor(real ? 0x070a14 : (toon ? 0x0e1626 : 0x0b1220));
+}
+
+function applyTransparency() {
+  const want = state.isolate || state.transparency < 1;
+  parts.forEach(p => {
+    const m = p.mesh.material;
+    if (m && m.transparent !== undefined) { m.transparent = want; m.opacity = state.transparency; }
+  });
+  if (heartCapGroup) heartCapGroup.traverse(m => { if (m.isMesh) { m.material.transparent = state.isolate; m.material.opacity = state.isolate ? state.transparency : 1; } });
+  if (prismRays) {
+    const prismMesh = prismRays.group.children[0];
+    if (prismMesh) { prismMesh.material.transparent = true; prismMesh.material.opacity = 0.5 + state.transparency * 0.35; }
+  }
+}
+
+// ---------------- Clipping / section ----------------
+function applySection() {
+  const c = state.section / 1000; // -0.13..0.13 around center (heart ~1 unit wide -> scale later)
+  // heart body is ~1 unit tall; map slider to object space roughly
+  const k = state.subject === 'heart' ? (state.section / 100) : (state.section / 200);
+  clipPlane.constant = k;
+  capPlane.constant = -k;
+}
+
+// ---------------- Subject switching ----------------
+function loadSubject(name) {
+  // remove previous subject objects
+  scene.traverse((o) => {
+    if (o === spot || o === spot.target || o === fill || o === rim || o === gloe || o === amb || o instanceof THREE.AmbientLight || o instanceof THREE.SpotLight || o instanceof THREE.PointLight) return;
+    if (o.type === 'Scene') return;
+    // keep only lights & camera handled separately: remove meshes/lines added by subjects
+  });
+  // simpler: track subject roots
+  [heartBeatGroup, heartCapGroup, molecule, prismRays && prismRays.group].filter(Boolean).forEach(root => {
+    if (root && root.parent === scene) scene.remove(root);
+  });
+  parts.length = 0;
+  labelEls.forEach(e => e.remove()); labelEls.clear();
+  clearLabels();
+
+  if (name === 'heart') { buildHeart(); }
+  else if (name === 'mol') { buildMolecule(); }
+  else if (name === 'prism') { buildPrism(); }
+
+  applyStyle(state.style);
+  applySection();
+  applyTransparency();
+}
+
+// ---------------- Animation ----------------
+function animate() {
+  requestAnimationFrame(animate);
+  const t = performance.now() * 0.0015 * (state.playing ? state.speed : 0) + clock.getElapsedTime() * 0.001 * 0;
+
+  controls.update();
+
+  if (heartBeatGroup && state.playing) {
+    const beat = 1 + 0.05 * Math.sin(t * 3.2);
+    const beatY = 1 + 0.03 * Math.sin(t * 6);
+    heartBeatGroup.scale.set(beat, beatY, beat);
+    heartCapGroup.scale.copy(heartBeatGroup.scale);
+    heartBeatGroup.position.y = Math.sin(t * 3.2) * 0.012;
+    heartCapGroup.position.copy(heartBeatGroup.position);
+    // gentle blood-flow tint pulse on aorta
+  }
+
+  if (molecule && state.playing) {
+    molecule.rotation.y = t * 0.18;
+    molecule.rotation.x = Math.sin(t * 0.7) * 0.15;
+  }
+
+  if (prismRays && state.playing) {
+    prismRays.group.rotation.y = Math.sin(t * 0.4) * 0.12;
+    prismRays.motions.forEach(mo => {
+      mo.offset += 0.018;
+      if (mo.offset > 1) mo.offset = -0.4;
+      const { line, p0, p1, count } = mo;
+      const poss = line.geometry.attributes.position.array;
+      const d = p0.distanceTo(p1);
+      const seg = d / (count * 2);
+      for (let i = 0; i < count; i++) {
+        const t0 = ((i * 2 + mo.offset) / count) % 1;
+        const t1 = t0 + 0.35 / count;
+        if (t1 > 1) continue;
+        const a = new THREE.Vector3().lerpVectors(p0, p1, t0);
+        const b = new THREE.Vector3().lerpVectors(p0, p1, t1);
+        const base = i * 6;
+        poss[base] = a.x; poss[base + 1] = a.y; poss[base + 2] = a.z;
+        poss[base + 3] = b.x; poss[base + 4] = b.y; poss[base + 5] = b.z;
+      }
+      line.geometry.attributes.position.needsUpdate = true;
+    });
+  }
+
+  // Labels for current subject
+  if (heartBeatGroup) {
+    label('heart-body', 'वेंट्रिकल / Ventricles — pumps blood', new THREE.Vector3(0, 0.15, 0), true, true);
+    label('left-auricle', 'Right atrium — receives body blood', new THREE.Vector3(-0.52, 0.72, -0.18), true, false);
+    label('right-auricle', 'Left atrium — receives lung blood', new THREE.Vector3(0.52, 0.72, 0.18), true, false);
+    label('aorta', 'मुख्य धमनी / Aorta — oxygen-rich blood to body', new THREE.Vector3(0, 1.3, 0.25), true, true);
+    label('pulmonary', 'फुफ्फुस धमनी / Pulmonary artery — to lungs', new THREE.Vector3(0, 0.95, -0.05), true, false);
+    label('vena-cava', 'वेनाकावा / Vena cava — body blood to heart', new THREE.Vector3(0.1, -0.4, 0.2), true, false);
+    label('coronary', 'कोरोनरी नसें — feed heart muscle itself', new THREE.Vector3(-0.35, 0.85, 0.2), true, false);
+  } else if (molecule) {
+    parts.forEach(p => {
+      if (p.mesh === molecule) return;
+      const w = p.labelPos.clone();
+      const m = p.mesh;
+      if (m.parent) w.setFromMatrixPosition(m.matrixWorld);
+      label(p.id, p.labelText, w, true, p.labelHi);
+    });
+  } else if (prismRays) {
+    label('prism', 'गिलास prism — सफेद प्रकाश के सात रंग', new THREE.Vector3(0, 0, 0), true, true);
+  }
+
+  // render
+  if (bloom.enabled || copy.enabled) composer.render();
+  else renderer.render(scene, camera);
+
+  // FPS
+  const now = performance.now();
+  if (!animate.last) animate.last = now;
+  animate.frames = (animate.frames || 0) + 1;
+  if (now - animate.last >= 1000) { document.getElementById('fps').textContent = animate.frames + ' fps'; animate.frames = 0; animate.last = now; }
+}
+animate.last = 0;
+
+// ---------------- UI wiring ----------------
+const viewEl = view;
+function onResize() {
+  camera.aspect = view.clientWidth / view.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(view.clientWidth, view.clientHeight);
+  composer.setSize(view.clientWidth, view.clientHeight);
+}
+window.addEventListener('resize', onResize);
+
+document.querySelectorAll('[data-sub]').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('[data-sub]').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    state.subject = b.dataset.sub;
+    loadSubject(state.subject);
+  });
+});
+document.querySelectorAll('[data-style]').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('[data-style]').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    state.style = b.dataset.style;
+    applyStyle(state.style);
+  });
+});
+document.querySelectorAll('[data-preset]').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('[data-preset]').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    state.tissuePreset = b.dataset.preset;
+    if (state.style === 'realistic') applyStyle('realistic');
+  });
+});
+document.getElementById('sec').addEventListener('input', (e) => {
+  state.section = parseInt(e.target.value, 10);
+  document.getElementById('valX').textContent = Math.abs(state.section) + '%';
+  applySection();
+});
+document.getElementById('tr').addEventListener('input', (e) => {
+  state.transparency = parseInt(e.target.value, 10) / 100;
+  document.getElementById('valT').textContent = e.target.value + '%';
+  applyTransparency();
+});
+document.getElementById('btnPlay').addEventListener('click', () => {
+  state.playing = !state.playing;
+  document.getElementById('btnPlay').textContent = state.playing ? '⏸ Pause' : '▶ Play';
+});
+document.getElementById('btnIso').addEventListener('click', () => {
+  state.isolate = !state.isolate;
+  document.getElementById('btnIso').textContent = state.isolate ? 'Show all organs' : 'Isolate organ';
+  document.getElementById('btnIso').classList.toggle('active', state.isolate);
+  applyTransparency();
+});
+
+// Start
+loadSubject('heart');
+animate();
+</script>
+</body>
+</html>

@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vigyan Atlas — Class X Chemistry: Step-wise Lab Experiments</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0a0f1a;color:#e8eef2;font:14px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Noto Sans,Nirmala UI,"Noto Sans Devanagari",Arial,sans-serif;overflow:hidden}
+  #view{position:relative;width:100vw;height:100vh;background:linear-gradient(180deg,#0f1b33 0%,#070a14 100%);overflow:hidden;display:flex}
+  canvas{display:block;width:100%;height:100%}
+  #sidebar{position:absolute;top:0;left:0;width:300px;height:100%;background:rgba(8,15,26,0.95);backdrop-filter:blur(8px);border-right:1px solid rgba(255,255,255,0.08);z-index:25;overflow-y:auto;transform:translateX(-102%);transition:transform .25s}
+  #sidebar.open{transform:translateX(0)}
+  #sidebar h2{font-size:15px;color:#ffd54f;padding:14px;border-bottom:1px solid rgba(255,255,255,0.1)}
+  .exp{padding:8px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;color:#c9d6df;transition:all .15s;display:flex;justify-content:space-between;align-items:center}
+  .exp:hover{background:rgba(255,255,255,0.04);color:#fff}
+  .exp.active{background:linear-gradient(90deg,rgba(255,213,79,0.12),transparent);color:#ffd54f;border-left:3px solid #ffd54f}
+  .exp .hi{font-size:11px;color:#8ee0a7;opacity:0.75}
+  /* Lab panel (right) - Aim / Materials / Steps / Observation / Conclusion */
+  #lab{position:absolute;top:0;right:0;width:340px;height:100%;background:rgba(12,20,36,0.97);backdrop-filter:blur(10px);border-left:1px solid rgba(255,255,255,0.08);z-index:25;overflow-y:auto;transform:translateX(102%);transition:transform .25s}
+  #lab.open{transform:translateX(0)}
+  .labhead{padding:14px;border-bottom:1px solid rgba(255,255,255,0.08)}
+  .labhead h3{color:#ffd54f;font-size:15px;margin:0 0 4px 0}
+  .labhead p{color:#9fb3c8;font-size:12px;margin:0}
+  .section{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.05)}
+  .section h4{color:#8ee0a7;font-size:12.5px;text-transform:uppercase;letter-spacing:.6px;margin:0 0 6px 0}
+  .section p{color:#c9d6df;font-size:13px;line-height:1.5;margin:0 0 6px 0;white-space:pre-wrap}
+  .step{padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:6px;border-left:3px solid rgba(255,213,79,0.2)}
+  .step.active{border-left-color:#ffd54f;background:rgba(255,213,79,0.08)}
+  .step .stt{color:#ffd54f;font-size:11px;font-weight:700}
+  .step p{color:#c9d6df;font-size:12.5px;margin:2px 0 0 0;line-height:1.45}
+  .matlist{color:#c9d6df;font-size:12.5px;line-height:1.6}
+  .matlist span{display:block;margin:2px 0;padding-left:14px;position:relative}
+  .matlist span::before{content:"▸";position:absolute;left:0;color:#ffd54f}
+  #hud{position:absolute;top:12px;left:14px;right:360px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;z-index:25;pointer-events:none}
+  #hud>*{pointer-events:auto}
+  .bar{background:rgba(10,16,28,0.8);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:9px 13px;display:flex;gap:11px;align-items:center;flex-wrap:wrap}
+  .bar h2{font-size:15px;color:#ffd54f;margin:0 0 4px 0;letter-spacing:.3px}
+  .bar p{font-size:12px;color:#9fb3c8;margin:0;line-height:1.45}
+  .btn{border:none;background:#1d3a5a;color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:6px 12px;font-size:12.5px;cursor:pointer;transition:all .15s}
+  .btn:hover{background:#2a527e;border-color:#6fb3d8}
+  .btn.active{background:#ffd54f;color:#0b1220;border-color:#ffd54f}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .openBtn{position:absolute;top:12px;left:12px;z-index:35}
+  .labBtn{position:absolute;top:12px;right:12px;z-index:35}
+  #labels{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:20}
+  .lab{position:absolute;transform:translate(-50%,-10px);font:bold 12px/1.2 system-ui;color:#fff;text-shadow:0 0 10px rgba(0,0,0,.9),0 0 4px #000;padding:2px 7px;border-radius:6px;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.35);white-space:nowrap;opacity:0;transition:opacity .15s}
+  .lab.show{opacity:1}
+  .lab.hi{border-color:#ffd54f;background:rgba(15,30,50,.85);color:#ffd54f}
+  .hint{position:absolute;bottom:14px;left:14px;right:360px;color:#8aa3b8;font-size:12px;z-index:25;text-align:center;pointer-events:none}
+  @media (max-width:900px){#sidebar{width:250px}#lab{width:290px}#hud{left:12px;right:300px}.hint{right:300px}}
+  @media (max-width:640px){#sidebar{width:220px}#lab{width:260px}#hud{left:12px;right:270px}.hint{right:270px}}
+</style>
+</head>
+<body>
+<div id="view">
+  <button class="openBtn btn" onclick="toggleSidebar()">☰ Experiments</button>
+  <button class="labBtn btn" onclick="toggleLab()">🧪 Lab Panel</button>
+  <div id="sidebar">
+    <h2>कक्षा 10 रसायन विज्ञान · Class X Chemistry</h2>
+    <div class="exp active" data-exp="combination" onclick="selectExp('combination')">संयोग अभिक्रिया · Combination Reaction <span class="hi">संयोग अभिक्रिया</span></div>
+    <div class="exp" data-exp="decomposition" onclick="selectExp('decomposition')">विश्लेषण अभिक्रिया · Decomposition Reaction <span class="hi">विश्लेषण अभिक्रिया</span></div>
+    <div class="exp" data-exp="displacement" onclick="selectExp('displacement')">स्थापन अभिक्रिया · Displacement Reaction <span class="hi">स्थापन अभिक्रिया</span></div>
+    <div class="exp" data-exp="doubledisp" onclick="selectExp('doubledisp')">द्वि-संस्थापन · Double Displacement <span class="hi">द्वि-संस्थापन</span></div>
+    <div class="exp" data-exp="ph" onclick="selectExp('ph')">pH परीक्षण · pH Testing <span class="hi">pH परीक्षण</span></div>
+    <div class="exp" data-exp="neutralisation" onclick="selectExp('neutralisation')">उत्क्षेपीकरण · Neutralisation <span class="hi">उत्क्षेपीकरण</span></div>
+    <div class="exp" data-exp="metalacid" onclick="selectExp('metalacid')">धातु + अम्ल · Metal + Acid <span class="hi">धातु + अम्ल</span></div>
+    <div class="exp" data-exp="reactivity" onclick="selectExp('reactivity')">प्रतिक्रयाशीलता क्रम · Reactivity Series <span class="hi">प्रतिक्रियाशीलता क्रम</span></div>
+    <div class="exp" data-exp="covalent" onclick="selectExp('covalent')">सहसंयोजक बंधन · Covalent Bonding <span class="hi">सहसंयोजक बंधन</span></div>
+    <div class="exp" data-exp="micelle" onclick="selectExp('micelle')">मिसेल निर्माण · Micelle Formation <span class="hi">मिसेल निर्माण</span></div>
+  </div>
+  <div id="lab">
+    <div class="labhead">
+      <h3 id="labTitle">प्रयोग विवरण · Lab Details</h3>
+      <p id="labSub"></p>
+    </div>
+    <div class="section">
+      <h4>उद्देश्य · Aim</h4>
+      <p id="labAim"></p>
+    </div>
+    <div class="section">
+      <h4>सामग्री · Materials</h4>
+      <div class="matlist" id="labMat"></div>
+    </div>
+    <div class="section">
+      <h4>प्रक्रिया · Procedure</h4>
+      <div id="labSteps"></div>
+    </div>
+    <div class="section">
+      <h4>अवलोकन · Observation</h4>
+      <p id="labObs"></p>
+    </div>
+    <div class="section">
+      <h4>निष्कर्ष · Conclusion</h4>
+      <p id="labConc"></p>
+    </div>
+  </div>
+  <div id="hud">
+    <div class="bar">
+      <div>
+        <h2 id="expTitle">संयोग अभिक्रिया</h2>
+        <p id="expDesc"></p>
+      </div>
+    </div>
+    <div class="bar" style="flex:1;justify-content:flex-end">
+      <button class="btn" id="btnPrev">◀ पिछला</button>
+      <span class="btn" style="background:transparent;border:none;color:#c9d6df;cursor:default;padding:0" id="stepInfo">स्टेप 1 / 1</span>
+      <button class="btn" id="btnNext">अगला ▶</button>
+    </div>
+  </div>
+  <div id="labels"></div>
+  <div class="hint">खींचकर घुमाएं · स्टेप-बाय-स्टेप लैब प्रक्रिया · बिल्ट-इन PBR · वीडियो नहीं</div>
+</div>
+<script type="importmap">
+{"imports":{"three":"../../lib/three.module.js","three/addons/":"../../lib/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+// ---------- State ----------
+let state = {
+  exp: 'combination',
+  step: 0,
+  playing: false
+};
+
+// ---------- Scene ----------
+const view = document.querySelector('#view');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x070a14);
+scene.fog = new THREE.FogExp2(0x070a14, 0.15);
+
+const camera = new THREE.PerspectiveCamera(45, view.clientWidth / view.clientHeight, 0.1, 200);
+camera.position.set(0, 1.0, 4.6);
+
+const renderer = new THREE.WebGLRenderer({antialias:true, powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.setSize(view.clientWidth, view.clientHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+view.appendChild(renderer.domElement);
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance = 1.6;
+controls.maxDistance = 18;
+controls.autoRotate = false;
+
+// ---------- Lights ----------
+const amb = new THREE.AmbientLight(0xffffff, 0.25); scene.add(amb);
+const spot = new THREE.SpotLight(0xffffff, 60, 30, 0.35, 0.5, 1);
+spot.position.set(1.8, 2.6, 2.2); spot.target.position.set(0,0,0);
+spot.castShadow = true; spot.shadow.mapSize.set(2048,2048);
+scene.add(spot); scene.add(spot.target);
+const fill = new THREE.PointLight(0x6fb3d8, 14, 16); fill.position.set(-2.2,0.4,1.6); scene.add(fill);
+const rim = new THREE.PointLight(0xffd54f, 16, 16); rim.position.set(1.4,-1.2,-2.2); scene.add(rim);
+const bunsenFlame = new THREE.PointLight(0xffd54f, 25, 8); bunsenFlame.position.set(0,0.9,0); scene.add(bunsenFlame);
+
+// ---------- Lab equipment (procedural, PBR) ----------
+function matLab(color, opts={}) {
+  return new THREE.MeshStandardMaterial(Object.assign({color, roughness:0.45, metalness:0.15, clearcoat:0.3, clearcoatRoughness:0.2}, opts));
+}
+function matGlassLiq(color, opts={}) {
+  return new THREE.MeshPhysicalMaterial(Object.assign({color, roughness:0.12, metalness:0, transmission:0.55, thickness:0.7, clearcoat:0.9, clearcoatRoughness:0.1, ior:1.33}, opts));
+}
+function matMetal(color=0xa0a8b0, opts={}) {
+  return new THREE.MeshStandardMaterial(Object.assign({color, roughness:0.3, metalness:0.85, clearcoat:0.2, clearcoatRoughness:0.15}, opts));
+}
+function matFire(color=0xffd54f, opts={}) {
+  return new THREE.MeshBasicMaterial(Object.assign({color, transparent:true, opacity:0.9}, opts));
+}
+
+// Lab stand
+function makeStand() {
+  const g = new THREE.Group();
+  const base = new THREE.Mesh(new THREE.BoxGeometry(1.4,0.12,0.7), matMetal(0x7a8088));
+  base.position.set(0,-0.06,0); base.castShadow=true; base.receiveShadow=true; g.add(base);
+  const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.045,0.045,1.6,12), matMetal());
+  rod.position.set(0,0.74,0); rod.castShadow=true; g.add(rod);
+  const clamp = new THREE.Mesh(new THREE.BoxGeometry(0.16,0.05,0.05), matMetal());
+  clamp.position.set(0.28,1.1,0); g.add(clamp);
+  const clampJaw = new THREE.Mesh(new THREE.BoxGeometry(0.06,0.1,0.05), matMetal());
+  clampJaw.position.set(0.34,1.1,0); g.add(clampJaw);
+  return g;
+}
+// Beaker
+function makeBeaker(h=0.9, r=0.28, liqColor=0x6fb3d8, liqLevel=0.7) {
+  const g = new THREE.Group();
+  const wall = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 32), matLab(0xd0d8e0));
+  wall.material.transparent=true; wall.material.opacity=0.55; wall.castShadow=true; wall.receiveShadow=true; g.add(wall);
+  const bottom = new THREE.Mesh(new THREE.CylinderGeometry(r, r, 0.03, 32), matLab(0xb8c0c8));
+  bottom.position.set(0,-h/2+0.015,0); bottom.castShadow=true; g.add(bottom);
+  const rim = new THREE.Mesh(new THREE.CylinderGeometry(r+0.02, r+0.02, 0.04, 32), matLab(0xa8b0b8));
+  rim.position.set(0,h/2-0.02,0); rim.castShadow=true; g.add(rim);
+  // liquid
+  const liq = new THREE.Mesh(new THREE.CylinderGeometry(r-0.01, r-0.01, h*liqLevel, 32), matGlassLiq(liqColor));
+  liq.position.set(0,-h/2+0.03+(h*liqLevel)/2,0); g.add(liq);
+  // surface meniscus
+  const surf = new THREE.Mesh(new THREE.CylinderGeometry(r-0.01, r-0.01, 0.02, 32), matGlassLiq(0xffffff));
+  surf.position.set(0,-h/2+0.03+(h*liqLevel)-0.01,0); surf.material.transparent=true; surf.material.opacity=0.4; g.add(surf);
+  return g;
+}
+// Test tube
+function makeTestTube(h=1.0, r=0.14, liqColor=0xf0a040, liqLevel=0.5) {
+  const g = new THREE.Group();
+  const wall = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 24), matLab(0xd0d8e0));
+  wall.material.transparent=true; wall.material.opacity=0.5; wall.castShadow=true; g.add(wall);
+  const bottom = new THREE.Mesh(new THREE.SphereGeometry(r, 24, 16), matLab(0xb8c0c8));
+  bottom.position.set(0,-h/2+r,0); g.add(bottom);
+  const liq = new THREE.Mesh(new THREE.CylinderGeometry(r-0.008, r-0.008, h*liqLevel, 24), matGlassLiq(liqColor));
+  liq.position.set(0,-h/2+r-0.02+(h*liqLevel)/2,0); g.add(liq);
+  return g;
+}
+// Bunsen burner
+function makeBurner() {
+  const g = new THREE.Group();
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.22,0.22,0.18,20), matMetal(0x4a4a4a));
+  base.position.set(0,-0.09,0); base.castShadow=true; g.add(base);
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.11,0.11,0.5,20), matMetal(0x6a6a6a));
+  body.position.set(0,0.16,0); body.castShadow=true; g.add(body);
+  const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.12,16), matMetal(0x3a3a3a));
+  nozzle.position.set(0,0.47,0); g.add(nozzle);
+  // flame
+  const flame = new THREE.Mesh(new THREE.ConeGeometry(0.09,0.45,16), matFire(0xffd54f));
+  flame.position.set(0,0.74,0); g.add(flame);
+  const flame2 = new THREE.Mesh(new THREE.ConeGeometry(0.05,0.22,12), matFire(0xffffff));
+  flame2.position.set(0,0.86,0); g.add(flame2);
+  return g;
+}
+// Tripod
+function makeTripod() {
+  const g = new THREE.Group();
+  for(let i=0;i<3;i++){
+    const ang=(i/3)*Math.PI*2;
+    const leg=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.7,8), matMetal(0x5a6068));
+    leg.position.set(Math.cos(ang)*0.35,-0.35,Math.sin(ang)*0.35);
+    leg.rotation.set(Math.PI/3,0,ang);leg.castShadow=true;g.add(leg);
+  }
+  const mesh=new THREE.Mesh(new THREE.CircleGeometry(0.12,3),matMetal());mesh.position.set(0,0,0);mesh.rotation.x=Math.PI/2;g.add(mesh);
+  return g;
+}
+// Wire gauze
+function makeGauze() {
+  const g=new THREE.Group();
+  const wire=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.02,0.5),matMetal(0x8a9098));wire.position.set(0,0.01,0);wire.castShadow=true;g.add(wire);
+  const center=new THREE.Mesh(new THREE.CircleGeometry(0.18,12),matLab(0x4a5058));center.position.set(0,0.021,0);center.rotation.x=Math.PI/2;g.add(center);
+  return g;
+}
+// Evaporating dish
+function makeDish() {
+  const g=new THREE.Group();
+  const dish=new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.28,0.12,24),matLab(0x908070));dish.position.set(0,0,0);dish.castShadow=true;g.add(dish);
+  const liq=new THREE.Mesh(new THREE.CylinderGeometry(0.32,0.26,0.05,24),matGlassLiq(0xe0a040));liq.position.set(0,0.065,0);g.add(liq);
+  return g;
+}
+// Molecule helper (ball-and-stick)
+function makeMolecule(scale=1) {
+  const g=new THREE.Group();
+  // Carbon atoms (black), Oxygen (red), Hydrogen (white)
+  const C=matPBR(0x333333,{roughness:0.8,metalness:0});
+  const O=matPBR(0xd02020,{roughness:0.2,metalness:0});
+  const H=matPBR(0xf0f0f0,{roughness:0.5,metalness:0});
+  const bond=matLab(0x606070,{roughness:0.6,metalness:0});
+  return {g,C,O,H,bond};
+}
+// Arrow (for reaction)
+function makeArrow(p0,p1,color=0xffd54f) {
+  const dir=new THREE.Vector3().subVectors(p1,p0).normalize();
+  const len=p0.distanceTo(p1);
+  const g=new THREE.Group();
+  const shaft=new THREE.Mesh(new THREE.CylinderGeometry(0.025,0.025,len,10),matLab(color));
+  shaft.position.copy(p0).lerp(p1,0.5);shaft.lookAt(p1);shaft.rotation.x-=Math.PI/2;g.add(shaft);
+  const head=new THREE.Mesh(new THREE.ConeGeometry(0.07,0.3,12),matLab(color));
+  head.position.copy(p1);head.lookAt(p0);head.rotation.x-=Math.PI/2;g.add(head);
+  return g;
+}
+// ---------- Labels ----------
+const labelsEl=document.getElementById('labels');
+const labelEls=new Map();
+function label(id,text,pos,active,hi){
+  let el=labelEls.get(id);
+  if(!el){el=document.createElement('div');el.className='lab'+(hi?' hi':'');el.textContent=text;labelsEl.appendChild(el);labelEls.set(id,el);}
+  if(active){
+    const v=pos.clone().project(camera);
+    const x=(v.x*0.5+0.5)*view.clientWidth;
+    const y=(1-(v.y*0.5+0.5))*view.clientHeight;
+    el.style.left=x+'px';el.style.top=y+'px';el.classList.add('show');
+    if(hi)el.classList.add('hi');else el.classList.remove('hi');
+  }else{el.classList.remove('show');}
+}
+function clearLabels(){labelEls.forEach(e=>e.classList.remove('show'));}
+// ---------- Current lab model ----------
+let currentGroup=null;
+function clearScene(){
+  if(currentGroup){
+    scene.remove(currentGroup);
+    currentGroup.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose();}});
+  }
+  currentGroup=null;clearLabels();
+}
+// ---------- Experiment data ----------
+// Each exp: {title, sub, aim, mat:[], steps:[{proc,obs,build}], obs, conc}
+const EXPS={
+ combination:{
+  title:'संयोग अभिक्रिया · Combination Reaction', sub:'चूना पत्थर + जल → स्लेक्ड लाइम',
+  aim:'कैल्शियम ऑक्साइड और जल से कैल्शियम हाइड्रॉक्सिड बनाना और ऊष्मा का अवलोकन करना।',
+  mat:['चूना पत्थर (CaO)','जल (H₂O)','बीकर','कांच की छड़','थर्मामीटर'],
+  steps:[
+    {proc:'शुष्क कैल्शियम ऑक्साइड (क्विकलाइम) को बीकर में लें।',obs:'सफेद चूर्ण दिखाई देता है।',build:(g)=>{
+      const stand=makeStand();stand.position.set(-0.9,0,0);g.add(stand);
+      const beaker=makeBeaker(1.0,0.3,0xe8e0d0,0.5);beaker.position.set(-0.9,0.4,0);g.add(beaker);
+      const pow=new THREE.Mesh(new THREE.CylinderGeometry(0.13,0.13,0.06,24),matLab(0xf0f0f0));pow.position.set(-0.9,0.68,0);g.add(pow);
+      label('cao','CaO (चूना पत्थर)',new THREE.Vector3(-0.9,0.95,0),true,true);
+    }},
+    {proc:'बीकर में धीरे-धीरे जल डालें और हिलाएं।',obs:'मिश्रण गर्म हो जाता है (ऊष्माक्षेपी)।',build:(g)=>{
+      const stand=makeStand();stand.position.set(-0.9,0,0);g.add(stand);
+      const beaker=makeBeaker(1.0,0.3,0xe8e0d0,0.85);beaker.position.set(-0.9,0.4,0);g.add(beaker);
+      const steam=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.22,0.5,16),matLab(0xe0e0e0));steam.material.transparent=true;steam.material.opacity=0.35;steam.position.set(-0.9,1.15,0);g.add(steam);
+      label('h2o','H₂O डाल रहे हैं',new THREE.Vector3(-0.9,0.95,0),true,true);
+    }},
+    {proc:'अंत में कैल्शियम हाइड्रॉक्सिड (स्लेक्ड लाइम) का घोल बनता है।',obs:'दूधिया सफेद घोल बनता है।',build:(g)=>{
+      const stand=makeStand();stand.position.set(-0.9,0,0);g.add(stand);
+      const beaker=makeBeaker(1.0,0.3,0xf0f0e8,0.9);beaker.position.set(-0.9,0.4,0);g.add(beaker);
+      label('caoh2','Ca(OH)₂ स्लेक्ड लाइम',new THREE.Vector3(-0.9,0.95,0),true,true);
+    }}],
+  obs:'मिश्रण गर्म हो जाता है और दूधिया सफेद कैल्शियम हाइड्रॉक्सिड बनता है।',
+  conc:'CaO + H₂O → Ca(OH)₂ + ऊष्मा। यह एक ऊष्माक्षेपी संयोग अभिक्रिया है।'
+ },
+ decomposition:{
+  title:'विश्लेषण अभिक्रिया · Decomposition Reaction', sub:'फेरस सल्फेट का तापन → लोहा ऑक्साइड + सल्फर डाइऑक्साइड',
+  aim:'फेरस सल्फेट क्रिस्टल को गर्म करने पर होने वाले परिवर्तन का अवलोकन करना।',
+  mat:['फेरस सल्फेट (FeSO₄)','कांच की नली','बनसेन बर्नर','स्टैंड','चिमटे'],
+  steps:[
+    {proc:'हरे फेरस सल्फेट क्रिस्टल को कांच की नली में लें।',obs:'क्रिस्टल हरे रंग के हैं।',build:(g)=>{
+      const stand=makeStand();stand.position.set(0,0,0);g.add(stand);
+      const tube=makeTestTube(1.1,0.16,0x60a060,0.4);tube.position.set(0,0.4,0);g.add(tube);
+      const burn=makeBurner();burn.position.set(0,-0.35,0);g.add(burn);
+      label('feso4','FeSO₄ हरे क्रिस्टल',new THREE.Vector3(0,0.95,0),true,true);
+    }},
+    {proc:'बनसेन बर्नर से नली के तल को गर्म करें।',obs:'हरा रंग भूरे रंग में बदलता है और गंध आती है।',build:(g)=>{
+      const stand=makeStand();stand.position.set(0,0,0);g.add(stand);
+      const tube=makeTestTube(1.1,0.16,0x8a6d3f,0.35);tube.position.set(0,0.4,0);g.add(tube);
+      const burn=makeBurner();burn.position.set(0,-0.35,0);g.add(burn);
+      const flame=new THREE.Mesh(new THREE.ConeGeometry(0.09,0.5,16),matFire(0xffd54f));flame.position.set(0,0.68,0);g.add(flame);
+      const smoke=new THREE.Mesh(new THREE.CylinderGeometry(0.13,0.2,0.5,16),matLab(0x8a8a8a));smoke.material.transparent=true;smoke.material.opacity=0.4;smoke.position.set(0,1.05,0);g.add(smoke);
+      label('heat','तापन',new THREE.Vector3(0,0.95,0),true,true);
+    }},
+    {proc:'उत्पाद: लोहा ऑक्साइड (भूरा), सल्फर डाइऑक्साइड, सल्फर ट्राईऑक्साइड।',obs:'भूरा ठोस और गैस निकलती है।',build:(g)=>{
+      const stand=makeStand();stand.position.set(0,0,0);g.add(stand);
+      const tube=makeTestTube(1.1,0.16,0x8a6d3f,0.2);tube.position.set(0,0.4,0);g.add(tube);
+      const solid=new THREE.Mesh(new THREE.CylinderGeometry(0.13,0.13,0.25,24),matLab(0x8a6d3f));solid.position.set(0,-0.15,0);g.add(solid);
+      const gas=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.24,0.55,16),matLab(0xd0d0d0));gas.material.transparent=true;gas.material.opacity=0.5;gas.position.set(0,1.0,0);g.add(gas);
+      label('prod','Fe₂O₃ + SO₂ + SO₃',new THREE.Vector3(0,0.95,0),true,true);
+    }}],
+  obs:'हरे क्रिस्टल का रंग भूरा हो जाता है और गैस निकलती है।',
+  conc:'2FeSO₄ → Fe₂O₃ + SO₂ + SO₃। यह ऊष्मा विश्लेषण अभिक्रिया है।'
+ },
+ displacement:{
+  title:'स्थापन अभिक्रिया · Displacement Reaction', sub:'जिंक + कॉपर सल्फेट → जिंक सल्फेट + कॉपर',
+  aim:'जिंक को कॉपर सल्फेट विलयन में डालकर स्थापन अभिक्रिया देखना।',
+  mat:['जिंक (Zn)','कॉपर सल्फेट (CuSO₄)','बीकर','चिमटे','कांच की छड़'],
+  steps:[
+    {proc:'बीकर में नीला कॉपर सल्फेट विलयन लें।',obs:'विलयन नीला है।',build:(g)=>{
+      const stand=makeStand();stand.position.set(0,0,0);g.add(stand);
+      const beaker=makeBeaker(1.0,0.3,0x4080c0,0.8);beaker.position.set(0,0.4,0);g.add(beaker);
+      label('cuso4','CuSO₄ नीला विलयन',new THREE.Vector3(0,0.95,0),true,true);
+    }},
+    {proc:'जिंक की पट्टी चिमटे से विलयन में डालें।',obs:'लाल-भूरा कॉपर जमा होने लगता है।',build:(g)=>{
+      const stand=makeStand();stand.position.set(0,0,0);g.add(stand);
+      const beaker=makeBeaker(1.0,0.3,0x60a0c0,0.8);beaker.position.set(0,0.4,0);g.add(beaker);
+      const zn=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,0.9,12),matLab(0xa0a8b0));zn.position.set(0.25,0.55,0);zn.rotation.x=0.4;g.add(zn);
+      const cu=new THREE.Mesh(new THREE.SphereGeometry(0.08,24,20),matLab(0xb87333));cu.position.set(-0.1,0.1,0);g.add(cu);
+      label('zn','Zn जिंक',new THREE.Vector3(0.35,0.9,0),true,true);
+    }},
+    {proc:'विलयन का रंग फीका पड़ता है और कॉपर जमा होता है।',obs:'नीला रंग कम, लाल-भूरा ठोस अधिक।',build:(g)=>{
+      const stand=makeStand();stand.position.set(0,0,0);g.add(stand);
+      const beaker=makeBeaker(1.0,0.3,0xa0c0e0,0.8);beaker.position.set(0,0.4,0);g.add(beaker);
+      const cu=new THREE.Group();
+      for(let i=0;i<8;i++){const c=new THREE.Mesh(new THREE.SphereGeometry(0.07,16,12),matLab(0xb87333));c.position.set((Math.random()-0.5)*0.2,-0.2+(Math.random()*0.3),(Math.random()-0.5)*0.2);cu.add(c);}
+      cu.position.set(0,-0.15,0);g.add(cu);
+      label('znso4','ZnSO₄ फीका नीला',new THREE.Vector3(0,0.95,0),true,true);
+    }}],
+  obs:'नीला विलयन फीका पड़ता है और लाल-भूरा कॉपर जमा होता है।',
+  conc:'Zn + CuSO₄ → ZnSO₄ + Cu। जिंक अधिक अभिक्रियाशील है।'
+ },
+ doubledisp:{
+  title:'द्वि-संस्थापन अभिक्रिया · Double Displacement', sub:'लेड नाइट्रेट + पोटैशियम आयोडाइड → पीला अवक्षेप',
+  aim:'दो विलयनों के बीच आयन विनिमय से अवक्षेप बनाना।',
+  mat:['लेड नाइट्रेट Pb(NO₃)₂','पोटैशियम आयोडाइड KI','दो कांच की नलियां','बनसेन बर्नर'],
+  steps:[
+    {proc:'पहली नली में लेड नाइट्रेट विलयन लें।',obs:'रंगहीन विलयन।',build:(g)=>{
+      const t1=makeTestTube(1.0,0.16,0xe8e8e8,0.5);t1.position.set(-0.5,0.4,0);g.add(t1);
+      const t2=makeTestTube(1.0,0.16,0xe8e8e8,0.5);t2.position.set(0.5,0.4,0);g.add(t2);
+      label('pb','Pb(NO₃)₂',new THREE.Vector3(-0.5,0.95,0),true,true);
+    }},
+    {proc:'दूसरी नली में पोटैशियम आयोडाइड विलयन मिलाएं।',obs:'तुरंत पीला अवक्षेप (PbI₂) बनता है।',build:(g)=>{
+      const t1=makeTestTube(1.0,0.16,0xffd54f,0.5);t1.position.set(-0.5,0.4,0);g.add(t1);
+      const t2=makeTestTube(1.0,0.16,0xe8e8e8,0.5);t2.position.set(0.5,0.4,0);g.add(t2);
+      const ppt=new THREE.Mesh(new THREE.CylinderGeometry(0.13,0.13,0.25,24),matLab(0xffd54f));ppt.position.set(-0.5,-0.05,0);g.add(ppt);
+      label('ki','KI मिलाया',new THREE.Vector3(-0.5,0.95,0),true,true);
+    }},
+    {proc:'अवक्षेप को छानकर सुखाएं।',obs:'चमकीला पीला ठोस पदार्थ।',build:(g)=>{
+      const dish=makeDish();dish.position.set(0,0,0);g.add(dish);
+      const stand=makeStand();stand.position.set(0,-0.55,0);g.add(stand);
+      label('pbi2','PbI₂ पीला अवक्षेप',new THREE.Vector3(0,0.35,0),true,true);
+    }}],
+  obs:'दो रंगहीन विलयनों से पीला अवक्षेप बनता है।',
+  conc:'Pb(NO₃)₂ + 2KI → PbI₂↓ + 2KNO₃। यह अवक्षेपण अभिक्रिया है।'
+ },
+ ph:{
+  title:'pH परीक्षण · pH Testing', sub:'सामान्य सूचक से अम्लीय / क्षारीय प्रकृति',
+  aim:'विभिन्न विलयनों का pH जांचना और अम्लीय / क्षारीय प्रकृति बताना।',
+  mat:['हल्का नींबू रस','साबुन का घोल','शुद्ध जल','लिटमस पेपर','pH पेपर'],
+  steps:[
+    {proc:'तीन कांच की नलियों में अलग-अलग विलयन लें।',obs:'सभी रंगहीन दिखाई देते हैं।',build:(g)=>{
+      const tubes=[-0.7,0,0.7];
+      tubes.forEach((x,i)=>{
+        const t=makeTestTube(0.9,0.15,0xf0f0e8,0.5);t.position.set(x,0.4,0);g.add(t);
+      });
+      label('sol','विलयन A, B, C',new THREE.Vector3(0,0.95,0),true,true);
+    }},
+    {proc:'प्रत्येक पर pH पेपर / लिटमस डालें।',obs:'रंग बदलता है: लाल (अम्ल), नीला (क्षार), हरा (तटस्थ)।',build:(g)=>{
+      const tubes=[-0.7,0,0.7];
+      const colors=[0xff6b6b,0x6bbf6b,0x8ee0a7];
+      tubes.forEach((x,i)=>{
+        const t=makeTestTube(0.9,0.15,colors[i],0.5);t.position.set(x,0.4,0);g.add(t);
+        const paper=new THREE.Mesh(new THREE.BoxGeometry(0.08,0.25,0.03),matLab(colors[i]));paper.position.set(x+0.12,0.6,0);g.add(paper);
+      });
+      label('ph','pH रंग परिवर्तन',new THREE.Vector3(0,0.95,0),true,true);
+    }},
+    {proc:'पहला अम्लीय, दूसरा क्षारीय, तीसरा तटस्थ।',obs:'pH मान से प्रकृति ज्ञात होती है।',build:(g)=>{
+      const tubes=[-0.7,0,0.7];
+      const labelsT=['pH 2 अम्लीय','pH 7 तटस्थ','pH 10 क्षारीय'];
+      tubes.forEach((x,i)=>{
+        const t=makeTestTube(0.9,0.15,[0xff6b6b,0x8ee0a7,0x6bbf6b][i],0.5);t.position.set(x,0.4,0);g.add(t);
+        label('r'+i,labelsT[i],new THREE.Vector3(x,0.8,0),true,false);
+      });
+    }}],
+  obs:'अम्ल लाल, क्षार नीला/हरा, तटस्थ हरा दिखाता है।',
+  conc:'pH 7 से कम = अम्ल, 7 = तटस्थ, 7 से अधिक = क्षार।'
+ },
+ neutralisation:{
+  title:'उत्क्षेपीकरण · Neutralisation', sub:'अम्ल + क्षार → लवण + जल',
+  aim:'हाइड्रोक्लोरिक अम्ल और सोडियम हाइड्रॉक्सिड के बीच उत्क्षेपीकरण देखना।',
+  mat:['HCl अम्ल','NaOH क्षार','फेनॉफ़्थेलिन सूचक','बीकर','पिपेट'],
+  steps:[
+    {proc:'बीकर में HCl अम्ल लें और फेनॉफ़्थेलिन डालें।',obs:'विलयन रंगहीन रहता है।',build:(g)=>{
+      const stand=makeStand();stand.position.set(0,0,0);g.add(stand);
+      const beaker=makeBeaker(1.0,0.3,0xf0e8e8,0.75);beaker.position.set(0,0.4,0);g.add(beaker);
+      label('hcl','HCl + फेनॉफ़्थेलिन',new THREE.Vector3(0,0.95,0),true,true);
+    }},
+    {proc:'धीरे-धीरे NaOH क्षार डालें।',obs:'गुलाबी रंग आता है।',build:(g)=>{
+      const stand=makeStand();stand.position.set(0,0,0);g.add(stand);
+      const beaker=makeBeaker(1.0,0.3,0xe0b0ff,0.85);beaker.position.set(0,0.4,0);g.add(beaker);
+      const drop=new THREE.Mesh(new THREE.SphereGeometry(0.05,16,12),matGlassLiq(0xe0b0ff));drop.position.set(0.2,0.85,0);g.add(drop);
+      label('naoh','NaOH क्षार',new THREE.Vector3(0,0.95,0),true,true);
+    }},
+    {proc:'उत्क्षेपीकरण के बाद घोल तटस्थ हो जाता है।',obs:'गुलाबी रंग मिटता है।',build:(g)=>{
+      const stand=makeStand();stand.position.set(0,0,0);g.add(stand);
+      const beaker=makeBeaker(1.0,0.3,0xf0f0e8,0.9);beaker.position.set(0,0.4,0);g.add(beaker);
+      label('salt','NaCl + H₂O',new THREE.Vector3(0,0.95,0),true,true);
+    }}],
+  obs:'अम्ल और क्षार मिलाकर लवण और जल बनता है, गुलाबी रंग मिटता है।',
+  conc:'HCl + NaOH → NaCl + H₂O। यह उत्क्षेपीकरण अभिक्रिया है।'
+ },
+ metalacid:{
+  title:'धातु + अम्ल · Metal + Acid', sub:'मैग्नीशियम + HCl → मैग्नीशियम क्लोराइड + हाइड्रोजन',
+  aim:'धातु को अम्ल में डालकर हाइड्रोजन गैस निकालना।',
+  mat:['मैग्नीशियम पट्टी (Mg)','HCl अम्ल','कांच की नली','डिलीवरी ट्यूब','गैस जार'],
+  steps:[
+    {proc:'नली में तनु HCl अम्ल लें।',obs:'रंगहीन अम्ल।',build:(g)=>{
+      const stand=makeStand();stand.position.set(0,0,0);g.add(stand);
+      const tube=makeTestTube(1.1,0.18,0xf0e8e8,0.6);tube.position.set(0,0.4,0);g.add(tube);
+      label('hcl','तनु HCl',new THREE.Vector3(0,0.95,0),true,true);
+    }},
+    {proc:'मैग्नीशियम पट्टी डिलीवरी ट्यूब से डालें।',obs:'बुलबुले निकलते हैं (हाइड्रोजन गैस)।',build:(g)=>{
+      const stand=makeStand();stand.position.set(0,0,0);g.add(stand);
+      const tube=makeTestTube(1.1,0.18,0xf0e8e8,0.55);tube.position.set(0,0.4,0);g.add(tube);
+      const mg=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.8,12),matLab(0xa0a8b0));mg.position.set(0.22,0.6,0);mg.rotation.x=0.3;g.add(mg);
+      const bub=new THREE.Group();
+      for(let i=0;i<6;i++){const b=new THREE.Mesh(new THREE.SphereGeometry(0.05,12,10),matLab(0xffffff));b.position.set(0.05,0.1+i*0.08,0);bub.add(b);}
+      bub.position.set(0,0.2,0);g.add(bub);
+      label('mg','Mg पट्टी',new THREE.Vector3(0.3,0.85,0),true,true);
+    }},
+    {proc:'गैस जार में एकत्रित गैस को ज्वलनशीलता परीक्षण दें।',obs:''पॉप'' ध्वनि के साथ जलती है।',build:(g)=>{
+      const jar=new THREE.Mesh(new THREE.CylinderGeometry(0.22,0.22,0.9,24),matLab(0xe0e0e0));jar.material.transparent=true;jar.material.opacity=0.5;jar.position.set(1.1,0.4,0);jar.castShadow=true;g.add(jar);
+      const flame=new THREE.Mesh(new THREE.ConeGeometry(0.08,0.35,14),matFire(0xffd54f));flame.position.set(1.1,1.1,0);g.add(flame);
+      label('h2','H₂ गैस',new THREE.Vector3(1.1,0.95,0),true,true);
+    }}],
+  obs:'मैग्नीशियम पट्टी तेजी से जलती है और हाइड्रोजन गैस निकलती है जो 'पॉप' आवाज के साथ जलती है।',
+  conc:'Mg + 2HCl → MgCl₂ + H₂↑। धातु अम्ल से लवण और हाइड्रोजन बनाती है।'
+ },
+ reactivity:{
+  title:'प्रतिक्रियाशीलता क्रम · Reactivity Series', sub:'क्रोम की तुलना में जिंक अधिक अभिक्रियाशील',
+  aim:'विभिन्न धातुओं की अभिक्रियाशीलता की तुलना करना।',
+  mat:['जिंक (Zn),'','लोहा (Fe),'','तांबा (Cu),'','फेरस सल्फेट विलयन','कॉपर सल्फेट विलयन'],
+  steps:[
+    {proc:'चार नलियों में अलग-अलग धातु की पट्टियां रखें।',obs:'सभी पट्टियां धातु जैसी चमकदार।',build:(g)=>{
+      const metals=[-1.2,-0.4,0.4,1.2];
+      const names=['Zn','Fe','Cu','Pb'];
+      metals.forEach((x,i)=>{
+        const m=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,0.7,12),matLab([0xa0a8b0,0x7a6a5a,0xb87333,0x9a9a9a][i]));m.position.set(x,0.55,0);m.castShadow=true;g.add(m);
+        label('m'+i,names[i],new THREE.Vector3(x,0.95,0),true,false);
+      });
+    }},
+    {proc:'प्रत्येक पर फेरस सल्फेट विलयन डालें।',obs:'केवल जिंक और लोहा विस्थापित करते हैं, तांबा नहीं।',build:(g)=>{
+      const metals=[-1.2,-0.4,0.4,1.2];
+      const results=['विस्थापन','आंशिक','कोई नहीं','कोई नहीं'];
+      metals.forEach((x,i)=>{
+        const m=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,0.7,12),matLab([0xa0a8b0,0x7a6a5a,0xb87333,0x9a9a9a][i]));m.position.set(x,0.55,0);m.castShadow=true;g.add(m);
+        const liq=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,0.18,24),matGlassLiq(0x4080c0));liq.position.set(x,0.15,0);g.add(liq);
+        label('r'+i,results[i],new THREE.Vector3(x,0.35,0),true,false);
+      });
+    }},
+    {proc:'क्रियाशीलता क्रम: Zn > Fe > Cu > Pb।',obs:'अधिक क्रियाशील धातु कम क्रियाशील को विस्थापित करती है।',build:(g)=>{
+      const seq=new THREE.Group();
+      ['Zn','Fe','Cu','Pb'].forEach((n,i)=>{
+        const s=new THREE.Mesh(new THREE.SphereGeometry(0.12,20,16),matLab([0xa0a8b0,0x7a6a5a,0xb87333,0x9a9a9a][i]));s.position.set(i*0.5-0.75,0,0);seq.add(s);
+      });
+      seq.position.set(0,-0.6,0);g.add(seq);
+      label('order','Zn > Fe > Cu > Pb',new THREE.Vector3(0,-0.2,0),true,true);
+    }}],
+  obs:'जिंक सबसे अधिक, फिर लोहा, तांबा सबसे कम अभिक्रियाशील।',
+  conc:'प्रतिक्रियाशीलता क्रम: K > Na > Ca > Mg > Al > Zn > Fe > Pb > Cu > Ag > Au।'
+ },
+ covalent:{
+  title:'सहसंयोजक बंधन · Covalent Bonding', sub:'मीथेन CH₄ और इथेनॉल C₂H₅OH',
+  aim:'कार्बन परमाणुओं का इलेक्ट्रॉन साझाकरण दर्शाना।',
+  mat:['कार्बन परमाणु','हाइड्रोजन परमाणु','ऑक्सीजन परमाणु','बॉल-एंड-स्टिक मॉडल'],
+  steps:[
+    {proc:'कार्बन परमाणु के चारों ओर 4 हाइड्रोजन परमाणु लगाएं।',obs:'मीथेन CH₄ बनता है।',build:(g)=>{
+      const mol=makeMolecule(1.4);
+      const C=new THREE.Mesh(new THREE.SphereGeometry(0.28,32,24),mol.C);C.position.set(0,0,0);mol.g.add(C);
+      for(let i=0;i<4;i++){const ang=(i/4)*Math.PI*2;const H=new THREE.Mesh(new THREE.SphereGeometry(0.14,24,20),mol.H);H.position.set(Math.cos(ang)*0.7,Math.sin(ang)*0.7,0);mol.g.add(H);const b=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,0.62,8),mol.bond);b.position.set(Math.cos(ang)*0.35,Math.sin(ang)*0.35,0);b.rotation.z=ang;mol.g.add(b);}
+      mol.g.position.set(0,0,0);g.add(mol.g);
+      label('ch4','CH₄ मीथेन',new THREE.Vector3(0,0.95,0),true,true);
+    }},
+    {proc:'इथेनॉल C₂H₅OH बनाएं: 2 कार्बन, 6 हाइड्रोजन, 1 ऑक्सीजन।',obs:'इथेनॉल अणु बनता है।',build:(g)=>{
+      const mol=makeMolecule(1.4);
+      const C1=new THREE.Mesh(new THREE.SphereGeometry(0.26,32,24),mol.C);C1.position.set(-0.55,0,0);mol.g.add(C1);
+      const C2=new THREE.Mesh(new THREE.SphereGeometry(0.26,32,24),mol.C);C2.position.set(0.55,0,0);mol.g.add(C2);
+      const O=new THREE.Mesh(new THREE.SphereGeometry(0.24,32,24),mol.O);O.position.set(0.55,0.75,0);mol.g.add(O);
+      const H1=new THREE.Mesh(new THREE.SphereGeometry(0.13,24,20),mol.H);H1.position.set(0.55,-0.75,0);mol.g.add(H1);
+      const b1=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.035,1.1,8),mol.bond);b1.position.set(0,0,0);mol.g.add(b1);
+      const b2=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.035,0.72,8),mol.bond);b2.position.set(0.84,0.38,0);b2.rotation.z=0.7;mol.g.add(b2);
+      mol.g.position.set(0,0,0);g.add(mol.g);
+      label('eth','C₂H₅OH इथेनॉल',new THREE.Vector3(0,0.95,0),true,true);
+    }},
+    {proc:'सहसंयोजक बंधन इलेक्ट्रॉन साझा करके बनता है।',obs:'अणु स्थिर हो जाता है।',build:(g)=>{
+      const mol=makeMolecule(1.4);
+      const C=new THREE.Mesh(new THREE.SphereGeometry(0.3,32,24),mol.C);C.position.set(0,0,0);mol.g.add(C);
+      const glow=new THREE.Mesh(new THREE.SphereGeometry(0.5,32,24),mol.H);glow.material.transparent=true;glow.material.opacity=0.2;glow.position.copy(C.position);mol.g.add(glow);
+      mol.g.position.set(0,0,0);g.add(mol.g);
+      label('bond','साझा इलेक्ट्रॉन युग्म',new THREE.Vector3(0,0.95,0),true,true);
+    }}],
+  obs:'कार्बन इलेक्ट्रॉन साझा करके सहसंयोजक बंध बनाता है।',
+  conc:'कार्बन और हाइड्रोजन सहसंयोजक बंधन से मीथेन और इथेनॉल जैसे यौगिक बनाते हैं।'
+ },
+ micelle:{
+  title:'मिसेल निर्माण · Micelle Formation', sub:'साबुन का जल में मिसेल बनना',
+  aim:'साबुन अणु का हाइड्रोफिलिक सिर और हाइड्रोफोबिक पूंछ दर्शाना।',
+  mat:['साबुन अणु','जल','तेल / गंदगी','मिसेल संरचना'],
+  steps:[
+    {proc:'साबुन अणु: हाइड्रोफिलिक सिर (जल-प्रेमी) और हाइड्रोफोबिक पूंछ (तेल-प्रेमी)।',obs:'दो भागों वाला अणु।',build:(g)=>{
+      const mol=makeMolecule(1.3);
+      const head=new THREE.Mesh(new THREE.SphereGeometry(0.22,24,20),matGlassLiq(0x6fb3d8));head.position.set(0,0.35,0);mol.g.add(head);
+      const tail=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,0.8,16),matLab(0x5a3a2a));tail.position.set(0,-0.1,0);tail.rotation.x=Math.PI/2;mol.g.add(tail);
+      mol.g.position.set(0,0,0);g.add(mol.g);
+      label('soap','साबुन अणु',new THREE.Vector3(0,0.95,0),true,true);
+    }},
+    {proc:'जल में साबुन डालें: सिर जल की ओर, पूंछ तेल की ओर।',obs:'मिसेल बनती है।',build:(g)=>{
+      const mic=new THREE.Group();
+      for(let i=0;i<12;i++){const ang=(i/12)*Math.PI*2;const mol2=makeMolecule(0.9);const h=new THREE.Mesh(new THREE.SphereGeometry(0.14,20,16),mol2.H);h.position.set(Math.cos(ang)*0.5,Math.sin(ang)*0.5,0);mol2.g.add(h);const t=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.5,12),mol2.H);t.position.set(Math.cos(ang)*0.9,Math.sin(ang)*0.9,0);t.rotation.z=ang;mol2.g.add(t);mol2.g.position.set(Math.cos(ang)*0.5,Math.sin(ang)*0.5,0);mol2.g.rotation.z=ang;mic.add(mol2.g);}
+      mic.position.set(0,0,0);g.add(mic);
+      const oil=new THREE.Mesh(new THREE.SphereGeometry(0.7,32,24),matLab(0x3a2a1a));oil.position.set(0,0,0);oil.material.transparent=true;oil.material.opacity=0.35;g.add(oil);
+      label('mic','मिसेल',new THREE.Vector3(0,0.95,0),true,true);
+    }},
+    {proc:'मिसेल तेल को घेरकर जल में घोल देती है।',obs:'गंदगी हटती है।',build:(g)=>{
+      const mic=new THREE.Group();
+      for(let i=0;i<16;i++){const ang=(i/16)*Math.PI*2;const mol2=makeMolecule(0.9);const h=new THREE.Mesh(new THREE.SphereGeometry(0.13,20,16),mol2.H);h.position.set(Math.cos(ang)*0.55,Math.sin(ang)*0.55,0);mol2.g.add(h);const t=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.55,12),mol2.H);t.position.set(Math.cos(ang)*1.0,Math.sin(ang)*1.0,0);t.rotation.z=ang;mol2.g.add(t);mol2.g.position.set(Math.cos(ang)*0.55,Math.sin(ang)*0.55,0);mol2.g.rotation.z=ang;mic.add(mol2.g);}
+      mic.position.set(0,0,0);g.add(mic);
+      const dirt=new THREE.Mesh(new THREE.SphereGeometry(0.5,32,24),matLab(0x2a2018));dirt.position.set(0,0,0);g.add(dirt);
+      label('clean','गंदगी हटी',new THREE.Vector3(0,0.95,0),true,true);
+    }}],
+  obs:'साबुन मिसेल बनाकर तेल और गंदगी को जल में घोलती है।',
+  conc:'साबुन अणु का सिर जल-प्रेमी और पूंछ तेल-प्रेमी होती है, जिससे मिसेल बनती है और सफाई होती है।'
+ }
+};
+
+// ---------- Build selected experiment ----------
+function buildExp(name){
+  const e=EXPS[name];
+  clearScene();
+  const g=new THREE.Group();
+  // track which step's build was called; we build incrementally
+  state.exp=name;
+  state.step=0;
+  updateUI();
+  renderStep(g);
+}
+function renderStep(g){
+  const e=EXPS[state.exp];
+  const s=e.steps[state.step];
+  clearLabels();
+  // clear previous step meshes except keep group
+  if(currentGroup){scene.remove(currentGroup);}
+  currentGroup=g;
+  // call build with current group
+  s.build(g);
+  scene.add(g);
+  // camera reset
+  camera.position.set(0,1.0,4.6);
+  controls.target.set(0,0,0);
+  // update lab panel
+  document.getElementById('labTitle').textContent=e.title;
+  document.getElementById('labSub').textContent=e.sub;
+  document.getElementById('labAim').textContent=e.aim;
+  document.getElementById('labMat').innerHTML=e.mat.map(m=>`<span>${m}</span>`).join('');
+  document.getElementById('labObs').textContent=e.obs;
+  document.getElementById('labConc').textContent=e.conc;
+  // steps list
+  const stepsHtml=e.steps.map((s,i)=>`<div class="step${i===state.step?' active':''}"><div class="stt">स्टेप ${i+1}</div><p>${s.proc}</p></div>`).join('');
+  document.getElementById('labSteps').innerHTML=stepsHtml;
+  // hud
+  document.getElementById('expTitle').textContent=e.title;
+  document.getElementById('expDesc').textContent=e.sub;
+  document.getElementById('stepInfo').textContent=`स्टेप ${state.step+1} / ${e.steps.length}`;
+  document.getElementById('btnPrev').disabled=state.step===0;
+  document.getElementById('btnNext').disabled=state.step===e.steps.length-1;
+  // labels for this step (build function labels internally already; but ensure at least title)
+}
+
+// ---------- Topic selection from sidebar ----------
+function selectExp(name){
+  document.querySelectorAll('.exp').forEach(el=>{el.classList.remove('active');if(el.dataset.exp===name)el.classList.add('active');});
+  buildExp(name);
+  const sb=document.getElementById('sidebar');sb.classList.remove('open');
+}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
+function toggleLab(){document.getElementById('lab').classList.toggle('open');}
+
+// ---------- Step navigation ----------
+document.getElementById('btnPrev').addEventListener('click',()=>{
+  if(state.step>0){state.step--;renderStep(new THREE.Group());}
+});
+document.getElementById('btnNext').addEventListener('click',()=>{
+  const e=EXPS[state.exp];
+  if(state.step<e.steps.length-1){state.step++;renderStep(new THREE.Group());}
+});
+
+// ---------- Animation ----------
+const clock=new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const t=performance.now()*0.0015;
+  controls.update();
+  if(currentGroup){
+    currentGroup.rotation.y=Math.sin(t*0.3)*0.06;
+    currentGroup.rotation.x=Math.sin(t*0.2)*0.04;
+  }
+  // flame flicker
+  if(bunsenFlame){bunsenFlame.intensity=20+Math.sin(t*6)*5;}
+  renderer.render(scene,camera);
+}
+animate();
+
+// ---------- Resize ----------
+window.addEventListener('resize',()=>{
+  camera.aspect=view.clientWidth/view.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(view.clientWidth,view.clientHeight);
+});
+
+// Start
+buildExp('combination');
+</script>
+</body>
+</html>

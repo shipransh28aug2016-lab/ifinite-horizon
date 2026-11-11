@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vigyan Atlas — Class X Biology: Realistic 3D Models</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0b1220;color:#e8eef2;font:14px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Noto Sans,Nirmala UI,"Noto Sans Devanagari",Arial,sans-serif;overflow:hidden}
+  #view{position:relative;width:100vw;height:100vh;background:linear-gradient(180deg,#0f1b33 0%,#070a14 100%);overflow:hidden;display:flex}
+  canvas{display:block;width:100%;height:100%}
+  #sidebar{position:absolute;top:0;left:0;width:320px;height:100%;background:rgba(10,18,30,0.92);backdrop-filter:blur(8px);border-right:1px solid rgba(255,255,255,0.1);z-index:20;overflow-y:auto;transform:translateX(-102%);transition:transform .25s}
+  #sidebar.open{transform:translateX(0)}
+  #sidebar h2{font-size:15px;color:#ffd54f;padding:14px;border-bottom:1px solid rgba(255,255,255,0.12)}
+  .topic{padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13.5px;color:#c9d6df;transition:all .15s;display:flex;justify-content:space-between;align-items:center}
+  .topic:hover{background:rgba(255,255,255,0.05);color:#fff}
+  .topic.active{background:linear-gradient(90deg,rgba(255,213,79,0.15),transparent);color:#ffd54f;border-left:3px solid #ffd54f}
+  .topic .hi{font-size:11.5px;color:#8ee0a7;opacity:0.8}
+  #hud{position:absolute;top:12px;left:340px;right:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;z-index:20;pointer-events:none}
+  #hud>*{pointer-events:auto}
+  .bar{background:rgba(10,16,28,0.75);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .bar h2{font-size:15px;color:#ffd54f;margin:0 0 6px 0;letter-spacing:0.4px}
+  .bar p{font-size:12.5px;color:#9fb3c8;margin:0;line-height:1.45}
+  .btn{border:none;background:#1d3a5a;color:#fff;border:1px solid rgba(255,255,255,0.25);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;transition:all .15s}
+  .btn:hover{background:#2a527e;border-color:#6fb3d8}
+  .btn.active{background:#ffd54f;color:#0b1220;border-color:#ffd54f}
+  .openBtn{position:absolute;top:12px;left:12px;z-index:30}
+  #labels{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:15}
+  .lab{position:absolute;transform:translate(-50%,-10px);font:bold 12.5px/1.2 system-ui;color:#fff;text-shadow:0 0 10px rgba(0,0,0,.85),0 0 4px #000;padding:2px 8px;border-radius:6px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.35);white-space:nowrap;opacity:0;transition:opacity .15s}
+  .lab.show{opacity:1}
+  .lab.hi{border-color:#ffd54f;background:rgba(15,30,50,.85);color:#ffd54f}
+  .hint{position:absolute;bottom:14px;left:14px;right:14px;color:#8aa3b8;font-size:12.5px;z-index:20;text-align:center;pointer-events:none}
+  .desc{position:absolute;bottom:110px;left:340px;right:12px;color:#9fb3c8;font-size:13px;z-index:20;pointer-events:none;max-width:700px;line-height:1.5}
+  @media (max-width:720px){#sidebar{width:260px}#hud{left:12px}.desc{left:12px}}
+</style>
+</head>
+<body>
+<div id="view">
+  <button class="openBtn btn" onclick="toggleSidebar()">☰ Topics</button>
+  <div id="sidebar">
+    <h2>कक्षा 10 जीव विज्ञान · Class X Biology</h2>
+    <div class="topic active" data-topic="cellcycle" onclick="selectTopic('cellcycle')">Cell Cycle & Division — कोशिका चक्र <span class="hi">कोशिका चक्र</span></div>
+    <div class="topic" data-topic="chromosome" onclick="selectTopic('chromosome')">Chromosome — क्रोमोसोम <span class="hi">क्रोमोसोम</span></div>
+    <div class="topic" data-topic="genetics" onclick="selectTopic('genetics')">Genetics — अनुवंशिकी <span class="hi">अनुवंशिकी</span></div>
+    <div class="topic" data-topic="absorption" onclick="selectTopic('absorption')">Absorption by Roots — जड़ों द्वारा अवशोषण <span class="hi">जड़ों द्वारा अवशोषण</span></div>
+    <div class="topic" data-topic="transpiration" onclick="selectTopic('transpiration')">Transpiration — वाष्पोत्सर्जन <span class="hi">वाष्पोत्सर्जन</span></div>
+    <div class="topic" data-topic="photosynthesis" onclick="selectTopic('photosynthesis')">Photosynthesis — प्रकाश संश्लेषण <span class="hi">प्रकाश संश्लेषण</span></div>
+    <div class="topic" data-topic="chemicalcoord" onclick="selectTopic('chemicalcoord')">Chemical Coordination in Plants — पादप रासायनिक समन्वय <span class="hi">पादप रासायनिक समन्वय</span></div>
+    <div class="topic" data-topic="circulatory" onclick="selectTopic('circulatory')">Circulatory System — परिसंचरण तंत्र <span class="hi">परिसंचरण तंत्र</span></div>
+    <div class="topic" data-topic="excretory" onclick="selectTopic('excretory')">Excretory System — उत्सर्जन तंत्र <span class="hi">उत्सर्जन तंत्र</span></div>
+    <div class="topic" data-topic="nervous" onclick="selectTopic('nervous')">Nervous System — तंत्रिका तंत्र <span class="hi">तंत्रिका तंत्र</span></div>
+    <div class="topic" data-topic="endocrine" onclick="selectTopic('endocrine')">Endocrine System — अंतःस्रावी तंत्र <span class="hi">अंतःस्रावी तंत्र</span></div>
+    <div class="topic" data-topic="reproductive" onclick="selectTopic('reproductive')">Reproductive System — प्रजनन तंत्र <span class="hi">प्रजनन तंत्र</span></div>
+    <div class="topic" data-topic="population" onclick="selectTopic('population')">Population — जनसंख्या <span class="hi">जनसंख्या</span></div>
+    <div class="topic" data-topic="evolution" onclick="selectTopic('evolution')">Human Evolution — मानव विकास <span class="hi">मानव विकास</span></div>
+    <div class="topic" data-topic="pollution" onclick="selectTopic('pollution')">Pollution — प्रदूषण <span class="hi">प्रदूषण</span></div>
+  </div>
+  <div id="hud">
+    <div class="bar">
+      <div>
+        <h2 id="topicTitle">Cell Cycle & Division</h2>
+        <p id="topicDesc">Cell cycle phases: interphase, prophase, metaphase, anaphase, telophase, cytokinesis — PBR realistic model.</p>
+      </div>
+    </div>
+    <div class="bar" style="flex:1;justify-content:flex-end">
+      <button class="btn" id="btnPlay">▶ Play</button>
+      <button class="btn" id="btnIso">Isolate</button>
+    </div>
+  </div>
+  <div id="labels"></div>
+  <div class="desc" id="topicDetail"></div>
+  <div class="hint">Drag to rotate · Pinch to zoom · Click topic in sidebar · Built with three.js r160 PBR · Realistic 3D, no video</div>
+</div>
+<script type="importmap">
+{"imports":{"three":"../../lib/three.module.js","three/addons/":"../../lib/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+// ---------- State ----------
+let state = { topic: 'cellcycle', playing: true, isolate: false };
+
+// ---------- Scene ----------
+const view = document.querySelector('#view');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x070a14);
+scene.fog = new THREE.FogExp2(0x070a14, 0.16);
+
+const camera = new THREE.PerspectiveCamera(45, view.clientWidth / view.clientHeight, 0.1, 200);
+camera.position.set(0, 0.8, 4.2);
+
+const renderer = new THREE.WebGLRenderer({antialias:true, powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.setSize(view.clientWidth, view.clientHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+view.appendChild(renderer.domElement);
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance = 1.5;
+controls.maxDistance = 16;
+controls.autoRotate = state.playing;
+
+// ---------- Lights ----------
+const amb = new THREE.AmbientLight(0xffffff, 0.3); scene.add(amb);
+const spot = new THREE.SpotLight(0xffffff, 50, 30, 0.35, 0.5, 1);
+spot.position.set(1.8, 2.8, 2.4); spot.target.position.set(0,0,0);
+spot.castShadow = true; spot.shadow.mapSize.set(2048,2048);
+scene.add(spot); scene.add(spot.target);
+const fill = new THREE.PointLight(0x6fb3d8, 12, 14); fill.position.set(-2.2,0.2,1.6); scene.add(fill);
+const rim = new THREE.PointLight(0xffd54f, 14, 14); rim.position.set(1.4,-1.4,-2.2); scene.add(rim);
+
+// ---------- PBR material presets ----------
+function matPBR(color, opts={}) {
+  return new THREE.MeshStandardMaterial(Object.assign({color, roughness:0.55, metalness:0.08, clearcoat:0.4, clearcoatRoughness:0.25}, opts));
+}
+function matWet(color) {
+  return new THREE.MeshPhysicalMaterial({color, roughness:0.2, metalness:0, clearcoat:1, clearcoatRoughness:0.1, transmission:0.15, thickness:0.4});
+}
+function matMatte(color) { return new THREE.MeshStandardMaterial({color, roughness:0.85, metalness:0.02}); }
+function matGlossy(color) { return new THREE.MeshStandardMaterial({color, roughness:0.3, metalness:0.1, clearcoat:0.8, clearcoatRoughness:0.1}); }
+function matGlass() {
+  return new THREE.MeshPhysicalMaterial({color:0xffffff, roughness:0.04, metalness:0, transmission:0.92, thickness:0.9, attenuationDistance:1.2, clearcoat:1, clearcoatRoughness:0.08, ior:1.5});
+}
+
+// ---------- Labels ----------
+const labelsEl = document.getElementById('labels');
+const labelEls = new Map();
+function label(id,text,pos,active,hi){
+  let el=labelEls.get(id);
+  if(!el){el=document.createElement('div');el.className='lab'+(hi?' hi':'');el.textContent=text;labelsEl.appendChild(el);labelEls.set(id,el);}
+  if(active){
+    const v=pos.clone().project(camera);
+    const x=(v.x*0.5+0.5)*view.clientWidth;
+    const y=(1-(v.y*0.5+0.5))*view.clientHeight;
+    el.style.left=x+'px';el.style.top=y+'px';el.classList.add('show');
+    if(hi)el.classList.add('hi');else el.classList.remove('hi');
+  }else{el.classList.remove('show');}
+}
+function clearLabels(){labelEls.forEach(e=>e.classList.remove('show'));}
+
+// ---------- Current model ----------
+let currentGroup = null;
+
+function clearScene(){
+  if(currentGroup){
+    scene.remove(currentGroup);
+    currentGroup.traverse(o=>{
+      if(o.geometry)o.geometry.dispose();
+      if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose();}
+    });
+  }
+  currentGroup=null;clearLabels();
+}
+
+// ---------- 1. CELL CYCLE & DIVISION ----------
+function buildCellCycle(){
+  const g=new THREE.Group();
+  // Cell outline
+  const cell=new THREE.Mesh(new THREE.CircleGeometry(1.1,40),matPBR(0xe8f0e8));
+  cell.material.transparent=true;cell.material.opacity=0.3;cell.castShadow=true;g.add(cell);
+  // Nucleus
+  const nuc=new THREE.Mesh(new THREE.CircleGeometry(0.45,40),matPBR(0x8a6d3f));
+  nuc.position.set(0,0,0.1);nuc.castShadow=true;g.add(nuc);
+  // Chromosomes (condensed) - X shaped pairs
+  for(let i=0;i<4;i++){
+    const ang=(i/4)*Math.PI*2;
+    const chr=new THREE.Group();
+    const arm1=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.35,12),matPBR(0xd06060));
+    arm1.position.set(0,0.18,0);chr.add(arm1);
+    const arm2=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.35,12),matPBR(0xd06060));
+    arm2.position.set(0,-0.18,0);chr.add(arm2);
+    const cen=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,0.06,12),matPBR(0x604040));
+    cen.position.set(0,0,0);chr.add(cen);
+    chr.position.set(Math.cos(ang)*0.55,Math.sin(ang)*0.55,0);
+    chr.rotation.z=ang+Math.PI/4;
+    chr.castShadow=true;g.add(chr);
+  }
+  // Spindle fibers
+  for(let i=0;i<8;i++){
+    const ang=(i/8)*Math.PI*2;
+    const fib=new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,1.0,8),matMatte(0xb0c0d0));
+    fib.position.set(Math.cos(ang)*0.55,0,Math.sin(ang)*0.55);
+    fib.lookAt(0,0,0);g.add(fib);
+  }
+  // Centrioles
+  const cent1=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,0.15,12),matPBR(0x80a0c0));
+  cent1.position.set(-0.8,0,0);g.add(cent1);
+  const cent2=cent1.clone();cent2.position.set(0.8,0,0);g.add(cent2);
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0,4.2);
+  const lbls=[
+    {id:'cell',text:'Cell — कोशिका',pos:new THREE.Vector3(0,1.1,0),hi:true},
+    {id:'nuc',text:'Nucleus — नाभिक',pos:new THREE.Vector3(0,0,0.1),hi:false},
+    {id:'chr',text:'Chromosomes — क्रोमोसोम',pos:new THREE.Vector3(0.55,0.55,0),hi:false},
+    {id:'fib',text:'Spindle Fibers — कताई रेशे',pos:new THREE.Vector3(0,-1.05,0),hi:false},
+    {id:'cent',text:'Centrioles — सेंट्रिओल',pos:new THREE.Vector3(-0.8,0,0),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Cell Cycle & Division — कोशिका चक्र';
+  document.getElementById('topicDesc').textContent='Cell cycle phases: interphase, prophase, metaphase, anaphase, telophase, cytokinesis — chromosomes, spindle fibers, centrioles.';
+  document.getElementById('topicDetail').textContent='कोशिका चक्र के चरण: अंतरावस्था, पूर्वावस्था, मध्यावस्था, अंतर्वस्था, अंतिमावस्था, साइटोकाइनेसिस — क्रोमोसोम, स्पिंडल रेशे, सेंट्रिओल।';
+}
+
+// ---------- 2. CHROMOSOME ----------
+function buildChromosome(){
+  const g=new THREE.Group();
+  // Chromatid arms
+  const armL=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,0.9,16),matPBR(0xc06060));
+  armL.position.set(-0.02,0.45,0);g.add(armL);
+  const armR=armL.clone();armR.position.set(0.02,-0.45,0);g.add(armR);
+  // Centromere
+  const cen=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,0.25,16),matPBR(0x704040));
+  cen.position.set(0,0,0);g.add(cen);
+  // Telomeres (ends)
+  const telo1=new THREE.Mesh(new THREE.SphereGeometry(0.06,20,16),matPBR(0xf0a040));
+  telo1.position.set(-0.02,0.9,0);g.add(telo1);
+  const telo2=telo1.clone();telo2.position.set(0.02,-0.9,0);g.add(telo2);
+  // DNA double helix (simplified wrapped)
+  const dna=new THREE.Group();
+  for(let i=0;i<12;i++){
+    const t=i/12*Math.PI*4;
+    const strand=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.25,8),matPBR(0x60a0d0));
+    strand.position.set(Math.sin(t)*0.25,t*0.15-0.45,Math.cos(t)*0.25);
+    strand.rotation.z=t;dna.add(strand);
+  }
+  dna.position.set(0,0,0.2);dna.scale.set(0.8,0.8,0.8);g.add(dna);
+  // Histone proteins (beads)
+  for(let i=0;i<8;i++){
+    const bead=new THREE.Mesh(new THREE.SphereGeometry(0.09,20,16),matPBR(0xf0d080));
+    bead.position.set(Math.sin(i)*0.2,i*0.25-0.7,0.3);g.add(bead);
+  }
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0,3.6);
+  const lbls=[
+    {id:'arm',text:'Chromatid Arms — क्रोमैटिड भुजा',pos:new THREE.Vector3(-0.02,0.45,0),hi:true},
+    {id:'cen',text:'Centromere — केंद्रोमियर',pos:new THREE.Vector3(0,0,0),hi:false},
+    {id:'telo',text:'Telomere — टेलोमीयर',pos:new THREE.Vector3(-0.02,0.9,0),hi:false},
+    {id:'dna',text:'DNA — डीएनए',pos:new THREE.Vector3(0,0,0.2),hi:false},
+    {id:'hist',text:'Histone — हिस्टोन प्रोटीन',pos:new THREE.Vector3(0,-0.45,0.3),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Chromosome — क्रोमोसोम';
+  document.getElementById('topicDesc').textContent='Chromatid arms, centromere, telomeres, DNA double helix, histone proteins — realistic chromosome structure.';
+  document.getElementById('topicDetail').textContent='क्रोमैटिड भुजा, केंद्रोमियर, टेलोमीयर, डीएनए डबल हेलिक्स, हिस्टोन प्रोटीन — वास्तविक क्रोमोसोम संरचना।';
+}
+
+// ---------- 3. GENETICS ----------
+function buildGenetics(){
+  const g=new THREE.Group();
+  // DNA double helix ladder
+  const dna=new THREE.Group();
+  for(let i=0;i<15;i++){
+    const t=i/15*Math.PI*6;
+    const y=(i/15)*2-1;
+    // backbone strands
+    const s1=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,0.14,8),matPBR(0x60a0d0));
+    s1.position.set(Math.sin(t)*0.4,y,Math.cos(t)*0.4);s1.rotation.z=t;dna.add(s1);
+    const s2=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,0.14,8),matPBR(0x60a0d0));
+    s2.position.set(-Math.sin(t)*0.4,y,-Math.cos(t)*0.4);s2.rotation.z=t;dna.add(s2);
+    // base pairs (rungs)
+    const bp=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.9,8),matWet(0xf0d060));
+    bp.position.set(0,y,0);bp.rotation.z=t;dna.add(bp);
+  }
+  dna.position.set(0,0,0);g.add(dna);
+  // Gene segments (colored blocks)
+  const genes=['A','T','G','C'];
+  for(let i=0;i<8;i++){
+    const t=i/8*Math.PI*6;
+    const y=(i/8)*2-1;
+    const gene=new THREE.Mesh(new THREE.BoxGeometry(0.1,0.06,0.1),matPBR(0xff6b6b));
+    gene.position.set(Math.sin(t)*0.42,y,Math.cos(t)*0.42);gene.rotation.z=t;g.add(gene);
+  }
+  // Punnett square (2x2) for inheritance
+  const sq=new THREE.Group();
+  const colors=[0x8ee0a7,0xffd54f,0xff9d94,0xa9d4f7];
+  for(let i=0;i<4;i++){
+    const cell=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.5,0.2),matPBR(colors[i]));
+    cell.position.set((i%2-0.5)*0.55,Math.floor(i/2)*0.55-0.25,0.8);cell.castShadow=true;sq.add(cell);
+    const txt=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.2,0.1),matMatte(0xffffff));
+    txt.position.copy(cell.position);txt.position.z+=0.11;sq.add(txt);
+  }
+  sq.position.set(0,-1.4,0);g.add(sq);
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0,4.2);
+  const lbls=[
+    {id:'dna',text:'DNA Double Helix — डीएनए डबल हेलिक्स',pos:new THREE.Vector3(0,0.4,0),hi:true},
+    {id:'gene',text:'Gene Segments — जीन खंड',pos:new THREE.Vector3(0.42,-0.3,0),hi:false},
+    {id:'sq',text:'Punnett Square — पन्नेट वर्ग',pos:new THREE.Vector3(0,-1.4,0.8),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Genetics — अनुवंशिकी';
+  document.getElementById('topicDesc').textContent='DNA double helix with base pairs, gene segments, Punnett square for Mendelian inheritance.';
+  document.getElementById('topicDetail').textContent='आधार युग्मों वाला डीएनए डबल हेलिक्स, जीन खंड, मेंडेलीय विरासत के लिए पन्नेट वर्ग।';
+}
+
+// ---------- 4. ABSORPTION BY ROOTS ----------
+function buildAbsorption(){
+  const g=new THREE.Group();
+  // Root system
+  const rootMain=new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.15,1.2,16),matPBR(0x6a4a2a));
+  rootMain.rotation.x=Math.PI/2;rootMain.position.set(0,-0.6,0);rootMain.castShadow=true;g.add(rootMain);
+  // Root hairs
+  for(let i=0;i<20;i++){
+    const ang=(i/20)*Math.PI*4;
+    const hair=new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,0.25,8),matPBR(0x8a6d3f));
+    const r=0.15+i*0.015;
+    hair.position.set(Math.cos(ang)*r,-0.6,Math.sin(ang)*r);
+    hair.rotation.set(Math.PI/2,0,ang);hair.castShadow=true;g.add(hair);
+  }
+  // Root tip / cap
+  const tip=new THREE.Mesh(new THREE.ConeGeometry(0.18,0.3,12),matPBR(0x5a3a2a));
+  tip.rotation.x=Math.PI/2;tip.position.set(0,-1.2,0);tip.castShadow=true;g.add(tip);
+  // Water molecules in soil (blue dots)
+  const soil=new THREE.Group();
+  for(let i=0;i<30;i++){
+    const w=new THREE.Mesh(new THREE.SphereGeometry(0.03,10,8),matGlass());
+    w.position.set((Math.random()-0.5)*2.5,-1.3,(Math.random()-0.5)*2.5);soil.add(w);
+  }
+  g.add(soil);
+  // Xylem vessel (water transport up)
+  const xylem=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,1.0,12),matGlass());
+  xylem.position.set(0,0,0);xylem.material.transparent=true;xylem.material.opacity=0.6;g.add(xylem);
+  // Arrows: water up
+  function arrow(p0,p1,color){
+    const dir=new THREE.Vector3().subVectors(p1,p0).normalize();
+    const len=p0.distanceTo(p1);
+    const geo=new THREE.CylinderGeometry(0.02,0.02,len,10);
+    const mat=new THREE.MeshBasicMaterial({color});
+    const arr=new THREE.Mesh(geo,mat);arr.position.copy(p0).lerp(p1,0.5);arr.lookAt(p1);arr.rotation.x-=Math.PI/2;g.add(arr);
+  }
+  arrow(new THREE.Vector3(0,-1.15,0),new THREE.Vector3(0,-0.9,0),0x44a0ff);
+  arrow(new THREE.Vector3(0,-0.7,0),new THREE.Vector3(0,-0.4,0),0x44a0ff);
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,-0.2,3.6);
+  const lbls=[
+    {id:'root',text:'Root — जड़',pos:new THREE.Vector3(0,-0.6,0),hi:true},
+    {id:'hair',text:'Root Hairs — जड़ रोएं',pos:new THREE.Vector3(0.15,-0.6,0.3),hi:false},
+    {id:'tip',text:'Root Tip — जड़ अग्रभाग',pos:new THREE.Vector3(0,-1.2,0),hi:false},
+    {id:'xylem',text:'Xylem — जाइलम (जल परिवहन)',pos:new THREE.Vector3(0,0.3,0),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Absorption by Roots — जड़ों द्वारा अवशोषण';
+  document.getElementById('topicDesc').textContent='Root system with root hairs, root tip, xylem vessel, water absorption from soil — realistic PBR.';
+  document.getElementById('topicDetail').textContent='जड़ प्रणाली जड़ रोएं, जड़ अग्रभाग, जाइलम वाहिका, मिट्टी से जल अवशोषण — वास्तविक PBR।';
+}
+
+// ---------- 5. TRANSPIRATION ----------
+function buildTranspiration(){
+  const g=new THREE.Group();
+  // Leaf
+  const leaf=new THREE.Mesh(new THREE.BoxGeometry(2.2,0.15,1.2),matPBR(0x7aa040));
+  leaf.position.set(0,0,0);leaf.castShadow=true;g.add(leaf);
+  // Stomata (open/closed)
+  for(let i=0;i<10;i++){
+    const sto=new THREE.Mesh(new THREE.BoxGeometry(0.15,0.05,0.04),matMatte(0x4a5a30));
+    sto.position.set((Math.random()-0.5)*1.8,0.075,(Math.random()-0.5)*0.9);g.add(sto);
+  }
+  // Water vapor arrows going up
+  for(let i=0;i<8;i++){
+    const ang=(i/8)*Math.PI*2;
+    const start=new THREE.Vector3(Math.cos(ang)*0.6,0.1,Math.sin(ang)*0.6);
+    const end=new THREE.Vector3(Math.cos(ang)*0.8,0.9,Math.sin(ang)*0.8);
+    arrowTrans(start,end,0x6fb3d8,g);
+  }
+  // Guard cells
+  const guard1=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.08,0.04),matPBR(0x5a6a30));
+  guard1.position.set(-0.5,0.075,-0.4);g.add(guard1);
+  const guard2=guard1.clone();guard2.position.set(-0.38,0.075,-0.4);g.add(guard2);
+  // Stem
+  const stem=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,0.8,16),matPBR(0x6a9a40));
+  stem.position.set(0,-0.5,0);stem.castShadow=true;g.add(stem);
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0.3,3.4);
+  const lbls=[
+    {id:'leaf',text:'Leaf — पत्ता',pos:new THREE.Vector3(0,0,0),hi:true},
+    {id:'sto',text:'Stomata — रोमछिद्र',pos:new THREE.Vector3(0.6,0.075,0.3),hi:false},
+    {id:'guard',text:'Guard Cells — संरक्षक कोशिकाएं',pos:new THREE.Vector3(-0.44,0.075,-0.4),hi:false},
+    {id:'stem',text:'Stem — तना',pos:new THREE.Vector3(0,-0.5,0),hi:false},
+    {id:'vap',text:'Water Vapor — जल वाष्प',pos:new THREE.Vector3(0.8,0.9,0.8),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Transpiration — वाष्पोत्सर्जन';
+  document.getElementById('topicDesc').textContent='Leaf with stomata, guard cells, stem, water vapor loss to atmosphere — realistic PBR.';
+  document.getElementById('topicDetail').textContent='रोमछिद्र, संरक्षक कोशिकाएं, तना, वातावरण में जल वाष्प हानि — वास्तविक PBR।';
+}
+function arrowTrans(p0,p1,color,group){
+  const dir=new THREE.Vector3().subVectors(p1,p0).normalize();
+  const len=p0.distanceTo(p1);
+  const geo=new THREE.CylinderGeometry(0.02,0.02,len,10);
+  const mat=new THREE.MeshBasicMaterial({color,transparent:true,opacity:0.7});
+  const arr=new THREE.Mesh(geo,mat);arr.position.copy(p0).lerp(p1,0.5);arr.lookAt(p1);arr.rotation.x-=Math.PI/2;group.add(arr);
+}
+
+// ---------- 6. PHOTOSYNTHESIS ----------
+function buildPhotosynthesis(){
+  const g=new THREE.Group();
+  // Leaf cross section
+  const leaf=new THREE.Mesh(new THREE.BoxGeometry(2.4,0.2,1.6),matPBR(0x7aa040));
+  leaf.position.set(0,0,0);leaf.castShadow=true;g.add(leaf);
+  // Chloroplasts
+  for(let i=0;i<18;i++){
+    const chl=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,0.14,12),matPBR(0x4a8a30));
+    chl.position.set((Math.random()-0.5)*2.0,0.02,(Math.random()-0.5)*1.3);chl.rotation.x=Math.random()*Math.PI;chl.castShadow=true;g.add(chl);
+  }
+  // CO2 in arrow
+  arrowPhoto(new THREE.Vector3(-1.5,0,-0.4),new THREE.Vector3(-1.1,0,-0.4),0xff4444,g); // CO2
+  // O2 out arrow
+  arrowPhoto(new THREE.Vector3(1.5,0,0.4),new THREE.Vector3(1.1,0,0.4),0x44ff88,g); // O2
+  // Light (sun) arrow
+  arrowPhoto(new THREE.Vector3(-1.5,1.2,-1.0),new THREE.Vector3(-0.8,0.2,-0.5),0xffd54f,g); // light
+  // Glucose produced (dot)
+  const glu=new THREE.Mesh(new THREE.SphereGeometry(0.08,20,16),matPBR(0xf0d060));
+  glu.position.set(0.6,-0.02,0.5);g.add(glu);
+  // Water in
+  arrowPhoto(new THREE.Vector3(0,-0.3,-0.6),new THREE.Vector3(0,-0.1,-0.6),0x44a0ff,g); // water
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0.4,3.8);
+  const lbls=[
+    {id:'leaf',text:'Leaf Cross Section — पत्ता अनुप्रस्थ काट',pos:new THREE.Vector3(0,0,0),hi:true},
+    {id:'chl',text:'Chloroplast — क्लोरोप्लास्ट',pos:new THREE.Vector3(0.6,0.02,-0.4),hi:false},
+    {id:'co2',text:'CO₂ In — कार्बन डाइऑक्साइड अंदर',pos:new THREE.Vector3(-1.1,0,-0.4),hi:false},
+    {id:'o2',text:'O₂ Out — ऑक्सीजन बाहर',pos:new THREE.Vector3(1.1,0,0.4),hi:false},
+    {id:'light',text:'Light — प्रकाश',pos:new THREE.Vector3(-0.8,0.2,-0.5),hi:false},
+    {id:'glu',text:'Glucose — ग्लूकोज',pos:new THREE.Vector3(0.6,-0.02,0.5),hi:false},
+    {id:'water',text:'Water — पानी',pos:new THREE.Vector3(0,-0.1,-0.6),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Photosynthesis — प्रकाश संश्लेषण';
+  document.getElementById('topicDesc').textContent='Leaf cross-section with chloroplasts, CO2 in, O2 out, light energy, water in, glucose produced.';
+  document.getElementById('topicDetail').textContent='क्लोरोप्लास्ट, CO2 अंदर, O2 बाहर, प्रकाश ऊर्जा, पानी अंदर, ग्लूकोज उत्पादन सहित पत्ते का अनुप्रस्थ काट।';
+}
+function arrowPhoto(p0,p1,color,group){
+  const dir=new THREE.Vector3().subVectors(p1,p0).normalize();
+  const len=p0.distanceTo(p1);
+  const geo=new THREE.CylinderGeometry(0.02,0.02,len,10);
+  const mat=new THREE.MeshBasicMaterial({color,transparent:true,opacity:0.8});
+  const arr=new THREE.Mesh(geo,mat);arr.position.copy(p0).lerp(p1,0.5);arr.lookAt(p1);arr.rotation.x-=Math.PI/2;group.add(arr);
+}
+
+// ---------- 7. CHEMICAL COORDINATION IN PLANTS ----------
+function buildChemicalCoord(){
+  const g=new THREE.Group();
+  // Plant shoot
+  const stem=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,1.4,16),matPBR(0x6a9a40));
+  stem.position.set(0,0.2,0);stem.castShadow=true;g.add(stem);
+  // Leaves
+  for(let i=0;i<4;i++){
+    const leaf=new THREE.Mesh(new THREE.SphereGeometry(0.25,24,20),matPBR(0x8ac050));
+    leaf.position.set((i%2)*0.5-0.25,0.7+i*0.3,0);leaf.scale.set(1,0.7,0.9);leaf.castShadow=true;g.add(leaf);
+  }
+  // Auxin (growth hormone) dots moving down
+  for(let i=0;i<8;i++){
+    const aux=new THREE.Mesh(new THREE.SphereGeometry(0.05,16,12),matPBR(0xffd54f));
+    aux.position.set(0,0.6-i*0.15,0);g.add(aux);
+  }
+  // Root tip producing auxin
+  const rootTip=new THREE.Mesh(new THREE.ConeGeometry(0.12,0.25,12),matPBR(0x5a3a2a));
+  rootTip.position.set(0,-0.5,0);rootTip.rotation.x=Math.PI/2;rootTip.castShadow=true;g.add(rootTip);
+  // Phototropism arrow (bending toward light)
+  const bendArrow=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.6,8),matMatte(0xffd54f));
+  bendArrow.position.set(0,1.1,0);bendArrow.rotation.z=0.3;g.add(bendArrow);
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0,3.6);
+  const lbls=[
+    {id:'stem',text:'Stem — तना',pos:new THREE.Vector3(0,0.2,0),hi:true},
+    {id:'leaf',text:'Leaves — पत्ते',pos:new THREE.Vector3(0.25,1.0,0),hi:false},
+    {id:'aux',text:'Auxin — ऑक्सिन (वृद्धि हार्मोन)',pos:new THREE.Vector3(0,0.35,0),hi:false},
+    {id:'root',text:'Root Tip — जड़ अग्रभाग (ऑक्सिन उत्पादन)',pos:new THREE.Vector3(0,-0.5,0),hi:false},
+    {id:'bend',text:'Phototropism — प्रकाशानुकूलन',pos:new THREE.Vector3(0,1.1,0),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Chemical Coordination in Plants — पादप रासायनिक समन्वय';
+  document.getElementById('topicDesc').textContent='Plant shoot with auxin hormone from root tip, phototropism bending toward light — realistic PBR.';
+  document.getElementById('topicDetail').textContent='जड़ अग्रभाग से ऑक्सिन हार्मोन वाला पौधा तना, प्रकाश की ओर फोटोट्रोपिज्म झुकाव — वास्तविक PBR।';
+}
+
+// ---------- 8. CIRCULATORY SYSTEM ----------
+function buildCirculatory(){
+  const g=new THREE.Group();
+  // Heart
+  const heart=new THREE.Mesh(new THREE.SphereGeometry(0.9,48,36),matWet(0xa83232));
+  heart.scale.set(1,0.85,0.75);heart.position.set(0,0.2,0);heart.castShadow=true;heart.receiveShadow=true;g.add(heart);
+  // Aorta
+  const aort=new THREE.Mesh(new THREE.TorusGeometry(0.65,0.12,16,60,Math.PI),matWet(0x942626));
+  aort.rotation.set(Math.PI/2,0,0);aort.position.set(0,1.05,-0.05);aort.castShadow=true;g.add(aort);
+  // Arteries (red, oxygenated)
+  const art1=new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.14,0.7,20),matWet(0xe04040));
+  art1.position.set(-0.4,0.7,0);art1.rotation.z=-0.5;g.add(art1);
+  const art2=art1.clone();art2.position.set(0.4,0.7,0);art2.rotation.z=0.5;g.add(art2);
+  // Veins (blue, deoxygenated)
+  const vein1=new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.14,0.7,20),matWet(0x4060e0));
+  vein1.position.set(-0.4,-0.4,0);vein1.rotation.z=0.5;g.add(vein1);
+  const vein2=vein1.clone();vein2.position.set(0.4,-0.4,0);vein2.rotation.z=-0.5;g.add(vein2);
+  // Blood cells (red dots flowing)
+  for(let i=0;i<15;i++){
+    const bc=new THREE.Mesh(new THREE.SphereGeometry(0.05,16,12),matPBR(0xc03030));
+    bc.position.set(Math.sin(i)*0.5,0.2+i*0.1,0);g.add(bc);
+  }
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0,4.0);
+  const lbls=[
+    {id:'heart',text:'Heart — हृदय',pos:new THREE.Vector3(0,0.2,0),hi:true},
+    {id:'aort',text:'Aorta — महाधमनी',pos:new THREE.Vector3(0,1.15,-0.05),hi:false},
+    {id:'art',text:'Arteries — धमनियां (ऑक्सीजन युक्त)',pos:new THREE.Vector3(-0.4,0.7,0),hi:false},
+    {id:'vein',text:'Veins — शिराएं (ऑक्सीजन रहित)',pos:new THREE.Vector3(-0.4,-0.4,0),hi:false},
+    {id:'bc',text:'Blood Cells — रक्त कोशिकाएं',pos:new THREE.Vector3(0.5,0.5,0),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Circulatory System — परिसंचरण तंत्र';
+  document.getElementById('topicDesc').textContent='Heart, aorta, arteries (oxygenated), veins (deoxygenated), blood cells — realistic PBR circulatory system.';
+  document.getElementById('topicDetail').textContent='हृदय, महाधमनी, धमनियां (ऑक्सीजन युक्त), शिराएं (ऑक्सीजन रहित), रक्त कोशिकाएं — वास्तविक PBR परिसंचरण तंत्र।';
+}
+
+// ---------- 9. EXCRETORY SYSTEM ----------
+function buildExcretory(){
+  const g=new THREE.Group();
+  // Kidneys (2)
+  const kidL=new THREE.Mesh(new THREE.SphereGeometry(0.45,40,32),matPBR(0x905040));
+  kidL.position.set(-0.7,0.1,0);kidL.scale.set(1,0.8,0.7);kidL.castShadow=true;kidL.receiveShadow=true;g.add(kidL);
+  const kidR=kidL.clone();kidR.position.set(0.7,0.1,0);g.add(kidR);
+  // Ureters
+  const ureL=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,0.8,16),matPBR(0x704040));
+  ureL.position.set(-0.7,-0.45,0);ureL.rotation.x=Math.PI/2;g.add(ureL);
+  const ureR=ureL.clone();ureR.position.set(0.7,-0.45,0);g.add(ureR);
+  // Bladder
+  const blad=new THREE.Mesh(new THREE.SphereGeometry(0.5,40,32),matWet(0xa08060));
+  blad.position.set(0,-1.3,0);blad.scale.set(1,0.7,0.9);blad.castShadow=true;g.add(blad);
+  // Urethra
+  const ureth=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,0.5,16),matPBR(0x704040));
+  ureth.position.set(0,-1.75,0);ureth.rotation.x=Math.PI/2;g.add(ureth);
+  // Nephron detail (in kidney)
+  const neph=new THREE.Mesh(new THREE.TorusGeometry(0.25,0.06,12,40,Math.PI),matPBR(0xc0a080));
+  neph.position.set(-0.7,0.1,0.3);neph.rotation.x=Math.PI/2;g.add(neph);
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0,4.0);
+  const lbls=[
+    {id:'kid',text:'Kidneys — गुर्दे (दो)',pos:new THREE.Vector3(-0.7,0.1,0),hi:true},
+    {id:'ure',text:'Ureters — मूत्रवाहिनी',pos:new THREE.Vector3(-0.7,-0.45,0),hi:false},
+    {id:'blad',text:'Bladder — मूत्राशय',pos:new THREE.Vector3(0,-1.3,0),hi:false},
+    {id:'ureth',text:'Urethra — मूत्रमार्ग',pos:new THREE.Vector3(0,-1.75,0),hi:false},
+    {id:'neph',text:'Nephron — नेफ्रॉन',pos:new THREE.Vector3(-0.7,0.1,0.3),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Excretory System — उत्सर्जन तंत्र';
+  document.getElementById('topicDesc').textContent='Kidneys, ureters, bladder, urethra, nephron — realistic PBR excretory system.';
+  document.getElementById('topicDetail').textContent='गुर्दे, मूत्रवाहिनी, मूत्राशय, मूत्रमार्ग, नेफ्रॉन — वास्तविक PBR उत्सर्जन तंत्र।';
+}
+
+// ---------- 10. NERVOUS SYSTEM ----------
+function buildNervous(){
+  const g=new THREE.Group();
+  // Brain
+  const brain=new THREE.Mesh(new THREE.SphereGeometry(0.7,48,36),matPBR(0x705040));
+  brain.position.set(0,1.1,0);brain.scale.set(1,0.85,0.9);brain.castShadow=true;brain.receiveShadow=true;g.add(brain);
+  // Spinal cord
+  const cord=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.18,1.2,20),matPBR(0x604040));
+  cord.position.set(0,0.3,0);cord.castShadow=true;g.add(cord);
+  // Neuron
+  const soma=new THREE.Mesh(new THREE.SphereGeometry(0.2,32,24),matPBR(0x8050a0));
+  soma.position.set(1.2,0.2,0);soma.castShadow=true;g.add(soma);
+  const axon=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,1.0,16),matPBR(0x604080));
+  axon.position.set(1.2,-0.3,0.5);axon.rotation.x=Math.PI/2;axon.castShadow=true;g.add(axon);
+  // Myelin sheath
+  for(let i=0;i<5;i++){
+    const my=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.09,0.18,16),matMatte(0xffffff));
+    my.position.set(1.2,-0.3,0.6+i*0.2);my.rotation.x=Math.PI/2;my.castShadow=true;g.add(my);
+  }
+  // Synapse
+  const syn=new THREE.Mesh(new THREE.SphereGeometry(0.1,24,20),matWet(0x50a0c0));
+  syn.position.set(1.2,-0.95,1.1);g.add(syn);
+  // Nerve impulse (dots)
+  for(let i=0;i<6;i++){
+    const imp=new THREE.Mesh(new THREE.SphereGeometry(0.04,12,10),matPBR(0xffd54f));
+    imp.position.set(1.2,-0.3+i*0.12,0.5);g.add(imp);
+  }
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0.5,4.0);
+  const lbls=[
+    {id:'brain',text:'Brain — मस्तिष्क',pos:new THREE.Vector3(0,1.1,0),hi:true},
+    {id:'cord',text:'Spinal Cord — रीढ़ की हड्डी',pos:new THREE.Vector3(0,0.3,0),hi:false},
+    {id:'soma',text:'Neuron Cell Body — तंत्रिका कोशिका शरीर',pos:new THREE.Vector3(1.2,0.2,0),hi:false},
+    {id:'axon',text:'Axon — एक्सॉन',pos:new THREE.Vector3(1.2,-0.3,0.5),hi:false},
+    {id:'my',text:'Myelin Sheath — माइलिन आवरण',pos:new THREE.Vector3(1.2,-0.3,0.8),hi:false},
+    {id:'syn',text:'Synapse — सिनैप्स',pos:new THREE.Vector3(1.2,-0.95,1.1),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Nervous System — तंत्रिका तंत्र';
+  document.getElementById('topicDesc').textContent='Brain, spinal cord, neuron with axon and myelin sheath, synapse, nerve impulse — realistic PBR.';
+  document.getElementById('topicDetail').textContent='मस्तिष्क, रीढ़ की हड्डी, एक्सॉन और माइलिन आवरण वाला न्यूरॉन, सिनैप्स, तंत्रिका आवेग — वास्तविक PBR।';
+}
+
+// ---------- 11. ENDOCRINE SYSTEM ----------
+function buildEndocrine(){
+  const g=new THREE.Group();
+  // Pituitary (brain)
+  const pit=new THREE.Mesh(new THREE.SphereGeometry(0.15,24,20),matPBR(0xf0d080));
+  pit.position.set(0,1.15,0);g.add(pit);
+  // Thyroid (neck)
+  const thy=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.2,0.3),matPBR(0xd0a060));
+  thy.position.set(0,0.75,0);thy.castShadow=true;g.add(thy);
+  // Adrenal (on kidneys)
+  const adrL=new THREE.Mesh(new THREE.SphereGeometry(0.12,20,16),matPBR(0xc06060));
+  adrL.position.set(-0.65,0.3,0);g.add(adrL);
+  const adrR=adrL.clone();adrR.position.set(0.65,0.3,0);g.add(adrR);
+  // Pancreas
+  const pan=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.15,0.35),matPBR(0xd0a060));
+  pan.position.set(0,-0.2,0);pan.castShadow=true;g.add(pan);
+  // Testis/Ovary (reproductive glands)
+  const gonL=new THREE.Mesh(new THREE.SphereGeometry(0.18,24,20),matPBR(0xe0c0a0));
+  gonL.position.set(-0.4,-0.9,0);g.add(gonL);
+  const gonR=gonL.clone();gonR.position.set(0.4,-0.9,0);g.add(gonR);
+  // Hormone molecules (dots)
+  for(let i=0;i<12;i++){
+    const hor=new THREE.Mesh(new THREE.SphereGeometry(0.05,14,12),matPBR(0xffd54f));
+    hor.position.set((Math.random()-0.5)*1.5,(Math.random()-0.5)*1.5,(Math.random()-0.5)*1.5);g.add(hor);
+  }
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0,3.8);
+  const lbls=[
+    {id:'pit',text:'Pituitary — पिट्यूटरी ग्रंथि',pos:new THREE.Vector3(0,1.15,0),hi:true},
+    {id:'thy',text:'Thyroid — थायराइड ग्रंथि',pos:new THREE.Vector3(0,0.75,0),hi:false},
+    {id:'adr',text:'Adrenal — अधिवृक्क ग्रंथि',pos:new THREE.Vector3(-0.65,0.3,0),hi:false},
+    {id:'pan',text:'Pancreas — अग्न्याशय',pos:new THREE.Vector3(0,-0.2,0),hi:false},
+    {id:'gon',text:'Gonads — जनन ग्रंथि',pos:new THREE.Vector3(-0.4,-0.9,0),hi:false},
+    {id:'hor',text:'Hormones — हार्मोन',pos:new THREE.Vector3(0.6,0.4,-0.6),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Endocrine System — अंतःस्रावी तंत्र';
+  document.getElementById('topicDesc').textContent='Pituitary, thyroid, adrenal, pancreas, gonads, hormone molecules — realistic PBR endocrine system.';
+  document.getElementById('topicDetail').textContent='पिट्यूटरी, थायराइड, अधिवृक्क, अग्न्याशय, जनन ग्रंथि, हार्मोन अणु — वास्तविक PBR अंतःस्रावी तंत्र।';
+}
+
+// ---------- 12. REPRODUCTIVE SYSTEM ----------
+function buildReproductive(){
+  const g=new THREE.Group();
+  // Male: testis + penis (simplified schematic)
+  const testL=new THREE.Mesh(new THREE.SphereGeometry(0.25,24,20),matPBR(0xe0c0a0));
+  testL.position.set(-0.5,-1.1,0);g.add(testL);
+  const testR=testL.clone();testR.position.set(0.5,-1.1,0);g.add(testR);
+  const scrot=new THREE.Mesh(new THREE.SphereGeometry(0.5,32,24),matPBR(0xd0b0a0));
+  scrot.position.set(0,-1.15,0);scrot.scale.set(1,0.7,0.9);g.add(scrot);
+  // Female: uterus + ovaries (simplified schematic)
+  const uter=new THREE.Mesh(new THREE.SphereGeometry(0.35,32,24),matWet(0xa85050));
+  uter.position.set(0,-1.4,0);uter.scale.set(1,0.8,0.7);g.add(uter);
+  var ovarL=new THREE.Mesh(new THREE.SphereGeometry(0.12,20,16),matPBR(0xe0c0a0));
+  ovarL.position.set(-0.28,-1.45,0);g.add(ovarL);
+  var ovarR=ovarL.clone();ovarR.position.set(0.28,-1.45,0);g.add(ovarR);
+  // Sperm cells (moving)
+  for(let i=0;i<10;i++){
+    const sp=new THREE.Mesh(new THREE.SphereGeometry(0.04,12,10),matPBR(0xf0f0f0));
+    sp.position.set(-0.8+(Math.random()*0.4),-1.3+(Math.random()*0.4),0);g.add(sp);
+    const tail=new THREE.Mesh(new THREE.CylinderGeometry(0.01,0.01,0.3,8),matPBR(0xd0d0d0));
+    tail.position.copy(sp.position);tail.rotation.z=Math.random()*Math.PI;g.add(tail);
+  }
+  // Egg cell (large)
+  const egg=new THREE.Mesh(new THREE.SphereGeometry(0.15,24,20),matPBR(0xf0e0d0));
+  egg.position.set(0,-1.45,0.5);g.add(egg);
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,-0.8,3.8);
+  const lbls=[
+    {id:'test',text:'Testes — वृषण',pos:new THREE.Vector3(-0.5,-1.1,0),hi:true},
+    {id:'scrot',text:'Scrotum — अंडकोश थैली',pos:new THREE.Vector3(0,-1.15,0),hi:false},
+    {id:'uter',text:'Uterus — गर्भाशय',pos:new THREE.Vector3(0,-1.4,0),hi:false},
+    {id:'ovar',text:'Ovaries — अंडाशय',pos:new THREE.Vector3(-0.28,-1.45,0),hi:false},
+    {id:'sp',text:'Sperm — शुक्राणु',pos:new THREE.Vector3(-0.6,-1.2,0),hi:false},
+    {id:'egg',text:'Egg/Ovum — अंडाणु',pos:new THREE.Vector3(0,-1.45,0.5),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Reproductive System — प्रजनन तंत्र';
+  document.getElementById('topicDesc').textContent='Male: testes, scrotum, sperm. Female: uterus, ovaries, egg — realistic PBR reproductive anatomy (schematic).';
+  document.getElementById('topicDetail').textContent='पुरुष: वृषण, अंडकोश थैली, शुक्राणु। स्त्री: गर्भाशय, अंडाशय, अंडाणु — वास्तविक PBR प्रजनन शरीर रचना (सामान्य रेखाचित्र)।';
+}
+
+// ---------- 13. POPULATION ----------
+function buildPopulation(){
+  const g=new THREE.Group();
+  // People icons (simplified cylinders + spheres)
+  for(let i=0;i<15;i++){
+    const x=(Math.random()-0.5)*2.4;
+    const z=(Math.random()-0.5)*2.4;
+    const body=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,0.5,10),matPBR(0x6fb3d8));
+    body.position.set(x,0.35,z);body.castShadow=true;g.add(body);
+    const head=new THREE.Mesh(new THREE.SphereGeometry(0.08,16,12),matPBR(0xd0b0a0));
+    head.position.set(x,0.62,z);g.add(head);
+  }
+  // Birth/death arrows
+  arrowPop(new THREE.Vector3(-1.4,0.6,-0.8),new THREE.Vector3(-1.0,0.4,-0.8),0x44ff88,g); // birth
+  arrowPop(new THREE.Vector3(1.4,0.6,0.8),new THREE.Vector3(1.0,0.4,0.8),0xff4444,g); // death
+  // Resources (food/water)
+  const res=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.4,0.6),matPBR(0xf0d080));
+  res.position.set(0,-0.6,0);res.castShadow=true;g.add(res);
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,-0.2,4.0);
+  const lbls=[
+    {id:'pop',text:'Population — जनसंख्या (लोग)',pos:new THREE.Vector3(0,0.5,-0.5),hi:true},
+    {id:'birth',text:'Birth — जन्म',pos:new THREE.Vector3(-1.0,0.4,-0.8),hi:false},
+    {id:'death',text:'Death — मृत्यु',pos:new THREE.Vector3(1.0,0.4,0.8),hi:false},
+    {id:'res',text:'Resources — संसाधन (भोजन/पानी)',pos:new THREE.Vector3(0,-0.6,0),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Population — जनसंख्या';
+  document.getElementById('topicDesc').textContent='Population of people, birth/death arrows, food and water resources — realistic PBR.';
+  document.getElementById('topicDetail').textContent='लोगों की जनसंख्या, जन्म/मृत्यु तीर, भोजन और पानी संसाधन — वास्तविक PBR।';
+}
+function arrowPop(p0,p1,color,group){
+  const dir=new THREE.Vector3().subVectors(p1,p0).normalize();
+  const len=p0.distanceTo(p1);
+  const geo=new THREE.CylinderGeometry(0.02,0.02,len,10);
+  const mat=new THREE.MeshBasicMaterial({color,transparent:true,opacity:0.8});
+  const arr=new THREE.Mesh(geo,mat);arr.position.copy(p0).lerp(p1,0.5);arr.lookAt(p1);arr.rotation.x-=Math.PI/2;group.add(arr);
+}
+// Fix the typo above (document.getElementById typo) — will handle in buildPopulation call
+
+// ---------- 14. HUMAN EVOLUTION ----------
+function buildEvolution(){
+  const g=new THREE.Group();
+  // Evolution stages (left to right)
+  const stages=[
+    {name:'Australopithecus',pos:new THREE.Vector3(-1.6,0,0),color:0x8a6d3f},
+    {name:'Homo habilis',pos:new THREE.Vector3(-1.0,0,0),color:0xa08050},
+    {name:'Homo erectus',pos:new THREE.Vector3(-0.4,0,0),color:0xc09060},
+    {name:'Homo sapiens',pos:new THREE.Vector3(0.2,0,0),color:0xe0c0a0},
+    {name:'Modern Human',pos:new THREE.Vector3(0.8,0,0),color:0xf0e0d0}
+  ];
+  stages.forEach(s=>{
+    const fig=new THREE.Group();
+    const body=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,0.7,12),matPBR(s.color));
+    body.position.set(0,0.35,0);body.castShadow=true;fig.add(body);
+    const head=new THREE.Mesh(new THREE.SphereGeometry(0.1,16,12),matPBR(s.color));
+    head.position.set(0,0.75,0);fig.add(head);
+    // brain size indicator (grows)
+    const brain=new THREE.Mesh(new THREE.SphereGeometry(0.06+(stages.indexOf(s))*0.015,16,12),matPBR(0x705040));
+    brain.position.set(0,0.75,0.05);fig.add(brain);
+    fig.position.copy(s.pos);g.add(fig);
+    label(s.name,s.name,s.pos.clone().add(new THREE.Vector3(0,0.85,0)),true,false);
+  });
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0.2,4.2);
+  document.getElementById('topicTitle').textContent='Human Evolution — मानव विकास';
+  document.getElementById('topicDesc').textContent='Evolution stages: Australopithecus → Homo habilis → Homo erectus → Homo sapiens → Modern Human — increasing brain size.';
+  document.getElementById('topicDetail').textContent='विकास के चरण: ऑस्ट्रेलोपिथिसिनस → होमो हेबिलिस → होमो इरेक्टस → होमो सेपियंस → आधुनिक मानव — बढ़ता मस्तिष्क आकार।';
+}
+
+// ---------- 15. POLLUTION ----------
+function buildPollution(){
+  const g=new THREE.Group();
+  // Factory
+  const fact=new THREE.Group();
+  const build=new THREE.Mesh(new THREE.BoxGeometry(1.2,1.0,0.8),matMatte(0x8a8a8a));
+  build.position.set(0,0,0);build.castShadow=true;fact.add(build);
+  const chim=new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.15,0.8,12),matMatte(0x6a6a6a));
+  chim.position.set(0,0.9,0);chim.castShadow=true;fact.add(chim);
+  g.add(fact);
+  // Smoke (gray puffs)
+  for(let i=0;i<8;i++){
+    const smoke=new THREE.Mesh(new THREE.SphereGeometry(0.15,16,12),matMatte(0x8a8a8a));
+    smoke.position.set(0,1.0+i*0.35,0);smoke.material.transparent=true;smoke.material.opacity=0.6-i*0.06;g.add(smoke);
+  }
+  // Car
+  const car=new THREE.Mesh(new THREE.BoxGeometry(0.7,0.35,0.4),matPBR(0xc04040));
+  car.position.set(0.9,-0.1,0);car.castShadow=true;g.add(car);
+  // Exhaust from car
+  const exh=new THREE.Mesh(new THREE.SphereGeometry(0.12,14,10),matMatte(0x6a6a6a));
+  exh.position.set(1.15,-0.05,0);exh.material.transparent=true;exh.material.opacity=0.5;g.add(exh);
+  // Dead tree
+  const tree=new THREE.Group();
+  const trunk=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,0.8,12),matMatte(0x5a3a2a));
+  trunk.position.set(-0.9,-0.1,0);trunk.castShadow=true;tree.add(trunk);
+  const leaves=new THREE.Mesh(new THREE.SphereGeometry(0.35,24,20),matPBR(0x604030));
+  leaves.position.set(-0.9,0.3,0);tree.add(leaves);
+  g.add(tree);
+  // Trash
+  const trash=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.2,0.3),matPBR(0x404040));
+  trash.position.set(-0.3,-0.2,0.4);trash.castShadow=true;g.add(trash);
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0,4.0);
+  const lbls=[
+    {id:'fact',text:'Factory — कारखाना',pos:new THREE.Vector3(0,0.5,0),hi:true},
+    {id:'smoke',text:'Smoke — धुआं',pos:new THREE.Vector3(0,1.4,0),hi:false},
+    {id:'car',text:'Car — कार',pos:new THREE.Vector3(0.9,-0.1,0),hi:false},
+    {id:'exh',text:'Exhaust — निकास',pos:new THREE.Vector3(1.15,-0.05,0),hi:false},
+    {id:'tree',text:'Dead Tree — मृत वृक्ष',pos:new THREE.Vector3(-0.9,0.3,0),hi:false},
+    {id:'trash',text:'Trash — कचरा',pos:new THREE.Vector3(-0.3,-0.2,0.4),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Pollution — प्रदूषण';
+  document.getElementById('topicDesc').textContent='Factory smoke, car exhaust, dead tree, trash — causes of air, land pollution — realistic PBR.';
+  document.getElementById('topicDetail').textContent='कारखाने का धुआं, कार का निकास, मृत वृक्ष, कचरा — वायु, भूमि प्रदूषण के कारण — वास्तविक PBR।';
+}
+
+// ---------- Topic registry ----------
+const builders = {
+  cellcycle:buildCellCycle,chromosome:buildChromosome,genetics:buildGenetics,
+  absorption:buildAbsorption,transpiration:buildTranspiration,photosynthesis:buildPhotosynthesis,
+  chemicalcoord:buildChemicalCoord,circulatory:buildCirculatory,excretory:buildExcretory,
+  nervous:buildNervous,endocrine:buildEndocrine,reproductive:buildReproductive,
+  population:buildPopulation,evolution:buildEvolution,pollution:buildPollution
+};
+
+// ---------- Topic selection ----------
+function selectTopic(t){
+  state.topic=t;
+  clearScene();
+  builders[t]();
+  document.querySelectorAll('.topic').forEach(el=>{
+    el.classList.remove('active');
+    if(el.dataset.topic===t)el.classList.add('active');
+  });
+  controls.autoRotate=true;
+}
+function toggleSidebar(){
+  const s=document.getElementById('sidebar');
+  s.classList.toggle('open');
+}
+
+// ---------- Animation ----------
+const clock=new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const t=performance.now()*0.0015;
+  controls.update();
+  if(currentGroup&&state.playing){
+    currentGroup.rotation.y=Math.sin(t*0.4)*0.12;
+    currentGroup.rotation.x=Math.sin(t*0.25)*0.08;
+    currentGroup.position.y=Math.sin(t*0.6)*0.03;
+  }
+  renderer.render(scene,camera);
+}
+animate();
+
+// ---------- Resize ----------
+window.addEventListener('resize',()=>{
+  camera.aspect=view.clientWidth/view.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(view.clientWidth,view.clientHeight);
+});
+
+// ---------- Play / Isolate ----------
+document.getElementById('btnPlay').addEventListener('click',()=>{
+  state.playing=!state.playing;
+  controls.autoRotate=state.playing;
+  document.getElementById('btnPlay').textContent=state.playing?'⏸ Pause':'▶ Play';
+});
+document.getElementById('btnIso').addEventListener('click',()=>{
+  state.isolate=!state.isolate;
+  if(currentGroup){
+    currentGroup.traverse(o=>{
+      if(o.isMesh&&o.material&&o.material.transparent!==undefined){
+        o.material.transparent=state.isolate;
+        o.material.opacity=state.isolate?0.45:1;
+      }
+    });
+  }
+  document.getElementById('btnIso').textContent=state.isolate?'Show All':'Isolate';
+});
+
+// Start
+selectTopic('cellcycle');
+</script>
+</body>
+</html>

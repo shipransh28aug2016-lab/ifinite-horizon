@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vigyan Atlas — Class X Biology: Realistic 2D Images (NCERT)</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0a0f1a;color:#e8eef2;font:14px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Noto Sans,Nirmala UI,"Noto Sans Devanagari",Arial,sans-serif;overflow:hidden}
+  #view{position:relative;width:100vw;height:100vh;background:linear-gradient(180deg,#0f1b33 0%,#070a14 100%);overflow:hidden;display:flex}
+  canvas{display:block}
+  #sidebar{position:absolute;top:0;left:0;width:300px;height:100%;background:rgba(8,15,26,0.95);backdrop-filter:blur(8px);border-right:1px solid rgba(255,255,255,0.08);z-index:25;overflow-y:auto;transform:translateX(-102%);transition:transform .25s}
+  #sidebar.open{transform:translateX(0)}
+  #sidebar h2{font-size:15px;color:#ffd54f;padding:14px;border-bottom:1px solid rgba(255,255,255,0.1)}
+  .topic{padding:8px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;color:#c9d6df;transition:all .15s;display:flex;justify-content:space-between;align-items:center}
+  .topic:hover{background:rgba(255,255,255,0.04);color:#fff}
+  .topic.active{background:linear-gradient(90deg,rgba(255,213,79,0.12),transparent);color:#ffd54f;border-left:3px solid #ffd54f}
+  .sub{padding:6px 14px 6px 34px;font-size:12.5px;color:#9fb3c8;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.03);transition:all .15s;display:flex;justify-content:space-between;align-items:center}
+  .sub:hover{background:rgba(255,255,255,0.03);color:#fff}
+  .sub.active{background:rgba(255,213,79,0.08);color:#ffd54f;border-left:2px solid #ffd54f}
+  #stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,#162432 0%,#070a14 70%);padding:20px;overflow:auto}
+  #imageWrap{position:relative;display:inline-block;max-width:92vw;max-height:82vh;box-shadow:0 20px 60px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden}
+  #imageWrap img{display:block;max-width:100%;max-height:100%;object-fit:contain}
+  .mark{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10}
+  .dot{width:10px;height:10px;background:#ffd54f;border-radius:50%;box-shadow:0 0 12px #ffd54f;border:2px solid #0b1220}
+  .lbl{position:absolute;left:calc(50% + 14px);top:50%;transform:translateY(-50%);background:rgba(8,15,26,.92);backdrop-filter:blur(6px);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:6px 10px;font-size:12.5px;line-height:1.35;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .18s;min-width:140px;max-width:260px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+  .lbl.hi{border-color:#ffd54f;background:rgba(15,30,50,.95);color:#ffd54f}
+  .lbl .en{font-weight:700;display:block}
+  .lbl .hi{font-size:11.5px;color:#8ee0a7;opacity:.9;display:block;margin-top:2px}
+  .mark.active .lbl{opacity:1}
+  .mark.active .dot{background:#ffd54f;box-shadow:0 0 16px #ffd54f}
+  #hud{position:absolute;top:12px;left:320px;right:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;z-index:25;pointer-events:none}
+  #hud>*{pointer-events:auto}
+  .bar{background:rgba(10,16,28,0.8);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:9px 13px;display:flex;gap:11px;align-items:center;flex-wrap:wrap}
+  .bar h2{font-size:15px;color:#ffd54f;margin:0 0 4px 0;letter-spacing:.3px}
+  .bar p{font-size:12px;color:#9fb3c8;margin:0;line-height:1.45}
+  .btn{border:none;background:#1d3a5a;color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:6px 12px;font-size:12.5px;cursor:pointer;transition:all .15s}
+  .btn:hover{background:#2a527e;border-color:#6fb3d8}
+  .btn.active{background:#ffd54f;color:#0b1220;border-color:#ffd54f}
+  .openBtn{position:absolute;top:12px;left:12px;z-index:35}
+  .hint{position:absolute;bottom:14px;left:320px;right:12px;color:#8aa3b8;font-size:12px;z-index:25;text-align:center;pointer-events:none}
+  @media (max-width:900px){#sidebar{width:250px}#hud{left:12px;right:12px}.hint{left:12px;right:12px}}
+  @media (max-width:640px){#sidebar{width:220px}}
+</style>
+</head>
+<body>
+<div id="view">
+  <button class="openBtn btn" onclick="toggleSidebar()">☰ Topics</button>
+  <div id="sidebar">
+    <h2>कक्षा 10 जीव विज्ञान · Class X Biology</h2>
+    <div class="topic active" data-topic="cell_cycle" onclick="selectTopic('cell_cycle')">कोशिका चक्र · Cell Cycle <span class="hi">कोशिका चक्र</span></div>
+    <div class="sub active" data-sub="cell_cycle_division" onclick="selectSub('cell_cycle_division')">Cell Cycle & Division — कोशिका चक्र</div>
+    <div class="sub" data-sub="chromosome_structure" onclick="selectSub('chromosome_structure')">Chromosome Structure — क्रोमोसोम संरचना</div>
+    <div class="topic" data-topic="genetics" onclick="selectTopic('genetics')">अनुवंशिकी · Genetics <span class="hi">अनुवंशिकी</span></div>
+    <div class="sub" data-sub="genetics_dna" onclick="selectSub('genetics_dna')">DNA & Inheritance — डीएनए और विरासत</div>
+    <div class="topic" data-topic="absorption" onclick="selectTopic('absorption')">जड़ों द्वारा अवशोषण · Absorption by Roots <span class="hi">जड़ों द्वारा अवशोषण</span></div>
+    <div class="sub" data-sub="absorption_roots" onclick="selectSub('absorption_roots')">Root Absorption — जड़ अवशोषण</div>
+    <div class="topic" data-topic="transpiration" onclick="selectTopic('transpiration')">वाष्पोत्सर्जन · Transpiration <span class="hi">वाष्पोत्सर्जन</span></div>
+    <div class="sub" data-sub="transpiration" onclick="selectSub('transpiration')">Transpiration — वाष्पोत्सर्जन</div>
+    <div class="topic" data-topic="photosynthesis" onclick="selectTopic('photosynthesis')">प्रकाश संश्लेषण · Photosynthesis <span class="hi">प्रकाश संश्लेषण</span></div>
+    <div class="sub" data-sub="photosynthesis" onclick="selectSub('photosynthesis')">Photosynthesis — प्रकाश संश्लेषण</div>
+    <div class="topic" data-topic="chemicalcoord" onclick="selectTopic('chemicalcoord')">पादप रासायनिक समन्वय · Chemical Coordination <span class="hi">पादप रासायनिक समन्वय</span></div>
+    <div class="sub" data-sub="chemical_coordination_plants" onclick="selectSub('chemical_coordination_plants')">Plant Hormones — पादप हार्मोन</div>
+    <div class="topic" data-topic="circulatory" onclick="selectTopic('circulatory')">परिसंचरण तंत्र · Circulatory System <span class="hi">परिसंचरण तंत्र</span></div>
+    <div class="sub" data-sub="circulatory_system" onclick="selectSub('circulatory_system')">Circulatory System — परिसंचरण तंत्र</div>
+    <div class="topic" data-topic="excretory" onclick="selectTopic('excretory')">उत्सर्जन तंत्र · Excretory System <span class="hi">उत्सर्जन तंत्र</span></div>
+    <div class="sub" data-sub="excretory_system" onclick="selectSub('excretory_system')">Excretory System — उत्सर्जन तंत्र</div>
+    <div class="topic" data-topic="nervous" onclick="selectTopic('nervous')">तंत्रिका तंत्र · Nervous System <span class="hi">तंत्रिका तंत्र</span></div>
+    <div class="sub" data-sub="nervous_system" onclick="selectSub('nervous_system')">Nervous System — तंत्रिका तंत्र</div>
+    <div class="topic" data-topic="endocrine" onclick="selectTopic('endocrine')">अंतःस्रावी तंत्र · Endocrine System <span class="hi">अंतःस्रावी तंत्र</span></div>
+    <div class="sub" data-sub="endocrine_system" onclick="selectSub('endocrine_system')">Endocrine System — अंतःस्रावी तंत्र</div>
+    <div class="topic" data-topic="reproductive" onclick="selectTopic('reproductive')">प्रजनन तंत्र · Reproductive System <span class="hi">प्रजनन तंत्र</span></div>
+    <div class="sub" data-sub="reproductive_system" onclick="selectSub('reproductive_system')">Reproductive System — प्रजनन तंत्र</div>
+    <div class="topic" data-topic="population" onclick="selectTopic('population')">जनसंख्या · Population <span class="hi">जनसंख्या</span></div>
+    <div class="sub" data-sub="population" onclick="selectSub('population')">Population — जनसंख्या</div>
+    <div class="topic" data-topic="evolution" onclick="selectTopic('evolution')">मानव विकास · Human Evolution <span class="hi">मानव विकास</span></div>
+    <div class="sub" data-sub="human_evolution" onclick="selectSub('human_evolution')">Human Evolution — मानव विकास</div>
+    <div class="topic" data-topic="pollution" onclick="selectTopic('pollution')">प्रदूषण · Pollution <span class="hi">प्रदूषण</span></div>
+    <div class="sub" data-sub="pollution" onclick="selectSub('pollution')">Pollution — प्रदूषण</div>
+  </div>
+  <div id="stage">
+    <div id="imageWrap"><img id="mainImg" src="" alt=""></div>
+  </div>
+  <div id="hud">
+    <div class="bar">
+      <div>
+        <h2 id="imgTitle">Cell Cycle & Division — कोशिका चक्र</h2>
+        <p id="imgDesc">वास्तविक कोशिका चक्र — सभी चरण सहित। Realistic cell cycle with all phases.</p>
+      </div>
+    </div>
+  </div>
+  <div id="labels"></div>
+  <div class="hint">चित्र पर डॉट पर क्लिक करें · लेबल अंग्रेजी + हिंदी में · क्लास X NCERT विषय (15 टॉपिक पूरे)</div>
+</div>
+<script>
+// Label data: subtopic -> {title, desc, img, marks:[{x,y,en,hi}]}
+const DATA={
+ cell_cycle_division:{
+  title:'Cell Cycle & Division — कोशिका चक्र', desc:'कोशिका चक्र के सभी चरण — अंतरावस्था, पूर्वावस्था, मध्यावस्था, अंतर्वस्था, अंतिमावस्था, साइटोकाइनेसिस। All cell cycle phases.',
+  img:'images/cell_cycle_division.png',
+  marks:[
+    {x:30,y:25,en:'Interphase',hi:'अंतरावस्था'},
+    {x:50,y:25,en:'Prophase',hi:'पूर्वावस्था'},
+    {x:70,y:25,en:'Metaphase',hi:'मध्यावस्था'},
+    {x:30,y:60,en:'Anaphase',hi:'अंतर्वस्था'},
+    {x:50,y:60,en:'Telophase',hi:'अंतिमावस्था'},
+    {x:70,y:60,en:'Cytokinesis',hi:'साइटोकाइनेसिस'},
+    {x:50,y:85,en:'Mitotic Spindle',hi:'माइटोटिक स्पिंडल'}
+  ]
+ },
+ chromosome_structure:{
+  title:'Chromosome Structure — क्रोमोसोम संरचना', desc:'क्रोमोसोम की विस्तृत संरचना — सिस्टर क्रोमैटिड, केंद्रोमियर, टेलोमीयर, क्रोमेटिन, हिस्टोन। Detailed chromosome structure.',
+  img:'images/chromosome_structure.png',
+  marks:[
+    {x:50,y:30,en:'Sister Chromatids',hi:'सिस्टर क्रोमैटिड'},
+    {x:50,y:50,en:'Centromere',hi:'केंद्रोमियर'},
+    {x:85,y:30,en:'Telomere',hi:'टेलोमीयर'},
+    {x:50,y:70,en:'Chromatin',hi:'क्रोमेटिन'},
+    {x:30,y:50,en:'Histone Nucleosomes',hi:'हिस्टोन न्यूक्लियोसोम'}
+  ]
+ },
+ genetics_dna:{
+  title:'DNA & Inheritance — डीएनए और विरासत', desc:'डीएनए डबल हेलिक्स, बेस युग्म, जीन खंड, पन्नेट वर्ग। DNA double helix, base pairs, gene segments, Punnett square.',
+  img:'images/genetics_dna.png',
+  marks:[
+    {x:50,y:30,en:'DNA Double Helix',hi:'डीएनए डबल हेलिक्स'},
+    {x:30,y:50,en:'Base Pairs',hi:'बेस युग्म'},
+    {x:70,y:50,en:'Sugar-Phosphate Backbone',hi:'चीनी-फॉस्फेट रीढ़'},
+    {x:50,y:75,en:'Gene Segments',hi:'जीन खंड'},
+    {x:75,y:75,en:'Punnett Square',hi:'पन्नेट वर्ग'}
+  ]
+ },
+ absorption_roots:{
+  title:'Root Absorption — जड़ अवशोषण', desc:'जड़ रोएं, मिट्टी से जल और खनिज आयनों का अवशोषण, जाइलम द्वारा परिवहन। Root hairs, water and mineral absorption from soil, xylem transport.',
+  img:'images/absorption_roots.png',
+  marks:[
+    {x:30,y:35,en:'Root Hairs',hi:'जड़ रोएं'},
+    {x:50,y:35,en:'Soil Water',hi:'मिट्टी का जल'},
+    {x:70,y:35,en:'Mineral Ions',hi:'खनिज आयन'},
+    {x:50,y:55,en:'Cortex Cells',hi:'कॉर्टेक्स कोशिकाएं'},
+    {x:50,y:75,en:'Xylem Vessels',hi:'जाइलम वाहिकाएं'}
+  ]
+ },
+ transpiration:{
+  title:'Transpiration — वाष्पोत्सर्जन', desc:'पत्ते में रोमछिद्र, जल वाष्प का बाहर निकलना, सूर्य का प्रकाश, जाइलम द्वारा जल परिवहन। Stomata, water vapor loss, sunlight, xylem transport.',
+  img:'images/transpiration.png',
+  marks:[
+    {x:30,y:35,en:'Stomata (Open)',hi:'खुले रोमछिद्र'},
+    {x:50,y:35,en:'Guard Cells',hi:'संरक्षक कोशिकाएं'},
+    {x:70,y:35,en:'Water Vapor',hi:'जल वाष्प'},
+    {x:50,y:55,en:'Sunlight',hi:'सूर्य का प्रकाश'},
+    {x:50,y:75,en:'Xylem Vein',hi:'जाइलम शिरा'}
+  ]
+ },
+ photosynthesis:{
+  title:'Photosynthesis — प्रकाश संश्लेषण', desc:'पत्ते में क्लोरोप्लास्ट, क्लोरोफिल, CO2 अंदर, O2 बाहर, जल, सूर्य का प्रकाश, ग्लूकोज उत्पादन। Chloroplast, chlorophyll, CO2 in, O2 out, water, sunlight, glucose.',
+  img:'images/photosynthesis.png',
+  marks:[
+    {x:40,y:30,en:'Chloroplast',hi:'क्लोरोप्लास्ट'},
+    {x:30,y:50,en:'CO₂ In',hi:'CO2 अंदर'},
+    {x:70,y:50,en:'O₂ Out',hi:'O2 बाहर'},
+    {x:50,y:70,en:'Sunlight',hi:'सूर्य का प्रकाश'},
+    {x:30,y:75,en:'Water In',hi:'जल अंदर'},
+    {x:70,y:70,en:'Glucose',hi:'ग्लूकोज'}
+  ]
+ },
+ chemical_coordination_plants:{
+  title:'Plant Hormones — पादप हार्मोन', desc:'पादप हार्मोन — ऑक्सिन, प्रकाशानुकूलन, जड़गुरुत्वानुकूलन। Plant hormones — auxin, phototropism, gravitropism.',
+  img:'images/chemical_coordination_plants.png',
+  marks:[
+    {x:30,y:35,en:'Auxin',hi:'ऑक्सिन'},
+    {x:70,y:35,en:'Phototropism',hi:'प्रकाशानुकूलन'},
+    {x:30,y:65,en:'Gravitropism',hi:'गुरुत्वानुकूलन'},
+    {x:50,y:80,en:'Shoot Tip',hi:'अग्रांश'}
+  ]
+ },
+ circulatory_system:{
+  title:'Circulatory System — परिसंचरण तंत्र', desc:'चार कक्षीय हृदय, महाधमनी, फुफ्फुस धमनी, वेनाकावा, धमनियां, शिराएं, रक्त कोशिकाएं। Four-chambered heart, aorta, pulmonary artery, vena cava, arteries, veins, blood cells.',
+  img:'images/circulatory_system.png',
+  marks:[
+    {x:35,y:40,en:'Heart',hi:'हृदय'},
+    {x:50,y:30,en:'Aorta',hi:'महाधमनी'},
+    {x:65,y:50,en:'Pulmonary Artery',hi:'फुफ्फुस धमनी'},
+    {x:20,y:60,en:'Vena Cava',hi:'वेनाकावा'},
+    {x:55,y:65,en:'Oxygenated Blood',hi:'ऑक्सीजन युक्त रक्त'},
+    {x:30,y:75,en:'Deoxygenated Blood',hi:'ऑक्सीजन रहित रक्त'}
+  ]
+ },
+ excretory_system:{
+  title:'Excretory System — उत्सर्जन तंत्र', desc:'गुर्दे, नेफ्रॉन, ग्लोमेरुलस, बोमैन कैप्सूल, मूत्रवाहिनी, मूत्राशय। Kidneys, nephrons, glomerulus, Bowman capsule, ureters, urinary bladder.',
+  img:'images/excretory_system.png',
+  marks:[
+    {x:30,y:35,en:'Kidneys',hi:'गुर्दे'},
+    {x:50,y:35,en:'Nephron',hi:'नेफ्रॉन'},
+    {x:45,y:50,en:'Glomerulus',hi:'ग्लोमेरुलस'},
+    {x:55,y:60,en:'Bowman Capsule',hi:'बोमैन कैप्सूल'},
+    {x:30,y:75,en:'Ureters',hi:'मूत्रवाहिनी'},
+    {x:50,y:85,en:'Urinary Bladder',hi:'मूत्राशय'}
+  ]
+ },
+ nervous_system:{
+  title:'Nervous System — तंत्रिका तंत्र', desc:'मस्तिष्क, रीढ़ की हड्डी, न्यूरॉन, डेंड्राइट, एक्सॉन, माइलिन आवरण, सिनैप्स। Brain, spinal cord, neuron, dendrites, axon, myelin sheath, synapse.',
+  img:'images/nervous_system.png',
+  marks:[
+    {x:30,y:30,en:'Brain',hi:'मस्तिष्क'},
+    {x:50,y:45,en:'Spinal Cord',hi:'रीढ़ की हड्डी'},
+    {x:70,y:35,en:'Neuron',hi:'न्यूरॉन'},
+    {x:75,y:55,en:'Axon',hi:'एक्सॉन'},
+    {x:60,y:70,en:'Myelin Sheath',hi:'माइलिन आवरण'},
+    {x:85,y:50,en:'Synapse',hi:'सिनैप्स'}
+  ]
+ },
+ endocrine_system:{
+  title:'Endocrine System — अंतःस्रावी तंत्र', desc:'पिट्यूटरी, थायराइड, अधिवृक्क, अग्न्याशय, जनन ग्रंथि, हार्मोन। Pituitary, thyroid, adrenal, pancreas, gonads, hormones.',
+  img:'images/endocrine_system.png',
+  marks:[
+    {x:30,y:30,en:'Pituitary Gland',hi:'पिट्यूटरी ग्रंथि'},
+    {x:50,y:30,en:'Thyroid Gland',hi:'थायराइड ग्रंथि'},
+    {x:70,y:35,en:'Adrenal Glands',hi:'अधिवृक्क ग्रंथियां'},
+    {x:50,y:55,en:'Pancreas',hi:'अग्न्याशय'},
+    {x:30,y:70,en:'Ovaries/Testes',hi:'अंडाशय/वृषण'},
+    {x:60,y:60,en:'Hormones',hi:'हार्मोन'}
+  ]
+ },
+ reproductive_system:{
+  title:'Reproductive System — प्रजनन तंत्र', desc:'पुरुष: वृषण, अंडकोश, शुक्राणु। स्त्री: गर्भाशय, अंडाशय, अंडाणु। Male: testes, scrotum, sperm. Female: uterus, ovaries, egg.',
+  img:'images/reproductive_system.png',
+  marks:[
+    {x:30,y:35,en:'Testes',hi:'वृषण'},
+    {x:30,y:55,en:'Scrotum',hi:'अंडकोश'},
+    {x:70,y:35,en:'Uterus',hi:'गर्भाशय'},
+    {x:70,y:55,en:'Ovaries',hi:'अंडाशय'},
+    {x:20,y:65,en:'Sperm',hi:'शुक्राणु'},
+    {x:80,y:65,en:'Egg/Ovum',hi:'अंडाणु'}
+  ]
+ },
+ population:{
+  title:'Population — जनसंख्या', desc:'लोगों की जनसंख्या, जन्म दर, मृत्यु दर, भोजन और पानी संसाधन। Population, birth rate, death rate, food and water resources.',
+  img:'images/population.png',
+  marks:[
+    {x:35,y:30,en:'Birth Rate',hi:'जन्म दर'},
+    {x:65,y:30,en:'Death Rate',hi:'मृत्यु दर'},
+    {x:30,y:55,en:'Food Resources',hi:'भोजन संसाधन'},
+    {x:70,y:55,en:'Water Resources',hi:'पानी संसाधन'},
+    {x:50,y:80,en:'Population Growth',hi:'जनसंख्या वृद्धि'}
+  ]
+ },
+ human_evolution:{
+  title:'Human Evolution — मानव विकास', desc:'ऑस्ट्रेलोपिथिसिनस → होमो हेबिलिस → होमो इरेक्टस → होमो सेपियंस → आधुनिक मानव। Australopithecus → Homo habilis → Homo erectus → Homo sapiens → Modern Human.',
+  img:'images/human_evolution.png',
+  marks:[
+    {x:20,y:45,en:'Australopithecus',hi:'ऑस्ट्रेलोपिथिसिनस'},
+    {x:40,y:45,en:'Homo habilis',hi:'होमो हेबिलिस'},
+    {x:55,y:45,en:'Homo erectus',hi:'होमो इरेक्टस'},
+    {x:70,y:45,en:'Homo sapiens',hi:'होमो सेपियंस'},
+    {x:85,y:45,en:'Modern Human',hi:'आधुनिक मानव'}
+  ]
+ },
+ pollution:{
+  title:'Pollution — प्रदूषण', desc:'कारखाने का धुआं, कार का निकास, मृत वृक्ष, कचरा — वायु, भूमि प्रदूषण। Factory smoke, car exhaust, dead tree, trash — air, land pollution.',
+  img:'images/pollution.png',
+  marks:[
+    {x:30,y:30,en:'Factory Smoke',hi:'कारखाने का धुआं'},
+    {x:70,y:30,en:'Car Exhaust',hi:'कार का निकास'},
+    {x:30,y:60,en:'Dead Tree',hi:'मृत वृक्ष'},
+    {x:70,y:60,en:'Trash',hi:'कचरा'},
+    {x:50,y:80,en:'Air & Land Pollution',hi:'वायु और भूमि प्रदूषण'}
+  ]
+ }
+};
+
+// State
+let state={sub:'cell_cycle_division'};
+
+// Elements
+const mainImg=document.getElementById('mainImg');
+const imgTitle=document.getElementById('imgTitle');
+const imgDesc=document.getElementById('imgDesc');
+const labelsEl=document.getElementById('labels');
+
+function selectTopic(t){
+  document.querySelectorAll('.topic').forEach(el=>el.classList.remove('active'));
+  const tEl=document.querySelector('[data-topic="'+t+'"]');
+  if(tEl)tEl.classList.add('active');
+  let sub=null;
+  let node=tEl;
+  while((node=node.nextElementSibling)&&node.classList.contains('sub')){sub=node;break;}
+  if(sub)selectSub(sub.dataset.sub);
+}
+function selectSub(sub){
+  state.sub=sub;
+  const d=DATA[sub];
+  if(!d)return;
+  mainImg.src=d.img;
+  imgTitle.textContent=d.title;
+  imgDesc.textContent=d.desc;
+  renderLabels();
+  document.querySelectorAll('.sub').forEach(el=>el.classList.remove('active'));
+  const sel=document.querySelector('[data-sub="'+sub+'"]');
+  if(sel)sel.classList.add('active');
+  document.querySelectorAll('.topic').forEach(el=>el.classList.remove('active'));
+  let tEl=sel;
+  while((tEl=tEl.previousElementSibling)&&!tEl.classList.contains('topic')){}
+  if(tEl)tEl.classList.add('active');
+  document.getElementById('sidebar').classList.remove('open');
+}
+function renderLabels(){
+  labelsEl.innerHTML='';
+  const d=DATA[state.sub];
+  if(!d)return;
+  d.marks.forEach((m,i)=>{
+    const wrap=document.createElement('div');
+    wrap.className='mark';
+    wrap.style.left=m.x+'%';wrap.style.top=m.y+'%';
+    wrap.onclick=(e)=>{e.stopPropagation();document.querySelectorAll('.mark').forEach(m=>m.classList.remove('active'));wrap.classList.add('active');};
+    const dot=document.createElement('div');dot.className='dot';wrap.appendChild(dot);
+    const lbl=document.createElement('div');lbl.className='lbl';
+    lbl.innerHTML='<span class="en">'+m.en+'</span><span class="hi">'+m.hi+'</span>';
+    wrap.appendChild(lbl);
+    labelsEl.appendChild(wrap);
+  });
+}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
+
+// Init
+selectSub('cell_cycle_division');
+</script>
+</body>
+</html>

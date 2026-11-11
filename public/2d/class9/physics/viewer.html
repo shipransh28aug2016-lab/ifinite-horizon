@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vigyan Atlas — Class IX Physics: Realistic 2D Images (NCERT)</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0a0f1a;color:#e8eef2;font:14px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Noto Sans,Nirmala UI,"Noto Sans Devanagari",Arial,sans-serif;overflow:hidden}
+  #view{position:relative;width:100vw;height:100vh;background:linear-gradient(180deg,#0f1b33 0%,#070a14 100%);overflow:hidden;display:flex}
+  canvas{display:block}
+  #sidebar{position:absolute;top:0;left:0;width:300px;height:100%;background:rgba(8,15,26,0.95);backdrop-filter:blur(8px);border-right:1px solid rgba(255,255,255,0.08);z-index:25;overflow-y:auto;transform:translateX(-102%);transition:transform .25s}
+  #sidebar.open{transform:translateX(0)}
+  #sidebar h2{font-size:15px;color:#ffd54f;padding:14px;border-bottom:1px solid rgba(255,255,255,0.1)}
+  .topic{padding:8px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;color:#c9d6df;transition:all .15s;display:flex;justify-content:space-between;align-items:center}
+  .topic:hover{background:rgba(255,255,255,0.04);color:#fff}
+  .topic.active{background:linear-gradient(90deg,rgba(255,213,79,0.12),transparent);color:#ffd54f;border-left:3px solid #ffd54f}
+  .sub{padding:6px 14px 6px 34px;font-size:12.5px;color:#9fb3c8;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.03);transition:all .15s;display:flex;justify-content:space-between;align-items:center}
+  .sub:hover{background:rgba(255,255,255,0.03);color:#fff}
+  .sub.active{background:rgba(255,213,79,0.08);color:#ffd54f;border-left:2px solid #ffd54f}
+  #stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,#162432 0%,#070a14 70%);padding:20px;overflow:auto}
+  #imageWrap{position:relative;display:inline-block;max-width:92vw;max-height:82vh;box-shadow:0 20px 60px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden}
+  #imageWrap img{display:block;max-width:100%;max-height:100%;object-fit:contain}
+  .mark{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10}
+  .dot{width:10px;height:10px;background:#ffd54f;border-radius:50%;box-shadow:0 0 12px #ffd54f;border:2px solid #0b1220}
+  .lbl{position:absolute;left:calc(50% + 14px);top:50%;transform:translateY(-50%);background:rgba(8,15,26,.92);backdrop-filter:blur(6px);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:6px 10px;font-size:12.5px;line-height:1.35;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .18s;min-width:140px;max-width:260px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+  .lbl.hi{border-color:#ffd54f;background:rgba(15,30,50,.95);color:#ffd54f}
+  .lbl .en{font-weight:700;display:block}
+  .lbl .hi{font-size:11.5px;color:#8ee0a7;opacity:.9;display:block;margin-top:2px}
+  .mark.active .lbl{opacity:1}
+  .mark.active .dot{background:#ffd54f;box-shadow:0 0 16px #ffd54f}
+  #hud{position:absolute;top:12px;left:320px;right:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;z-index:25;pointer-events:none}
+  #hud>*{pointer-events:auto}
+  .bar{background:rgba(10,16,28,0.8);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:9px 13px;display:flex;gap:11px;align-items:center;flex-wrap:wrap}
+  .bar h2{font-size:15px;color:#ffd54f;margin:0 0 4px 0;letter-spacing:.3px}
+  .bar p{font-size:12px;color:#9fb3c8;margin:0;line-height:1.45}
+  .btn{border:none;background:#1d3a5a;color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:6px 12px;font-size:12.5px;cursor:pointer;transition:all .15s}
+  .btn:hover{background:#2a527e;border-color:#6fb3d8}
+  .btn.active{background:#ffd54f;color:#0b1220;border-color:#ffd54f}
+  .openBtn{position:absolute;top:12px;left:12px;z-index:35}
+  .hint{position:absolute;bottom:14px;left:320px;right:12px;color:#8aa3b8;font-size:12px;z-index:25;text-align:center;pointer-events:none}
+  @media (max-width:900px){#sidebar{width:250px}#hud{left:12px;right:12px}.hint{left:12px;right:12px}}
+  @media (max-width:640px){#sidebar{width:220px}}
+</style>
+</head>
+<body>
+<div id="view">
+  <button class="openBtn btn" onclick="toggleSidebar()">☰ Topics</button>
+  <div id="sidebar">
+    <h2>कक्षा 9 भौतिक विज्ञान · Class IX Physics</h2>
+    <div class="topic active" data-topic="motion" onclick="selectTopic('motion')">गति · Motion <span class="hi">गति</span></div>
+    <div class="sub active" data-sub="motion" onclick="selectSub('motion')">Dynamics Cart on Track — गतिशील गाड़ी पटरी पर</div>
+    <div class="topic" data-topic="newton_laws" onclick="selectTopic('newton_laws')">न्यूटन के गति के नियम · Newton's Laws <span class="hi">न्यूटन के नियम</span></div>
+    <div class="sub" data-sub="newton_laws" onclick="selectSub('newton_laws')">Carts Colliding, Force Arrows — टकराती गाड़ियां, बल तीर</div>
+    <div class="topic" data-topic="gravitation" onclick="selectTopic('gravitation')">गुरुत्वाकर्षण · Gravitation <span class="hi">गुरुत्वाकर्षण</span></div>
+    <div class="sub" data-sub="gravitation" onclick="selectSub('gravitation')">Apple Falling, Earth Gravity — सेब गिरना, पृथ्वी गुरुत्वाकर्षण</div>
+    <div class="topic" data-topic="work_energy" onclick="selectTopic('work_energy')">कार्य और ऊर्जा · Work & Energy <span class="hi">कार्य और ऊर्जा</span></div>
+    <div class="sub" data-sub="work_energy" onclick="selectSub('work_energy')">Swinging Pendulum — दोलन करता पेंडुलम</div>
+    <div class="topic" data-topic="sound" onclick="selectTopic('sound')">ध्वनि · Sound <span class="hi">ध्वनि</span></div>
+    <div class="sub" data-sub="sound" onclick="selectSub('sound')">Vibrating Tuning Fork — कंपन करता ट्यूनिंग फोर्क</div>
+  </div>
+  <div id="stage">
+    <div id="imageWrap"><img id="mainImg" src="" alt=""></div>
+  </div>
+  <div id="hud">
+    <div class="bar">
+      <div>
+        <h2 id="imgTitle">गति · Motion</h2>
+        <p id="imgDesc">गतिशील गाड़ी पटरी पर — दूरी, समय और गति का अध्ययन। Dynamics cart on track — study of distance, time and speed — realistic lab image.</p>
+      </div>
+    </div>
+  </div>
+  <div id="labels"></div>
+  <div class="hint">चित्र पर डॉट पर क्लिक करें · लेबल अंग्रेजी + हिंदी में · क्लास IX NCERT विषय</div>
+</div>
+<script>
+// Label data: subtopic -> {title, desc, img, marks:[{x,y,en,hi}]}
+const DATA={
+ motion:{
+  title:'गति · Motion', desc:'गतिशील गाड़ी पटरी पर — दूरी, समय और गति का अध्ययन। Dynamics cart on track — study of distance, time and speed — realistic lab image.',
+  img:'images/motion.png',
+  marks:[
+    {x:30,y:40,en:'Dynamics Cart',hi:'गतिशील गाड़ी'},
+    {x:30,y:55,en:'Track / Rail',hi:'पटरी / रेल'},
+    {x:60,y:45,en:'Meter Ruler',hi:'मीटर पैमाना'},
+    {x:45,y:30,en:'Ticker Timer',hi:'टिकर टाइमर'},
+    {x:50,y:60,en:'Motion Blur',hi:'गति धुंधलका'},
+    {x:70,y:40,en:'Release Hand',hi:'हाथ छोड़ना'}
+  ]
+ },
+ newton_laws:{
+  title:'न्यूटन के गति के नियम · Newton\'s Laws', desc:'दो गाड़ियां टकराती हैं, बल तीर (वेक्टर), जड़ता का प्रदर्शन। Two carts colliding, force arrows, inertia demo — realistic lab image.',
+  img:'images/newton_laws.png',
+  marks:[
+    {x:30,y:40,en:'Cart 1',hi:'गाड़ी 1'},
+    {x:70,y:40,en:'Cart 2',hi:'गाड़ी 2'},
+    {x:50,y:30,en:'Force Arrow',hi:'बल तीर'},
+    {x:20,y:55,en:'Inertia (at rest)',hi:'जड़ता (स्थिरावस्था)'},
+    {x:50,y:60,en:'Collision Point',hi:'टक्कर बिंदु'}
+  ]
+ },
+ gravitation:{
+  title:'गुरुत्वाकर्षण · Gravitation', desc:'सेब पृथ्वी की ओर गिरता है, गुरुत्वाकर्षण क्षेत्र रेखाएं। Apple falling toward Earth, gravitational field lines — realistic image.',
+  img:'images/gravitation.png',
+  marks:[
+    {x:45,y:30,en:'Apple',hi:'सेब'},
+    {x:45,y:45,en:'Fall Direction',hi:'गिरने की दिशा'},
+    {x:45,y:65,en:'Earth',hi:'पृथ्वी'},
+    {x:30,y:50,en:'Gravitational Field',hi:'गुरुत्वाकर्षण क्षेत्र'},
+    {x:60,y:50,en:'Mass',hi:'द्रव्यमान'}
+  ]
+ },
+ work_energy:{
+  title:'कार्य और ऊर्जा · Work & Energy', desc:'डोलन करता पेंडुलम — उच्चतम बिंदु पर स्थितिज ऊर्जा, निम्नतम बिंदु पर गतिज ऊर्जा। Swinging pendulum — potential energy at top, kinetic energy at bottom — realistic image.',
+  img:'images/work_energy.png',
+  marks:[
+    {x:45,y:30,en:'Pendulum Bob',hi:'पेंडुलम बोब'},
+    {x:45,y:45,en:'Highest Point',hi:'उच्चतम बिंदु'},
+    {x:45,y:65,en:'Lowest Point',hi:'निम्नतम बिंदु'},
+    {x:30,y:50,en:'Potential Energy',hi:'स्थितिज ऊर्जा'},
+    {x:60,y:50,en:'Kinetic Energy',hi:'गतिज ऊर्जा'},
+    {x:45,y:80,en:'String',hi:'धागा'}
+  ]
+ },
+ sound:{
+  title:'ध्वनि · Sound', desc:'कंपन करता ट्यूनिंग फोर्क, पानी पर तरंगें, संपीडन और विरलन। Vibrating tuning fork, ripples on water, compression and rarefaction — realistic image.',
+  img:'images/sound.png',
+  marks:[
+    {x:40,y:35,en:'Tuning Fork',hi:'ट्यूनिंग फोर्क'},
+    {x:40,y:50,en:'Vibration',hi:'कंपन'},
+    {x:70,y:45,en:'Sound Waves',hi:'ध्वनि तरंगें'},
+    {x:50,y:55,en:'Compression',hi:'संपीडन'},
+    {x:50,y:65,en:'Rarefaction',hi:'विरलन'}
+  ]
+ }
+};
+
+// State
+let state={sub:'motion'};
+
+// Elements
+const mainImg=document.getElementById('mainImg');
+const imgTitle=document.getElementById('imgTitle');
+const imgDesc=document.getElementById('imgDesc');
+const labelsEl=document.getElementById('labels');
+
+function selectTopic(t){
+  document.querySelectorAll('.topic').forEach(el=>el.classList.remove('active'));
+  const tEl=document.querySelector('[data-topic="'+t+'"]');
+  if(tEl)tEl.classList.add('active');
+  let sub=null;
+  let node=tEl;
+  while((node=node.nextElementSibling)&&node.classList.contains('sub')){sub=node;break;}
+  if(sub)selectSub(sub.dataset.sub);
+}
+function selectSub(sub){
+  state.sub=sub;
+  const d=DATA[sub];
+  if(!d)return;
+  mainImg.src=d.img;
+  imgTitle.textContent=d.title;
+  imgDesc.textContent=d.desc;
+  renderLabels();
+  document.querySelectorAll('.sub').forEach(el=>el.classList.remove('active'));
+  const sel=document.querySelector('[data-sub="'+sub+'"]');
+  if(sel)sel.classList.add('active');
+  document.querySelectorAll('.topic').forEach(el=>el.classList.remove('active'));
+  let tEl=sel;
+  while((tEl=tEl.previousElementSibling)&&!tEl.classList.contains('topic')){}
+  if(tEl)tEl.classList.add('active');
+  document.getElementById('sidebar').classList.remove('open');
+}
+function renderLabels(){
+  labelsEl.innerHTML='';
+  const d=DATA[state.sub];
+  if(!d)return;
+  d.marks.forEach((m,i)=>{
+    const wrap=document.createElement('div');
+    wrap.className='mark';
+    wrap.style.left=m.x+'%';wrap.style.top=m.y+'%';
+    wrap.onclick=(e)=>{e.stopPropagation();document.querySelectorAll('.mark').forEach(m=>m.classList.remove('active'));wrap.classList.add('active');};
+    const dot=document.createElement('div');dot.className='dot';wrap.appendChild(dot);
+    const lbl=document.createElement('div');lbl.className='lbl';
+    lbl.innerHTML='<span class="en">'+m.en+'</span><span class="hi">'+m.hi+'</span>';
+    wrap.appendChild(lbl);
+    labelsEl.appendChild(wrap);
+  });
+}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
+
+// Init
+selectSub('motion');
+</script>
+</body>
+</html>
