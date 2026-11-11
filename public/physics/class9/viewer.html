@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vigyan Atlas — Class IX Physics: Step-wise Lab Experiments</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0a0f1a;color:#e8eef2;font:14px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Noto Sans,Nirmala UI,"Noto Sans Devanagari",Arial,sans-serif;overflow:hidden}
+  #view{position:relative;width:100vw;height:100vh;background:linear-gradient(180deg,#0f1b33 0%,#070a14 100%);overflow:hidden;display:flex}
+  canvas{display:block;width:100%;height:100%}
+  #sidebar{position:absolute;top:0;left:0;width:300px;height:100%;background:rgba(8,15,26,0.95);backdrop-filter:blur(8px);border-right:1px solid rgba(255,255,255,0.08);z-index:25;overflow-y:auto;transform:translateX(-102%);transition:transform .25s}
+  #sidebar.open{transform:translateX(0)}
+  #sidebar h2{font-size:15px;color:#ffd54f;padding:14px;border-bottom:1px solid rgba(255,255,255,0.1)}
+  .exp{padding:8px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;color:#c9d6df;transition:all .15s;display:flex;justify-content:space-between;align-items:center}
+  .exp:hover{background:rgba(255,255,255,0.04);color:#fff}
+  .exp.active{background:linear-gradient(90deg,rgba(255,213,79,0.12),transparent);color:#ffd54f;border-left:3px solid #ffd54f}
+  .exp .hi{font-size:11px;color:#8ee0a7;opacity:0.75}
+  #lab{position:absolute;top:0;right:0;width:340px;height:100%;background:rgba(12,20,36,0.97);backdrop-filter:blur(10px);border-left:1px solid rgba(255,255,255,0.08);z-index:25;overflow-y:auto;transform:translateX(102%);transition:transform .25s}
+  #lab.open{transform:translateX(0)}
+  .labhead{padding:14px;border-bottom:1px solid rgba(255,255,255,0.08)}
+  .labhead h3{color:#ffd54f;font-size:15px;margin:0 0 4px 0}
+  .labhead p{color:#9fb3c8;font-size:12px;margin:0}
+  .section{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.05)}
+  .section h4{color:#8ee0a7;font-size:12.5px;text-transform:uppercase;letter-spacing:.6px;margin:0 0 6px 0}
+  .section p{color:#c9d6df;font-size:13px;line-height:1.5;margin:0 0 6px 0;white-space:pre-wrap}
+  .step{padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:6px;border-left:3px solid rgba(255,213,79,0.2)}
+  .step.active{border-left-color:#ffd54f;background:rgba(255,213,79,0.08)}
+  .step .stt{color:#ffd54f;font-size:11px;font-weight:700}
+  .step p{color:#c9d6df;font-size:12.5px;margin:2px 0 0 0;line-height:1.45}
+  .matlist{color:#c9d6df;font-size:12.5px;line-height:1.6}
+  .matlist span{display:block;margin:2px 0;padding-left:14px;position:relative}
+  .matlist span::before{content:"▸";position:absolute;left:0;color:#ffd54f}
+  #hud{position:absolute;top:12px;left:14px;right:360px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;z-index:25;pointer-events:none}
+  #hud>*{pointer-events:auto}
+  .bar{background:rgba(10,16,28,0.8);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:9px 13px;display:flex;gap:11px;align-items:center;flex-wrap:wrap}
+  .bar h2{font-size:15px;color:#ffd54f;margin:0 0 4px 0;letter-spacing:.3px}
+  .bar p{font-size:12px;color:#9fb3c8;margin:0;line-height:1.45}
+  .btn{border:none;background:#1d3a5a;color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:6px 12px;font-size:12.5px;cursor:pointer;transition:all .15s}
+  .btn:hover{background:#2a527e;border-color:#6fb3d8}
+  .btn.active{background:#ffd54f;color:#0b1220;border-color:#ffd54f}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .openBtn{position:absolute;top:12px;left:12px;z-index:35}
+  .labBtn{position:absolute;top:12px;right:12px;z-index:35}
+  #labels{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:20}
+  .lab{position:absolute;transform:translate(-50%,-10px);font:bold 12px/1.2 system-ui;color:#fff;text-shadow:0 0 10px rgba(0,0,0,.9),0 0 4px #000;padding:2px 7px;border-radius:6px;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.35);white-space:nowrap;opacity:0;transition:opacity .15s}
+  .lab.show{opacity:1}
+  .lab.hi{border-color:#ffd54f;background:rgba(15,30,50,.85);color:#ffd54f}
+  .hint{position:absolute;bottom:14px;left:14px;right:360px;color:#8aa3b8;font-size:12px;z-index:25;text-align:center;pointer-events:none}
+  @media (max-width:900px){#sidebar{width:250px}#lab{width:290px}#hud{left:12px;right:300px}.hint{right:300px}}
+  @media (max-width:640px){#sidebar{width:220px}#lab{width:260px}#hud{left:12px;right:270px}.hint{right:270px}}
+</style>
+</head>
+<body>
+<div id="view">
+  <button class="openBtn btn" onclick="toggleSidebar()">☰ Experiments</button>
+  <button class="labBtn btn" onclick="toggleLab()">🔬 Lab Panel</button>
+  <div id="sidebar">
+    <h2>कक्षा 9 भौतिक विज्ञान · Class IX Physics</h2>
+    <div class="exp active" data-exp="motion" onclick="selectExp('motion')">गति · Motion <span class="hi">गति</span></div>
+    <div class="exp" data-exp="newton" onclick="selectExp('newton')">न्यूटन के गति के नियम · Newton's Laws <span class="hi">न्यूटन के नियम</span></div>
+    <div class="exp" data-exp="gravitation" onclick="selectExp('gravitation')">गुरुत्वाकर्षण · Gravitation <span class="hi">गुरुत्वाकर्षण</span></div>
+    <div class="exp" data-exp="energy" onclick="selectExp('energy')">कार्य और ऊर्जा · Work & Energy <span class="hi">कार्य और ऊर्जा</span></div>
+    <div class="exp" data-exp="sound" onclick="selectExp('sound')">ध्वनि · Sound <span class="hi">ध्वनि</span></div>
+  </div>
+  <div id="lab">
+    <div class="labhead">
+      <h3 id="labTitle">प्रयोग विवरण · Lab Details</h3>
+      <p id="labSub"></p>
+    </div>
+    <div class="section">
+      <h4>उद्देश्य · Aim</h4>
+      <p id="labAim"></p>
+    </div>
+    <div class="section">
+      <h4>सामग्री · Materials</h4>
+      <div class="matlist" id="labMat"></div>
+    </div>
+    <div class="section">
+      <h4>प्रक्रिया · Procedure</h4>
+      <div id="labSteps"></div>
+    </div>
+    <div class="section">
+      <h4>अवलोकन · Observation</h4>
+      <p id="labObs"></p>
+    </div>
+    <div class="section">
+      <h4>निष्कर्ष · Conclusion</h4>
+      <p id="labConc"></p>
+    </div>
+  </div>
+  <div id="hud">
+    <div class="bar">
+      <div>
+        <h2 id="expTitle">गति</h2>
+        <p id="expDesc"></p>
+      </div>
+    </div>
+    <div class="bar" style="flex:1;justify-content:flex-end">
+      <button class="btn" id="btnPrev">◀ पिछला</button>
+      <span class="btn" style="background:transparent;border:none;color:#c9d6df;cursor:default;padding:0" id="stepInfo">स्टेप 1 / 1</span>
+      <button class="btn" id="btnNext">अगला ▶</button>
+    </div>
+  </div>
+  <div id="labels"></div>
+  <div class="hint">खींचकर घुमाएं · स्टेप-बाय-स्टेप लैब प्रक्रिया · बिल्ट-इन PBR · वीडियो नहीं</div>
+</div>
+<script type="importmap">
+{"imports":{"three":"../../lib/three.module.js","three/addons/":"../../lib/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+// ---------- State ----------
+let state = { exp: 'motion', step: 0 };
+
+// ---------- Scene ----------
+const view = document.querySelector('#view');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x070a14);
+scene.fog = new THREE.FogExp2(0x070a14, 0.15);
+
+const camera = new THREE.PerspectiveCamera(45, view.clientWidth / view.clientHeight, 0.1, 200);
+camera.position.set(0, 1.2, 5.0);
+
+const renderer = new THREE.WebGLRenderer({antialias:true, powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.setSize(view.clientWidth, view.clientHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+view.appendChild(renderer.domElement);
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = 0.06;
+controls.minDistance = 1.6; controls.maxDistance = 20; controls.autoRotate = false;
+
+// ---------- Lights ----------
+const amb = new THREE.AmbientLight(0xffffff, 0.25); scene.add(amb);
+const spot = new THREE.SpotLight(0xffffff, 70, 30, 0.35, 0.5, 1);
+spot.position.set(2.0, 2.8, 2.4); spot.target.position.set(0,0,0);
+spot.castShadow = true; spot.shadow.mapSize.set(2048,2048);
+scene.add(spot); scene.add(spot.target);
+const fill = new THREE.PointLight(0x6fb3d8, 14, 16); fill.position.set(-2.2,0.4,1.6); scene.add(fill);
+const rim = new THREE.PointLight(0xffd54f, 16, 16); rim.position.set(1.4,-1.2,-2.2); scene.add(rim);
+
+// ---------- PBR materials ----------
+function matPBR(color, opts={}) {
+  return new THREE.MeshStandardMaterial(Object.assign({color, roughness:0.5, metalness:0.1, clearcoat:0.4, clearcoatRoughness:0.25}, opts));
+}
+function matLab(color, opts={}) {
+  return new THREE.MeshStandardMaterial(Object.assign({color, roughness:0.45, metalness:0.15, clearcoat:0.3, clearcoatRoughness:0.2}, opts));
+}
+function matGlow(color=0xffd54f, opts={}) {
+  return new THREE.MeshBasicMaterial(Object.assign({color, transparent:true, opacity:0.9}, opts));
+}
+function matMetal(color=0xa0a8b0, opts={}) {
+  return new THREE.MeshStandardMaterial(Object.assign({color, roughness:0.3, metalness:0.85}, opts));
+}
+// ---------- Equipment ----------
+function makeTrack() {
+  const g=new THREE.Group();
+  const base=new THREE.Mesh(new THREE.BoxGeometry(2.4,0.1,0.3),matLab(0x4a5058));
+  base.position.set(0,-0.05,0);base.castShadow=true;base.receiveShadow=true;g.add(base);
+  const rail=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,2.2,8),matLab(0x8a8a8a));
+  rail.position.set(0,0,0.12);rail.rotation.z=Math.PI/2;rail.castShadow=true;g.add(rail);
+  const rail2=rail.clone();rail2.position.set(0,0,-0.12);g.add(rail2);
+  return g;
+}
+function makeCart() {
+  const g=new THREE.Group();
+  const body=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.2,0.3),matLab(0xc04040));
+  body.position.set(0,0.2,0);body.castShadow=true;body.receiveShadow=true;g.add(body);
+  for(let x of [-0.15,0.15]){for(let z of [-0.15,0.15]){
+    const w=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,0.1,12),matLab(0x303030));
+    w.position.set(x,0.1,z);w.rotation.x=Math.PI/2;w.castShadow=true;g.add(w);
+  }}
+  return g;
+}
+// Arrow
+function makeArrow(p0,p1,color=0xffd54f) {
+  const dir=new THREE.Vector3().subVectors(p1,p0).normalize();
+  const len=p0.distanceTo(p1);
+  const g=new THREE.Group();
+  const shaft=new THREE.Mesh(new THREE.CylinderGeometry(0.025,0.025,len,10),matLab(color));
+  shaft.position.copy(p0).lerp(p1,0.5);shaft.lookAt(p1);shaft.rotation.x-=Math.PI/2;g.add(shaft);
+  const head=new THREE.Mesh(new THREE.ConeGeometry(0.07,0.3,12),matLab(color));
+  head.position.copy(p1);head.lookAt(p0);head.rotation.x-=Math.PI/2;g.add(head);
+  return g;
+}
+// Labels
+const labelsEl=document.getElementById('labels');
+const labelEls=new Map();
+function label(id,text,pos,active,hi){
+  let el=labelEls.get(id);
+  if(!el){el=document.createElement('div');el.className='lab'+(hi?' hi':'');el.textContent=text;labelsEl.appendChild(el);labelEls.set(id,el);}
+  if(active){
+    const v=pos.clone().project(camera);
+    const x=(v.x*0.5+0.5)*view.clientWidth;
+    const y=(1-(v.y*0.5+0.5))*view.clientHeight;
+    el.style.left=x+'px';el.style.top=y+'px';el.classList.add('show');
+    if(hi)el.classList.add('hi');else el.classList.remove('hi');
+  }else{el.classList.remove('show');}
+}
+function clearLabels(){labelEls.forEach(e=>e.classList.remove('show');)}
+// ---------- Current model ----------
+let currentGroup=null;
+function clearScene(){
+  if(currentGroup){
+    scene.remove(currentGroup);
+    currentGroup.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose();}});
+  }
+  currentGroup=null;clearLabels();
+}
+// ---------- Experiments ----------
+const EXPS={
+ motion:{
+  title:'गति · Motion', sub:'वेक-टाइम ग्राफ और गति के समीकरण',
+  aim:'एकसमान त्वरण से गतिमान वस्तु का वेग-समय ग्राफ खींचना और गति के समीकरण सत्यापित करना।',
+  mat:['कार्ट','ट्रैक','स्टॉपवॉच','मीटर पैमाना'],
+  steps:[
+    {proc:'कार्ट को ट्रैक पर रखें और छोड़ें।',obs:'कार्ट एकसमान त्वरण से बढ़ती है।',build:(g)=>{
+      const track=makeTrack();g.add(track);
+      const cart=makeCart();cart.position.set(-1.0,0.2,0);g.add(cart);
+      label('cart','कार्ट',new THREE.Vector3(-1.0,0.5,0),true,true);
+    }},
+    {proc:'विभिन्न समय पर दूरी मापें।',obs:'दूरी समय के वर्ग के समानुपाती बढ़ती है।',build:(g)=>{
+      const track=makeTrack();g.add(track);
+      const cart=makeCart();cart.position.set(0,0.2,0);g.add(cart);
+      const dots=new THREE.Group();
+      for(let i=0;i<6;i++){const d=new THREE.Mesh(new THREE.SphereGeometry(0.05,12,10),matLab(0xffd54f));d.position.set(-1.0+i*0.4,0.15,0);dots.add(d);}
+      g.add(dots);
+      label('dist','दूरी माप',new THREE.Vector3(0,0.6,0),true,true);
+    }},
+    {proc:'वेग-समय ग्राफ खींचें — सीधी रेखा।',obs:'ढाल = त्वरण।',build:(g)=>{
+      const axisX=new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,1.2,8),matLab(0xffffff));axisX.position.set(0,-0.6,0);axisX.rotation.z=Math.PI/2;g.add(axisX);
+      const axisY=new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,1.0,8),matLab(0xffffff));axisY.position.set(-0.6,0.1,0);g.add(axisY);
+      const line=new THREE.Mesh(new THREE.CylinderGeometry(0.025,0.025,1.0,8),matLab(0x44ff88));line.position.set(-0.1,0.1,0);line.rotation.z=0.7;g.add(line);
+      label('graph','v-t ग्राफ',new THREE.Vector3(0,0.5,0),true,true);
+    }}],
+  obs:'समान समय अंतराल में तय दूरी बढ़ती जाती है; वेग-समय ग्राफ सीधी रेखा होती है।',
+  conc:'गति के समीकरण: v = u + at, s = ut + ½at², v² = u² + 2as।'
+ },
+ newton:{
+  title:'न्यूटन के गति के नियम · Newton's Laws', sub:'जड़त्व, F = ma, क्रिया-प्रतिक्रिया',
+  aim:'न्यूटन के तीन गति के नियमों का प्रदर्शन करना।',
+  mat:['सिक्का और कार्ड','दो कार्ट','स्प्रिंग बैलेंस'],
+  steps:[
+    {proc:'कार्ड पर सिक्का रखें और कार्ड तेजी से खींचें।',obs:'सिक्का नीचे गिर जाता है (जड़त्व)।',build:(g)=>{
+      const card=new THREE.Mesh(new THREE.BoxGeometry(0.8,0.04,0.8),matLab(0x8a8a8a));
+      card.position.set(0,0.6,0);card.castShadow=true;g.add(card);
+      const coin=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.03,0.1,20),matLab(0xb08d3f));
+      coin.position.set(0,0.63,0);g.add(coin);
+      label('inertia','जड़त्व — सिक्का गिरा',new THREE.Vector3(0,0.9,0),true,true);
+    }},
+    {proc:'दो कार्ट को एक-दूसरे से दूर धकेलें।',obs:'दोनों विपरीत दिशा में चलती हैं।',build:(g)=>{
+      const c1=makeCart();c1.position.set(-0.7,0.2,0);g.add(c1);
+      const c2=makeCart();c2.position.set(0.7,0.2,0);g.add(c2);
+      const f1=makeArrow(new THREE.Vector3(-0.7,0.2,0),new THREE.Vector3(-1.1,0.2,0),0x44ff88);g.add(f1);
+      const f2=makeArrow(new THREE.Vector3(0.7,0.2,0),new THREE.Vector3(1.1,0.2,0),0xff4444);g.add(f2);
+      label('third','क्रिया = प्रतिक्रिया',new THREE.Vector3(0,0.6,0),true,true);
+    }},
+    {proc:'एक ही बल लगाने पर हल्की वस्तु अधिक त्वरण पाती है।',obs:'F = ma।',build:(g)=>{
+      const light=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.2,0.2),matLab(0x44ff88));
+      light.position.set(-0.6,0.2,0);g.add(light);
+      const heavy=new THREE.Mesh(new THREE.BoxGeometry(0.7,0.5,0.4),matLab(0x404040));
+      heavy.position.set(0.6,0.35,0);g.add(heavy);
+      const fa=makeArrow(new THREE.Vector3(-0.9,0.2,0),new THREE.Vector3(-0.6,0.2,0),0xffd54f);g.add(fa);
+      const fh=makeArrow(new THREE.Vector3(0.3,0.45,0),new THREE.Vector3(0.6,0.45,0),0xffd54f);g.add(fh);
+      label('fma','F = ma',new THREE.Vector3(0,0.6,0),true,true);
+    }}],
+  obs:'जड़त्व के कारण सिक्का गिरता है; क्रिया और प्रतिक्रिया बराबर और विपरीत होती हैं; बल द्रव्यमान और त्वरण का गुणनफल है।',
+  conc:'न्यूटन के नियम: जड़त्व, F = ma, क्रिया-प्रतिक्रिया।'
+ },
+ gravitation:{
+  title:'गुरुत्वाकर्षण · Gravitation', sub:'स्वतंत्र पतन और गुरुत्वीय त्वरण',
+  aim:'विभिन्न पिण्डों का गुरुत्वीय त्वरण समान देखना।',
+  mat:['दो गेंदें','ऊंचा स्टैंड','स्टॉपवॉच'],
+  steps:[
+    {proc:'दो गेंदें (भारी और हल्की) एक ही ऊंचाई से छोड़ें।',obs:'दोनों एक साथ जमीन पर पहुंचती हैं।',build:(g)=>{
+      const stand=makeStand();stand.position.set(0,0,0);g.add(stand);
+      const heavy=new THREE.Mesh(new THREE.SphereGeometry(0.18,32,24),matLab(0x404040));
+      heavy.position.set(-0.4,1.4,0);heavy.castShadow=true;g.add(heavy);
+      const light=new THREE.Mesh(new THREE.SphereGeometry(0.12,24,20),matLab(0xc04040));
+      light.position.set(0.4,1.4,0);light.castShadow=true;g.add(light);
+      const ground=new THREE.Mesh(new THREE.BoxGeometry(2.4,0.08,1.2),matLab(0x6a6a6a));
+      ground.position.set(0,-0.04,0);ground.receiveShadow=true;g.add(ground);
+      label('fall','स्वतंत्र पतन',new THREE.Vector3(0,1.6,0),true,true);
+    }},
+    {proc:'गुरुत्वीय त्वरण g = 9.8 मी/से² सभी के लिए समान।',obs:'भार का पतन पर कोई प्रभाव नहीं।',build:(g)=>{
+      const stand=makeStand();stand.position.set(0,0,0);g.add(stand);
+      const heavy=new THREE.Mesh(new THREE.SphereGeometry(0.18,32,24),matLab(0x404040));
+      heavy.position.set(-0.4,0.6,0);g.add(heavy);
+      const light=new THREE.Mesh(new THREE.SphereGeometry(0.12,24,20),matLab(0xc04040));
+      light.position.set(0.4,0.6,0);g.add(light);
+      const ground=new THREE.Mesh(new THREE.BoxGeometry(2.4,0.08,1.2),matLab(0x6a6a6a));
+      ground.position.set(0,-0.04,0);ground.receiveShadow=true;g.add(ground);
+      label('g','g = 9.8 मी/से²',new THREE.Vector3(0,1.0,0),true,true);
+    }},
+    {proc:'चंद्रमा पर गुरुत्वाकर्षण पृथ्वी का 1/6 भाग है।',obs:'चंद्रमा पर वस्तु हल्की महसूस होती है।',build:(g)=>{
+      const moon=new THREE.Mesh(new THREE.SphereGeometry(0.7,32,24),matLab(0xd0c0b0));
+      moon.position.set(0,0,0);moon.castShadow=true;g.add(moon);
+      const obj=new THREE.Mesh(new THREE.SphereGeometry(0.12,20,16),matLab(0xc04040));
+      obj.position.set(0,0.9,0);g.add(obj);
+      label('moon','चंद्रमा g/6',new THREE.Vector3(0,1.1,0),true,true);
+    }}],
+  obs:'सभी वस्तुएं गुरुत्वाकर्षण के तहत एकसमान त्वरण से गिरती हैं।',
+  conc:'गुरुत्वीय त्वरण g सभी स्वतंत्र रूप से गिरने वाली वस्तुओं के लिए समान होता है (वायु प्रतिरोध की अनुपस्थिति में)।'
+ },
+ energy:{
+  title:'कार्य और ऊर्जा · Work & Energy', sub:'गतिज और स्थितिज ऊर्जा',
+  aim:'गतिज ऊर्जा (½mv²) और स्थितिज ऊर्जा (mgh) का प्रदर्शन करना।',
+  mat:['पेंडुलम','भारी गेंद','दोर','स्टैंड'],
+  steps:[
+    {proc:'पेंडुलम बनाएं और गेंद को एक ओर उठाएं।',obs:'स्थितिज ऊर्जा अधिक।',build:(g)=>{
+      const stand=makeStand();stand.position.set(0,0,0);g.add(stand);
+      const rod=new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,1.4,8),matLab(0x8a8a8a));
+      rod.position.set(0,0.5,0);g.add(rod);
+      const bob=new THREE.Mesh(new THREE.SphereGeometry(0.16,32,24),matLab(0xc04040));
+      bob.position.set(0.7,0.1,0);bob.castShadow=true;g.add(bob);
+      label('pe','स्थितिज ऊर्जा mgh',new THREE.Vector3(0.7,0.4,0),true,true);
+    }},
+    {proc:'गेंद को छोड़ें — सबसे नीचे वेग अधिकतम।',obs:'गतिज ऊर्जा अधिकतम, स्थितिज न्यूनतम।',build:(g)=>{
+      const stand=makeStand();stand.position.set(0,0,0);g.add(stand);
+      const rod=new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,1.4,8),matLab(0x8a8a8a));
+      rod.position.set(0,0.5,0);g.add(rod);
+      const bob=new THREE.Mesh(new THREE.SphereGeometry(0.16,32,24),matLab(0x44ff88));
+      bob.position.set(0,-0.1,0);bob.castShadow=true;g.add(bob);
+      label('ke','गतिज ऊर्जा ½mv²',new THREE.Vector3(0,0.2,0),true,true);
+    }},
+    {proc:'ऊर्जा का रूपांतरण होता है, कुल ऊर्जा स्थिर रहती है।',obs:'ऊर्जा संरक्षण नियम।',build:(g)=>{
+      const stand=makeStand();stand.position.set(0,0,0);g.add(stand);
+      const rod=new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,1.4,8),matLab(0x8a8a8a));
+      rod.position.set(0,0.5,0);g.add(rod);
+      const bob=new THREE.Mesh(new THREE.SphereGeometry(0.16,32,24),matLab(0xffd54f));
+      bob.position.set(-0.7,0.1,0);bob.castShadow=true;g.add(bob);
+      const total=new THREE.Mesh(new THREE.SphereGeometry(0.25,32,24),matLab(0x44ff88));
+      total.material.transparent=true;total.material.opacity=0.25;total.position.set(0,1.4,0);g.add(total);
+      label('cons','ऊर्जा संरक्षण',new THREE.Vector3(0,1.1,0),true,true);
+    }}],
+  obs:'ऊर्जा एक रूप से दूसरे रूप में बदलती है लेकिन नष्ट नहीं होती।',
+  conc:'ऊर्जा संरक्षण नियम: ऊर्जा का सृजन या नाश नहीं होता, केवल रूपांतरण होता है।'
+ },
+ sound:{
+  title:'ध्वनि · Sound', sub:'ध्वनि तरंगें और प्रतिध्वनि',
+  aim:'ध्वनि तरंगों का कंपन और प्रतिध्वनि देखना।',
+  mat:['ट्यूनिंग फोर्क','रबर पैड','मापदंड','टॉर्च'],
+  steps:[
+    {proc:'ट्यूनिंग फोर्क को रबर पैड पर बजाएं।',obs:'फोर्क कंपन करता है, ध्वनि आती है।',build:(g)=>{
+      const fork=new THREE.Group();
+      const handle=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.6,12),matLab(0xa0a8b0));
+      handle.position.set(0,-0.1,0);g.add(handle);
+      const prong1=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.5,8),matLab(0xa0a8b0));
+      prong1.position.set(-0.1,0.35,0);prong1.rotation.z=0.1;g.add(prong1);
+      const prong2=prong1.clone();prong2.position.set(0.1,0.35,0);prong2.rotation.z=-0.1;g.add(prong2);
+      const wave=new THREE.Mesh(new THREE.TorusGeometry(0.3,0.02,12,24),matLab(0x6fb3d8));
+      wave.material.transparent=true;wave.material.opacity=0.4;wave.position.set(0,0.55,0);g.add(wave);
+      label('vib','कंपन',new THREE.Vector3(0,0.7,0),true,true);
+    }},
+    {proc:'ध्वनि तरंग संकुचन और विरलीकरण के रूप में आगे बढ़ती है।',obs:'माध्यम के कण दोलन करते हैं।',build:(g)=>{
+      const waves=new THREE.Group();
+      for(let i=0;i<6;i++){const w=new THREE.Mesh(new THREE.TorusGeometry(0.4+i*0.15,0.02,10,20),matLab(0x44ff88));w.material.transparent=true;w.material.opacity=0.5-i*0.07;w.position.set(0,0.6,0);waves.add(w);}
+      g.add(waves);
+      label('wave','ध्वनि तरंग',new THREE.Vector3(0,1.0,0),true,true);
+    }},
+    {proc:'पहाड़ से टकराकर ध्वनि लौटती है — प्रतिध्वनि।',obs:'मूल ध्वनि के 0.1 सेकंड बाद लौटती हुई ध्वनि।',build:(g)=>{
+      const source=new THREE.Mesh(new THREE.SphereGeometry(0.1,20,16),matLab(0xffd54f));
+      source.position.set(-1.5,0.6,0);g.add(source);
+      const wall=new THREE.Mesh(new THREE.BoxGeometry(0.1,1.4,1.4),matLab(0x6a6a6a));
+      wall.position.set(1.5,0.6,0);wall.receiveShadow=true;g.add(wall);
+      const ray1=makeRay(new THREE.Vector3(-1.5,0.6,0),new THREE.Vector3(1.4,0.6,0),0xffd54f);g.add(ray1);
+      const ray2=makeRay(new THREE.Vector3(1.4,0.6,0),new THREE.Vector3(-1.5,0.6,0),0x44ff88);g.add(ray2);
+      label('echo','प्रतिध्वनि',new THREE.Vector3(0,0.9,0),true,true);
+    }}],
+  obs:'ध्वनि यांत्रिक तरंग है जो माध्यम में संचरित होती है; प्रतिध्वनि परावर्तित ध्वनि है।',
+  conc:'ध्वनि के लिए माध्यम आवश्यक है; प्रतिध्वनि = परावर्तित ध्वनि।'
+ }
+};
+
+// ---------- Build ----------
+function buildExp(name){
+  const e=EXPS[name];
+  clearScene();
+  const g=new THREE.Group();
+  state.exp=name; state.step=0;
+  updateUI();
+  renderStep(g);
+}
+function renderStep(g){
+  const e=EXPS[state.exp];
+  const s=e.steps[state.step];
+  clearLabels();
+  if(currentGroup){scene.remove(currentGroup);}
+  currentGroup=g;
+  s.build(g);
+  scene.add(g);
+  camera.position.set(0,1.2,5.0); controls.target.set(0,0,0);
+  document.getElementById('labTitle').textContent=e.title;
+  document.getElementById('labSub').textContent=e.sub;
+  document.getElementById('labAim').textContent=e.aim;
+  document.getElementById('labMat').innerHTML=e.mat.map(m=>`<span>${m}</span>`).join('');
+  document.getElementById('labObs').textContent=e.obs;
+  document.getElementById('labConc').textContent=e.conc;
+  const stepsHtml=e.steps.map((s,i)=>`<div class="step${i===state.step?' active':''}"><div class="stt">स्टेप ${i+1}</div><p>${s.proc}</p></div>`).join('');
+  document.getElementById('labSteps').innerHTML=stepsHtml;
+  document.getElementById('expTitle').textContent=e.title;
+  document.getElementById('expDesc').textContent=e.sub;
+  document.getElementById('stepInfo').textContent=`स्टेप ${state.step+1} / ${e.steps.length}`;
+  document.getElementById('btnPrev').disabled=state.step===0;
+  document.getElementById('btnNext').disabled=state.step===e.steps.length-1;
+}
+function selectExp(name){
+  document.querySelectorAll('.exp').forEach(el=>{el.classList.remove('active');if(el.dataset.exp===name)el.classList.add('active');});
+  buildExp(name);
+  document.getElementById('sidebar').classList.remove('open');
+}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
+function toggleLab(){document.getElementById('lab').classList.toggle('open');}
+document.getElementById('btnPrev').addEventListener('click',()=>{if(state.step>0){state.step--;renderStep(new THREE.Group());}});
+document.getElementById('btnNext').addEventListener('click',()=>{const e=EXPS[state.exp];if(state.step<e.steps.length-1){state.step++;renderStep(new THREE.Group());}});
+
+// ---------- Animation ----------
+function animate(){
+  requestAnimationFrame(animate);
+  const t=performance.now()*0.0015;
+  controls.update();
+  if(currentGroup){currentGroup.rotation.y=Math.sin(t*0.3)*0.06;currentGroup.rotation.x=Math.sin(t*0.2)*0.04;}
+  renderer.render(scene,camera);
+}
+animate();
+window.addEventListener('resize',()=>{
+  camera.aspect=view.clientWidth/view.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(view.clientWidth,view.clientHeight);
+});
+buildExp('motion');
+</script>
+</body>
+</html>
