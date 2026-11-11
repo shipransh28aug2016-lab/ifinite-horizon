@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vigyan Atlas — Class IX Biology: Realistic 3D Models</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0b1220;color:#e8eef2;font:14px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Noto Sans,Nirmala UI,"Noto Sans Devanagari",Arial,sans-serif;overflow:hidden}
+  #view{position:relative;width:100vw;height:100vh;background:linear-gradient(180deg,#0f1b33 0%,#070a14 100%);overflow:hidden;display:flex}
+  canvas{display:block;width:100%;height:100%}
+  #sidebar{position:absolute;top:0;left:0;width:320px;height:100%;background:rgba(10,18,30,0.92);backdrop-filter:blur(8px);border-right:1px solid rgba(255,255,255,0.1);z-index:20;overflow-y:auto;transform:translateX(-102%);transition:transform .25s}
+  #sidebar.open{transform:translateX(0)}
+  #sidebar h2{font-size:15px;color:#ffd54f;padding:14px;border-bottom:1px solid rgba(255,255,255,0.12)}
+  .topic{padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13.5px;color:#c9d6df;transition:all .15s;display:flex;justify-content:space-between;align-items:center}
+  .topic:hover{background:rgba(255,255,255,0.05);color:#fff}
+  .topic.active{background:linear-gradient(90deg,rgba(255,213,79,0.15),transparent);color:#ffd54f;border-left:3px solid #ffd54f}
+  .topic .hi{font-size:11.5px;color:#8ee0a7;opacity:0.8}
+  #hud{position:absolute;top:12px;left:340px;right:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;z-index:20;pointer-events:none}
+  #hud>*{pointer-events:auto}
+  .bar{background:rgba(10,16,28,0.75);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .bar h2{font-size:15px;color:#ffd54f;margin:0 0 6px 0;letter-spacing:0.4px}
+  .bar p{font-size:12.5px;color:#9fb3c8;margin:0;line-height:1.45}
+  .btn{border:none;background:#1d3a5a;color:#fff;border:1px solid rgba(255,255,255,0.25);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;transition:all .15s}
+  .btn:hover{background:#2a527e;border-color:#6fb3d8}
+  .btn.active{background:#ffd54f;color:#0b1220;border-color:#ffd54f}
+  .openBtn{position:absolute;top:12px;left:12px;z-index:30}
+  #labels{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:15}
+  .lab{position:absolute;transform:translate(-50%,-10px);font:bold 12.5px/1.2 system-ui;color:#fff;text-shadow:0 0 10px rgba(0,0,0,.85),0 0 4px #000;padding:2px 8px;border-radius:6px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.35);white-space:nowrap;opacity:0;transition:opacity .15s}
+  .lab.show{opacity:1}
+  .lab.hi{border-color:#ffd54f;background:rgba(15,30,50,.85);color:#ffd54f}
+  .hint{position:absolute;bottom:14px;left:14px;right:14px;color:#8aa3b8;font-size:12.5px;z-index:20;text-align:center;pointer-events:none}
+  .desc{position:absolute;bottom:110px;left:340px;right:12px;color:#9fb3c8;font-size:13px;z-index:20;pointer-events:none;max-width:700px;line-height:1.5}
+  @media (max-width:720px){#sidebar{width:260px}#hud{left:12px}.desc{left:12px}}
+</style>
+</head>
+<body>
+<div id="view">
+  <button class="openBtn btn" onclick="toggleSidebar()">☰ Topics</button>
+  <div id="sidebar">
+    <h2>कक्षा 9 जीव विज्ञान · Class IX Biology</h2>
+    <div class="topic active" data-topic="cell" onclick="selectTopic('cell')">Cell — कोशिका <span class="hi">कोशिका</span></div>
+    <div class="topic" data-topic="tissues" onclick="selectTopic('tissues')">Tissues — ऊतक <span class="hi">ऊतक</span></div>
+    <div class="topic" data-topic="digestive" onclick="selectTopic('digestive')">Digestive System — पाचन तंत्र <span class="hi">पाचन तंत्र</span></div>
+    <div class="topic" data-topic="heart" onclick="selectTopic('heart')">Heart — हृदय <span class="hi">हृदय</span></div>
+    <div class="topic" data-topic="respiratory" onclick="selectTopic('respiratory')">Respiratory System — श्वसन तंत्र <span class="hi">श्वसन तंत्र</span></div>
+    <div class="topic" data-topic="skeleton" onclick="selectTopic('skeleton')">Skeleton & Joints — कंकाल और जोड़ <span class="hi">कंकाल और जोड़</span></div>
+    <div class="topic" data-topic="skin" onclick="selectTopic('skin')">Skin — त्वचा <span class="hi">त्वचा</span></div>
+    <div class="topic" data-topic="flower" onclick="selectTopic('flower')">Flower — फूल <span class="hi">फूल</span></div>
+    <div class="topic" data-topic="teeth" onclick="selectTopic('teeth')">Teeth — दांत <span class="hi">दांत</span></div>
+    <div class="topic" data-topic="seeds" onclick="selectTopic('seeds')">Seeds & Germination — बीज और अंकुरण <span class="hi">बीज और अंकुरण</span></div>
+    <div class="topic" data-topic="respiration" onclick="selectTopic('respiration')">Respiration in Plants — पादप श्वसन <span class="hi">पादप श्वसन</span></div>
+    <div class="topic" data-topic="kingdoms" onclick="selectTopic('kingdoms')">Five Kingdoms — पाँच जगत <span class="hi">पाँच जगत</span></div>
+    <div class="topic" data-topic="bacteria" onclick="selectTopic('bacteria')">Bacteria — जीवाणु <span class="hi">जीवाणु</span></div>
+    <div class="topic" data-topic="fungi" onclick="selectTopic('fungi')">Fungi — कवक <span class="hi">कवक</span></div>
+    <div class="topic" data-topic="diet" onclick="selectTopic('diet')">Food & Diet — भोजन और आहार <span class="hi">भोजन और आहार</span></div>
+  </div>
+  <div id="hud">
+    <div class="bar">
+      <div>
+        <h2 id="topicTitle">Cell — कोशिका</h2>
+        <p id="topicDesc">Realistic plant and animal cell with detailed organelles — nucleus, mitochondria, ER, Golgi, chloroplast, vacuole. PBR tissue materials.</p>
+      </div>
+    </div>
+    <div class="bar" style="flex:1;justify-content:flex-end">
+      <button class="btn" id="btnPlay">▶ Play</button>
+      <button class="btn" id="btnIso">Isolate</button>
+    </div>
+  </div>
+  <div id="labels"></div>
+  <div class="desc" id="topicDetail"></div>
+  <div class="hint">Drag to rotate · Pinch to zoom · Click topic in sidebar · Built with three.js r160 PBR · Realistic 3D, no video</div>
+</div>
+<script type="importmap">
+{"imports":{"three":"../../lib/three.module.js","three/addons/":"../../lib/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ---------- State ----------
+let state = {
+  topic: 'cell',
+  playing: true,
+  isolate: false,
+  speed: 1
+};
+
+// ---------- Scene ----------
+const view = document.querySelector('#view');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x070a14);
+scene.fog = new THREE.FogExp2(0x070a14, 0.16);
+
+const camera = new THREE.PerspectiveCamera(45, view.clientWidth / view.clientHeight, 0.1, 200);
+camera.position.set(0, 0.8, 4.2);
+
+const renderer = new THREE.WebGLRenderer({antialias:true, powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.setSize(view.clientWidth, view.clientHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+view.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance = 1.5;
+controls.maxDistance = 16;
+controls.autoRotate = state.playing;
+
+// ---------- Lights ----------
+const amb = new THREE.AmbientLight(0xffffff, 0.3);
+scene.add(amb);
+const spot = new THREE.SpotLight(0xffffff, 50, 30, 0.35, 0.5, 1);
+spot.position.set(1.8, 2.8, 2.4);
+spot.target.position.set(0,0,0);
+spot.castShadow = true;
+spot.shadow.mapSize.width = 2048;
+spot.shadow.mapSize.height = 2048;
+scene.add(spot); scene.add(spot.target);
+const fill = new THREE.PointLight(0x6fb3d8, 12, 14); fill.position.set(-2.2,0.2,1.6); scene.add(fill);
+const rim = new THREE.PointLight(0xffd54f, 14, 14); rim.position.set(1.4,-1.4,-2.2); scene.add(rim);
+
+// ---------- PBR material presets ----------
+function matPBR(color, opts={}) {
+  return new THREE.MeshStandardMaterial(Object.assign({
+    color, roughness:0.55, metalness:0.08, clearcoat:0.4, clearcoatRoughness:0.25
+  }, opts));
+}
+function matWet(color) {
+  return new THREE.MeshPhysicalMaterial({color, roughness:0.2, metalness:0, clearcoat:1, clearcoatRoughness:0.1, transmission:0.15, thickness:0.4});
+}
+function matMatte(color) {
+  return new THREE.MeshStandardMaterial({color, roughness:0.85, metalness:0.02});
+}
+function matGlossy(color) {
+  return new THREE.MeshStandardMaterial({color, roughness:0.3, metalness:0.1, clearcoat:0.8, clearcoatRoughness:0.1});
+}
+function matGlass() {
+  return new THREE.MeshPhysicalMaterial({color:0xffffff, roughness:0.04, metalness:0, transmission:0.92, thickness:0.9, attenuationDistance:1.2, clearcoat:1, clearcoatRoughness:0.08, ior:1.5});
+}
+
+// ---------- Labels ----------
+const labelsEl = document.getElementById('labels');
+const labelEls = new Map();
+function label(id,text,pos,active,hi){
+  let el=labelEls.get(id);
+  if(!el){el=document.createElement('div');el.className='lab'+(hi?' hi':'');el.textContent=text;labelsEl.appendChild(el);labelEls.set(id,el);}
+  if(active){
+    const v=pos.clone().project(camera);
+    const x=(v.x*0.5+0.5)*view.clientWidth;
+    const y=(1-(v.y*0.5+0.5))*view.clientHeight;
+    el.style.left=x+'px';el.style.top=y+'px';el.classList.add('show');
+    if(hi)el.classList.add('hi');else el.classList.remove('hi');
+  }else{el.classList.remove('show');}
+}
+function clearLabels(){labelEls.forEach(e=>e.classList.remove('show'));}
+
+// ---------- Current model group ----------
+let currentGroup = null;
+let currentMesh = null;
+
+function clearScene(){
+  if(currentGroup){scene.remove(currentGroup);currentGroup.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose();}});}
+  currentGroup=null;currentMesh=null;clearLabels();
+}
+
+// ---------- Topic builders ----------
+
+// --- 1. CELL (plant & animal) ---
+function buildCell(){
+  const g=new THREE.Group();
+  // Cell wall (plant) - outer box
+  const wallMat=matMatte(0x3a5a40);
+  const wall=new THREE.Mesh(new THREE.BoxGeometry(2.6,2.2,2.6),wallMat);
+  wall.material.transparent=true;wall.material.opacity=0.35;
+  wall.castShadow=true;wall.receiveShadow=true;g.add(wall);
+  // Cell membrane - inner box
+  const mem=new THREE.Mesh(new THREE.BoxGeometry(2.4,2.0,2.4),matGlossy(0x2a4a35));
+  mem.castShadow=true;mem.receiveShadow=true;g.add(mem);
+  // Cytoplasm fill
+  const cyto=new THREE.Mesh(new THREE.BoxGeometry(2.2,1.8,2.2),matPBR(0xe8f0e8));
+  cyto.material.transparent=true;cyto.material.opacity=0.5;g.add(cyto);
+  // Nucleus
+  const nuc=new THREE.Mesh(new THREE.SphereGeometry(0.5,40,32),matPBR(0x8a6d3f));
+  nuc.position.set(-0.7,0.3,0);nuc.castShadow=true;nuc.receiveShadow=true;g.add(nuc);
+  const nucleolus=new THREE.Mesh(new THREE.SphereGeometry(0.16,32,24),matPBR(0x5a4525));
+  nucleolus.position.copy(nuc.position);nucleolus.position.y+=0.02;g.add(nucleolus);
+  // Nuclear envelope
+  const nucEnv=nuc.clone();nucEnv.material=matGlass();nucEnv.scale.set(1.08,1.08,1.08);nucEnv.material.transparent=true;nucEnv.material.opacity=0.5;g.add(nucEnv);
+  // Mitochondria
+  for(let i=0;i<5;i++){
+    const mit=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,0.45,24),matWet(0x5a2e1e));
+    mit.rotation.set(Math.random()*Math.PI,Math.random()*Math.PI,Math.random()*Math.PI);
+    mit.position.set((Math.random()-0.5)*1.4,(Math.random()-0.5)*1,(Math.random()-0.5)*1.4);
+    mit.castShadow=true;g.add(mit);
+  }
+  // ER (tubes)
+  const er=new THREE.Group();
+  for(let i=0;i<6;i++){
+    const tube=new THREE.Mesh(new THREE.TorusGeometry(0.35,0.05,12,40,Math.PI/1.5),matPBR(0xd0e0a0));
+    tube.rotation.set(Math.random()*Math.PI,Math.random()*Math.PI,0);tube.position.set((Math.random()-0.5)*0.8,(Math.random()-0.5)*0.6,(Math.random()-0.5)*0.8);
+    tube.castShadow=true;er.add(tube);
+  }
+  g.add(er);
+  // Golgi (stacked flattened sacs)
+  const golgi=new THREE.Group();
+  for(let i=0;i<5;i++){
+    const sac=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.06,0.5),matPBR(0xffd080));
+    sac.position.set(0.85,i*0.08-0.16,0.2);sac.castShadow=true;golgi.add(sac);
+  }
+  g.add(golgi);
+  // Vacuole (plant, large)
+  const vac=new THREE.Mesh(new THREE.SphereGeometry(0.55,40,32),matGlass());
+  vac.position.set(0.6,-0.55,0);vac.scale.set(1,0.6,1);vac.material.transparent=true;vac.material.opacity=0.55;vac.castShadow=true;g.add(vac);
+  // Chloroplast
+  for(let i=0;i<3;i++){
+    const chl=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.18,0.3,24),matPBR(0x4a8a30));
+    chl.rotation.x=Math.PI/2;chl.position.set(-0.1,-0.55,(i-1)*0.35);chl.castShadow=true;g.add(chl);
+  }
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0.6,5);
+  // Labels
+  const lbls=[
+    {id:'nuc',text:'Nucleus — नाभिक',pos:new THREE.Vector3(-0.7,0.3,0),hi:true},
+    {id:'mito',text:'Mitochondria — माइटोकॉन्ड्रिया',pos:new THREE.Vector3(0.4,0.1,0.4),hi:false},
+    {id:'er',text:'Endoplasmic Reticulum',pos:new THREE.Vector3(-0.2,0.05,-0.3),hi:false},
+    {id:'golgi',text:'Golgi Apparatus',pos:new THREE.Vector3(0.85,-0.1,0.2),hi:false},
+    {id:'vac',text:'Vacuole — रसकोष',pos:new THREE.Vector3(0.6,-0.55,0),hi:false},
+    {id:'chl',text:'Chloroplast — क्लोरोप्लास्ट',pos:new THREE.Vector3(-0.1,-0.55,0.35),hi:false},
+    {id:'wall',text:'Cell Wall — कोशिका भित्ति',pos:new THREE.Vector3(1.3,0,0),hi:false},
+    {id:'mem',text:'Cell Membrane — कोशिका झिल्ली',pos:new THREE.Vector3(0,1.1,0),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Cell — कोशिका';
+  document.getElementById('topicDesc').textContent='Realistic plant cell with nucleus, mitochondria, ER, Golgi, vacuole, chloroplasts — PBR tissue materials.';
+  document.getElementById('topicDetail').textContent='पौधे और जानवर की कोशिका में नाभिक, माइटोकॉन्ड्रिया, एंडोप्लाज्मिक रेटिकुलम, गॉल्गी, रसकोष और क्लोरोप्लास्ट जैसे ऑर्गेनेल्स वास्तविक PBR मटीरियल में।';
+}
+
+// --- 2. TISSUES ---
+function buildTissues(){
+  const g=new THREE.Group();
+  // Epithelial - layered flat cells
+  const epi=new THREE.Group();
+  for(let r=0;r<4;r++){
+    for(let c=0;c<5;c++){
+      const cell=new THREE.Mesh(new THREE.BoxGeometry(0.34,0.07,0.34),matPBR(0xf0e0d0));
+      cell.position.set((c-2)*0.38,r*0.09-0.14,(r%2)*0.18);
+      cell.castShadow=true;epi.add(cell);
+    }
+  }
+  epi.position.set(-1.1,0,0);g.add(epi);
+  // Muscle fibers - parallel cylinders
+  const musc=new THREE.Group();
+  for(let i=0;i<8;i++){
+    const fib=new THREE.Mesh(new THREE.CylinderGeometry(0.11,0.11,1.4,20),matWet(0xc05040));
+    fib.position.set(-0.25+i*0.07,0.4,i*0.02);
+    fib.castShadow=true;musc.add(fib);
+  }
+  musc.position.set(0.2,0,0);g.add(musc);
+  // Nerve - cell body with axon
+  const nerve=new THREE.Group();
+  const soma=new THREE.Mesh(new THREE.SphereGeometry(0.22,32,24),matPBR(0x604080));
+  soma.position.set(1.4,0,0);soma.castShadow=true;nerve.add(soma);
+  const axon=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,1.2,16),matPBR(0x403060));
+  axon.position.set(1.4,0,0.6);axon.rotation.x=Math.PI/2;axon.castShadow=true;nerve.add(axon);
+  // myelin segments
+  for(let i=0;i<6;i++){
+    const my=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.09,0.16,16),matMatte(0xffffff));
+    my.position.set(1.4,0,0.75+i*0.2);my.rotation.x=Math.PI/2;my.castShadow=true;nerve.add(my);
+  }
+  g.add(nerve);
+  // Connective - fibrous matrix
+  const conn=new THREE.Group();
+  for(let i=0;i<15;i++){
+    const fib=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.5,10),matPBR(0xe0d8c8));
+    fib.position.set(2.4+(Math.random()-0.5)*0.8,(Math.random()-0.5)*0.8,(Math.random()-0.5)*0.8);
+    fib.rotation.set(Math.random()*Math.PI,Math.random()*Math.PI,0);fib.castShadow=true;conn.add(fib);
+  }
+  const connCells=new THREE.Group();
+  for(let i=0;i<8;i++){
+    const c=new THREE.Mesh(new THREE.SphereGeometry(0.08,16,12),matPBR(0xf0e0d0));
+    c.position.set(2.4+(Math.random()-0.5)*0.8,(Math.random()-0.5)*0.8,(Math.random()-0.5)*0.8);c.castShadow=true;connCells.add(c);
+  }
+  g.add(conn);g.add(connCells);
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0.2,4.5);
+  const lbls=[
+    {id:'epi',text:'Epithelial Tissue — उपकला ऊतक',pos:new THREE.Vector3(-1.1,0.05,0),hi:true},
+    {id:'musc',text:'Muscle Tissue — मांसपेशी ऊतक',pos:new THREE.Vector3(0.5,0.45,0),hi:false},
+    {id:'nerve',text:'Nervous Tissue — तंत्रिका ऊतक',pos:new THREE.Vector3(1.5,0,0),hi:false},
+    {id:'conn',text:'Connective Tissue — संयोजी ऊतक',pos:new THREE.Vector3(2.4,0,0),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Tissues — ऊतक';
+  document.getElementById('topicDesc').textContent='Four tissue types: epithelial (layered), muscle (fibers), nervous (neuron with axon), connective (fibrous matrix).';
+  document.getElementById('topicDetail').textContent='चार ऊतक प्रकार: उपकला (स्तरित कोशिकाएं), मांसपेशी (रेशे), तंत्रिका (न्यूरॉन एक्सॉन सहित), संयोजी (रेशेदार मैट्रिक्स)।';
+}
+
+// --- 3. DIGESTIVE SYSTEM ---
+function buildDigestive(){
+  const g=new THREE.Group();
+  // Mouth/oral cavity
+  const mouth=new THREE.Mesh(new THREE.SphereGeometry(0.45,32,24),matWet(0x7a2a2a));
+  mouth.position.set(0,1.1,0);mouth.castShadow=true;g.add(mouth);
+  // Teeth
+  for(let i=-1;i<=1;i+=1){
+    const t=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.3,12),matMatte(0xf0f0f0));
+    t.position.set(i*0.15,1.05,0.35);t.rotation.x=-Math.PI/4;t.castShadow=true;g.add(t);
+  }
+  // Tongue
+  const tongue=new THREE.Mesh(new THREE.SphereGeometry(0.35,32,24),matWet(0xc04040));
+  tongue.position.set(0,0.95,0.4);tongue.scale.set(1,0.7,0.9);g.add(tongue);
+  // Salivary glands
+  const sg=new THREE.Mesh(new THREE.SphereGeometry(0.22,24,20),matPBR(0xe0a080));
+  sg.position.set(-0.65,1.0,0.1);sg.castShadow=true;g.add(sg);
+  const sg2=sg.clone();sg2.position.set(0.65,1.0,0.1);g.add(sg2);
+  // Oesophagus
+  const oes=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.18,1.0,24),matPBR(0x8a3a3a));
+  oes.rotation.x=-Math.PI/3;oes.position.set(0,0.6,0.3);oes.castShadow=true;g.add(oes);
+  // Stomach
+  const stom=new THREE.Mesh(new THREE.SphereGeometry(0.75,40,32),matWet(0xa04040));
+  stom.position.set(0,-0.35,-0.1);stom.scale.set(1,0.85,0.7);stom.castShadow=true;g.add(stom);
+  // Liver
+  const liv=new THREE.Mesh(new THREE.BoxGeometry(1.1,0.6,0.7),matPBR(0xa05020));
+  liv.position.set(-0.85,-0.2,-0.3);liv.castShadow=true;liv.receiveShadow=true;g.add(liv);
+  // Pancreas
+  const pan=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.12,0.35),matPBR(0xd0a060));
+  pan.position.set(0.1,-0.5,-0.05);pan.castShadow=true;g.add(pan);
+  // Small intestine (coil)
+  const intGroup=new THREE.Group();
+  const center=new THREE.Vector3(0.5,-0.85,-0.2);
+  for(let i=0;i<14;i++){
+    const ang=(i/14)*Math.PI*4;
+    const r=0.25+i*0.035;
+    const coil=new THREE.Mesh(new THREE.TorusGeometry(r,0.07,10,30,ang),matPBR(0xd0a080));
+    coil.position.copy(center);coil.rotation.z=ang;coil.castShadow=true;intGroup.add(coil);
+  }
+  g.add(intGroup);
+  // Large intestine
+  const li=new THREE.Mesh(new THREE.TorusKnotGeometry(0.5,0.12,12,16),matPBR(0xb08060));
+  li.position.set(-0.4,-1.15,-0.1);li.scale.set(0.8,0.8,0.8);li.castShadow=true;g.add(li);
+  // Rectum/anus
+  const rec=new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.14,0.4,16),matPBR(0x7a3a3a));
+  rec.position.set(-0.4,-1.55,-0.1);rec.rotation.x=Math.PI/2;rec.castShadow=true;g.add(rec);
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,-0.1,4.2);
+  const lbls=[
+    {id:'mouth',text:'Mouth / Oral Cavity — मुंह',pos:new THREE.Vector3(0,1.1,0),hi:true},
+    {id:'teeth',text:'Teeth — दांत',pos:new THREE.Vector3(0,1.05,0.4),hi:false},
+    {id:'tongue',text:'Tongue — जीभ',pos:new THREE.Vector3(0,0.95,0.5),hi:false},
+    {id:'sg',text:'Salivary Glands — लार ग्रंथि',pos:new THREE.Vector3(-0.65,1.0,0.1),hi:false},
+    {id:'oes',text:'Oesophagus — भोजन नली',pos:new THREE.Vector3(0,0.7,0.4),hi:false},
+    {id:'stom',text:'Stomach — पेट',pos:new THREE.Vector3(0,-0.35,-0.1),hi:false},
+    {id:'liv',text:'Liver — यकृत',pos:new THREE.Vector3(-0.85,-0.2,-0.3),hi:false},
+    {id:'pan',text:'Pancreas — अग्न्याशय',pos:new THREE.Vector3(0.1,-0.5,-0.05),hi:false},
+    {id:'int',text:'Small Intestine — छोटी आंत',pos:new THREE.Vector3(0.5,-0.85,-0.2),hi:false},
+    {id:'li',text:'Large Intestine — बड़ी आंत',pos:new THREE.Vector3(-0.4,-1.15,-0.1),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Digestive System — पाचन तंत्र';
+  document.getElementById('topicDesc').textContent='Mouth, teeth, tongue, salivary glands, oesophagus, stomach, liver, pancreas, small & large intestine — realistic PBR organs.';
+  document.getElementById('topicDetail').textContent='मुंह, दांत, जीभ, लार ग्रंथि, भोजन नली, पेट, यकृत, अग्न्याशय, छोटी और बड़ी आंत — वास्तविक PBR अंग।';
+}
+
+// --- 4. HEART ---
+function buildHeart(){
+  const g=new THREE.Group();
+  const base=0xa83232;
+  const bodyMat=matWet(base);
+  const body=new THREE.Mesh(new THREE.SphereGeometry(1,48,36),bodyMat);
+  body.scale.set(1,0.82,0.7);body.position.set(0,0.05,0);body.castShadow=true;body.receiveShadow=true;g.add(body);
+  // Aorta arch
+  const aort=new THREE.Mesh(new THREE.TorusGeometry(0.72,0.13,16,60,Math.PI),matWet(0x942626));
+  aort.rotation.set(Math.PI/2,0,0);aort.position.set(0,1.18,-0.05);aort.castShadow=true;g.add(aort);
+  // Atria
+  const lat=new THREE.Mesh(new THREE.SphereGeometry(0.42,40,32),bodyMat);
+  lat.position.set(-0.52,0.72,-0.18);lat.scale.set(0.9,0.85,0.75);lat.castShadow=true;g.add(lat);
+  const rat=lat.clone();rat.position.set(0.52,0.72,0.18);g.add(rat);
+  // Ventricles (lower body)
+  const vent=new THREE.Mesh(new THREE.SphereGeometry(0.7,48,36),bodyMat);
+  vent.position.set(0,-0.25,0);vent.scale.set(1.1,0.9,0.8);vent.castShadow=true;g.add(vent);
+  // Pulmonary artery
+  const pulm=new THREE.Mesh(new THREE.CylinderGeometry(0.17,0.17,0.5,24),bodyMat);
+  pulm.rotation.set(-Math.PI/2.3,0.3,0);pulm.position.set(0,0.85,-0.12);pulm.castShadow=true;g.add(pulm);
+  // Vena cava
+  const vc=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.18,0.7,24),bodyMat);
+  vc.rotation.set(Math.PI/2,0,0);vc.position.set(0.05,-0.42,-0.15);vc.castShadow=true;g.add(vc);
+  // Coronary vessels
+  for(let a=-0.9;a<=0.9;a+=0.9){
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(0.88,0.045,10,40,1.3+(a<0?-0.2:0.2)),bodyMat);
+    ring.rotation.set(Math.PI/2+a*0.25,0.4,0);ring.position.set(0,0.75,a*0.28);ring.castShadow=true;g.add(ring);
+  }
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0.2,4.6);
+  const lbls=[
+    {id:'body',text:'Heart Body — हृदय शरीर',pos:new THREE.Vector3(0,0.15,0),hi:true},
+    {id:'aort',text:'Aorta — मुख्य धमनी',pos:new THREE.Vector3(0,1.3,0.25),hi:false},
+    {id:'lat',text:'Right Atrium — दायाँ अलिंद',pos:new THREE.Vector3(-0.52,0.72,-0.18),hi:false},
+    {id:'rat',text:'Left Atrium — बायाँ अलिंद',pos:new THREE.Vector3(0.52,0.72,0.18),hi:false},
+    {id:'vent',text:'Ventricles — निलय',pos:new THREE.Vector3(0,-0.25,0),hi:false},
+    {id:'pulm',text:'Pulmonary Artery — फुफ्फुस धमनी',pos:new THREE.Vector3(0,0.95,-0.05),hi:false},
+    {id:'vc',text:'Vena Cava — वेनाकावा',pos:new THREE.Vector3(0.1,-0.4,-0.15),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Heart — हृदय';
+  document.getElementById('topicDesc').textContent='Beating heart with chambers, aorta, atria, ventricles, pulmonary artery, vena cava, coronary vessels — PBR wet tissue.';
+  document.getElementById('topicDetail').textContent='धड़कता हुआ हृदय जिसमें कक्ष, महाधमनी, अलिंद, निलय, फुफ्फुस धमनी, वेनाकावा और कोरोनरी वाहिकाएं हैं — गीला ऊतक PBR मटीरियल में।';
+}
+
+// --- 5. RESPIRATORY SYSTEM ---
+function buildRespiratory(){
+  const g=new THREE.Group();
+  // Trachea
+  const trach=new THREE.Mesh(new THREE.CylinderGeometry(0.25,0.25,1.4,24),matPBR(0xc0a080));
+  trach.rotation.x=Math.PI/2;trach.position.set(0,0.7,0);trach.castShadow=true;g.add(trach);
+  // Bronchi
+  const brL=trach.clone();brL.position.set(-0.35,0.85,0.2);brL.rotation.set(Math.PI/2,0.4,0);brL.scale.set(0.8,0.8,0.8);g.add(brL);
+  const brR=brL.clone();brR.position.set(0.35,0.85,0.2);brR.rotation.set(Math.PI/2,-0.4,0);g.add(brR);
+  // Lungs
+  const lungL=new THREE.Mesh(new THREE.SphereGeometry(0.85,48,36),matWet(0xa06040));
+  lungL.position.set(-0.9,0.2,0);lungL.scale.set(0.8,1.1,0.7);lungL.castShadow=true;lungL.receiveShadow=true;g.add(lungL);
+  const lungR=lungL.clone();lungR.position.set(0.9,0.2,0);lungR.scale.set(0.8,1.1,0.7);g.add(lungR);
+  // Bronchioles (alveoli clusters)
+  for(let side=-1;side<=1;side+=2){
+    for(let i=0;i<12;i++){
+      const al=new THREE.Mesh(new THREE.SphereGeometry(0.09,20,16),matPBR(0xe0a080));
+      const ang=(i/12)*Math.PI*2;
+      al.position.set(side*(-0.6+Math.random()*0.6),0.2+Math.random()*0.8,Math.random()*0.6-0.3);
+      al.castShadow=true;g.add(al);
+    }
+  }
+  // Diaphragm
+  const dia=new THREE.Mesh(new THREE.BoxGeometry(2.6,0.12,1.6),matMatte(0x8a5030));
+  dia.position.set(0,-0.75,0);dia.castShadow=true;g.add(dia);
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0,4.4);
+  const lbls=[
+    {id:'trach',text:'Trachea — श्वासनली',pos:new THREE.Vector3(0,1.2,0),hi:true},
+    {id:'brL',text:'Left Bronchus — बायाँ श्वसनप्रवाह नली',pos:new THREE.Vector3(-0.35,0.85,0.2),hi:false},
+    {id:'brR',text:'Right Bronchus — दायाँ श्वसनप्रवाह नली',pos:new THREE.Vector3(0.35,0.85,0.2),hi:false},
+    {id:'lungL',text:'Left Lung — बायाँ फेफड़ा',pos:new THREE.Vector3(-0.9,0.2,0),hi:false},
+    {id:'lungR',text:'Right Lung — दायाँ फेफड़ा',pos:new THREE.Vector3(0.9,0.2,0),hi:false},
+    {id:'al',text:'Alveoli — वायुकोष',pos:new THREE.Vector3(-0.4,0.5,-0.2),hi:false},
+    {id:'dia',text:'Diaphragm — डायाफ्राम',pos:new THREE.Vector3(0,-0.75,0),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Respiratory System — श्वसन तंत्र';
+  document.getElementById('topicDesc').textContent='Trachea, bronchi, lungs with alveoli clusters, diaphragm — realistic PBR organs.';
+  document.getElementById('topicDetail').textContent='श्वासनली, ब्रोंची, फेफड़े (वायुकोष समूह सहित), डायाफ्राम — वास्तविक PBR अंग।';
+}
+
+// --- 6. SKELETON & JOINTS ---
+function buildSkeleton(){
+  const g=new THREE.Group();
+  // Humerus
+  const hum=new THREE.Mesh(new THREE.CylinderGeometry(0.22,0.22,1.2,24),matMatte(0xe8e0d0));
+  hum.rotation.z=Math.PI/2;hum.position.set(-0.7,0.4,0);hum.castShadow=true;g.add(hum);
+  // Radius/ulna
+  const rad=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.16,1.0,24),matMatte(0xe8e0d0));
+  rad.rotation.z=Math.PI/2;rad.position.set(-0.7,-0.6,0);g.add(rad);
+  const ulna=rad.clone();ulna.position.set(-0.55,-0.6,0);g.add(ulna);
+  // Elbow joint (cartilage)
+  const cart=new THREE.Mesh(new THREE.SphereGeometry(0.16,24,20),matGlossy(0xd0d0e0));
+  cart.position.set(-0.7,-0.2,0);g.add(cart);
+  // Scapula
+  const scap=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.9,0.12),matMatte(0xe8e0d0));
+  scap.position.set(-1.15,0.9,0);g.add(scap);
+  // Clavicle
+  const clav=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,0.9,20),matMatte(0xe8e0d0));
+  clav.rotation.z=-0.4;clav.position.set(-0.45,1.25,0);g.add(clav);
+  // Pelvis
+  const pel=new THREE.Mesh(new THREE.BoxGeometry(1.1,0.5,0.7),matMatte(0xe8e0d0));
+  pel.position.set(0,-1.1,0);g.add(pel);
+  // Femur
+  const fem=new THREE.Mesh(new THREE.CylinderGeometry(0.26,0.26,1.3,24),matMatte(0xe8e0d0));
+  fem.rotation.z=Math.PI/2;fem.position.set(0,-1.85,0);fem.castShadow=true;g.add(fem);
+  // Tibia/fibula
+  const tib=new THREE.Mesh(new THREE.CylinderGeometry(0.19,0.19,1.1,24),matMatte(0xe8e0d0));
+  tib.rotation.z=Math.PI/2;tib.position.set(0,-3.05,0);g.add(tib);
+  const fib=tib.clone();fib.position.set(0.15,-3.05,0);g.add(fib);
+  // Knee joint
+  const knee=new THREE.Mesh(new THREE.SphereGeometry(0.19,24,20),matGlossy(0xd0d0e0));
+  knee.position.set(0,-2.5,0);g.add(knee);
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,-0.5,4.4);
+  const lbls=[
+    {id:'hum',text:'Humerus — बांह की हड्डी',pos:new THREE.Vector3(-0.7,0.4,0),hi:true},
+    {id:'rad',text:'Radius — त्रिज्या हड्डी',pos:new THREE.Vector3(-0.7,-0.6,0),hi:false},
+    {id:'ulna',text:'Ulna — अलना हड्डी',pos:new THREE.Vector3(-0.55,-0.6,0),hi:false},
+    {id:'cart',text:'Cartilage — कार्टिलेज',pos:new THREE.Vector3(-0.7,-0.2,0),hi:false},
+    {id:'scap',text:'Scapula — कंधे की हड्डी',pos:new THREE.Vector3(-1.15,0.9,0),hi:false},
+    {id:'clav',text:'Clavicle — कॉलरबोन',pos:new THREE.Vector3(-0.45,1.25,0),hi:false},
+    {id:'pel',text:'Pelvis — श्रोणि',pos:new THREE.Vector3(0,-1.1,0),hi:false},
+    {id:'fem',text:'Femur — जांध की हड्डी',pos:new THREE.Vector3(0,-1.85,0),hi:false},
+    {id:'tib',text:'Tibia — पिंडली हड्डी',pos:new THREE.Vector3(0,-3.05,0),hi:false},
+    {id:'knee',text:'Knee Joint — घुटने का जोड़',pos:new THREE.Vector3(0,-2.5,0),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Skeleton & Joints — कंकाल और जोड़';
+  document.getElementById('topicDesc').textContent='Humerus, radius, ulna, scapula, clavicle, pelvis, femur, tibia, fibula, elbow & knee joints — realistic bone material with cartilage.';
+  document.getElementById('topicDetail').textContent='ह्यूमरस, रेडियस, अलना, स्कैपुला, क्लैविकल, पेल्विस, फीमर, टिबिया, फाइबुला, कोहनी और घुटने के जोड़ — वास्तविक हड्डी मटीरियल कार्टिलेज के साथ।';
+}
+
+// --- 7. SKIN ---
+function buildSkin(){
+  const g=new THREE.Group();
+  // Epidermis
+  const epi=new THREE.Mesh(new THREE.BoxGeometry(2,0.15,2),matPBR(0xe8d0c0));
+  epi.position.set(0,0.075,0);epi.castShadow=true;g.add(epi);
+  // Dermis
+  const der=new THREE.Mesh(new THREE.BoxGeometry(2,0.6,2),matPBR(0xc0a090));
+  der.position.set(0,-0.3,0);der.castShadow=true;g.add(der);
+  // Hypodermis/fat
+  const hyp=new THREE.Mesh(new THREE.BoxGeometry(2,0.4,2),matPBR(0xf0e0d0));
+  hyp.position.set(0,-0.7,0);hyp.castShadow=true;g.add(hyp);
+  // Hair follicle
+  const hair=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,0.5,16),matMatte(0x5a3a2a));
+  hair.position.set(-0.7,-0.05,0.6);hair.rotation.x=0.5;hair.castShadow=true;g.add(hair);
+  // Sebaceous gland
+  const seb=new THREE.Mesh(new THREE.SphereGeometry(0.12,24,20),matWet(0xd0b0a0));
+  seb.position.set(-0.65,-0.2,0.7);g.add(seb);
+  // Sweat gland
+  const sw=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,0.4,16),matWet(0xb0a0a0));
+  sw.position.set(0.5,-0.35,0.2);sw.rotation.x=0.3;g.add(sw);
+  // Blood vessel
+  const ves=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.8,16),matWet(0xa02a2a));
+  ves.position.set(0.7,-0.25,-0.4);ves.rotation.z=0.4;g.add(ves);
+  // Nerve ending
+  const ner=new THREE.Mesh(new THREE.SphereGeometry(0.06,20,16),matPBR(0x8060c0));
+  ner.position.set(0.6,-0.55,-0.3);g.add(ner);
+  // Melanocytes (dots)
+  for(let i=0;i<12;i++){
+    const mel=new THREE.Mesh(new THREE.SphereGeometry(0.04,12,10),matPBR(0x6a4a3a));
+    mel.position.set((Math.random()-0.5)*1.8,-0.03,(Math.random()-0.5)*1.8);g.add(mel);
+  }
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0,3.6);
+  const lbls=[
+    {id:'epi',text:'Epidermis — एपिडर्मिस',pos:new THREE.Vector3(0,0.075,0),hi:true},
+    {id:'der',text:'Dermis — डर्मिस',pos:new THREE.Vector3(0,-0.3,0),hi:false},
+    {id:'hyp',text:'Hypodermis (Fat) — उपचर्म',pos:new THREE.Vector3(0,-0.7,0),hi:false},
+    {id:'hair',text:'Hair Follicle — रोम कूप',pos:new THREE.Vector3(-0.7,-0.05,0.6),hi:false},
+    {id:'seb',text:'Sebaceous Gland — तैलीय ग्रंथि',pos:new THREE.Vector3(-0.65,-0.2,0.7),hi:false},
+    {id:'sw',text:'Sweat Gland — पसीना ग्रंथि',pos:new THREE.Vector3(0.5,-0.35,0.2),hi:false},
+    {id:'ves',text:'Blood Vessel — रक्तवाहिनी',pos:new THREE.Vector3(0.7,-0.25,-0.4),hi:false},
+    {id:'ner',text:'Nerve Ending — तंत्रिका अंत',pos:new THREE.Vector3(0.6,-0.55,-0.3),hi:false},
+    {id:'mel',text:'Melanocytes — मेलानोसाइट',pos:new THREE.Vector3(0.4,-0.03,-0.6),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Skin — त्वचा';
+  document.getElementById('topicDesc').textContent='Epidermis, dermis, hypodermis, hair follicle, sebaceous gland, sweat gland, blood vessel, nerve ending, melanocytes — layered PBR skin.';
+  document.getElementById('topicDetail').textContent='एपिडर्मिस, डर्मिस, हाइपोडर्मिस, रोम कूप, तैलीय ग्रंथि, पसीना ग्रंथि, रक्तवाहिनी, तंत्रिका अंत, मेलानोसाइट — स्तरित वास्तविक त्वचा PBR।';
+}
+
+// --- 8. FLOWER ---
+function buildFlower(){
+  const g=new THREE.Group();
+  // Pedicel
+  const ped=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,1.2,20),matPBR(0x6a8a40));
+  ped.position.set(0,0,0);ped.castShadow=true;g.add(ped);
+  // Receptacle
+  const rec=new THREE.Mesh(new THREE.SphereGeometry(0.25,32,24),matPBR(0x7a9a40));
+  rec.position.set(0,0.65,0);g.add(rec);
+  // Sepals
+  for(let i=0;i<5;i++){
+    const ang=(i/5)*Math.PI*2;
+    const sep=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.12,0.45,12),matPBR(0x6a8a40));
+    sep.position.set(Math.cos(ang)*0.4,0.65,Math.sin(ang)*0.4);
+    sep.rotation.set(Math.PI/3,0,ang);sep.castShadow=true;g.add(sep);
+  }
+  // Petals
+  for(let i=0;i<6;i++){
+    const ang=(i/6)*Math.PI*2;
+    const pet=new THREE.Mesh(new THREE.SphereGeometry(0.5,32,24),matPBR(0xff6b9d));
+    pet.position.set(Math.cos(ang)*0.62,0.85,Math.sin(ang)*0.62);
+    pet.scale.set(0.9,1.2,0.8);pet.castShadow=true;g.add(pet);
+  }
+  // Stamens
+  for(let i=0;i<6;i++){
+    const ang=(i/6)*Math.PI*2;
+    const stam=new THREE.Group();
+    const fil=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.4,10),matPBR(0xd0c0a0));
+    fil.position.set(Math.cos(ang)*0.35,1.05,Math.sin(ang)*0.35);fil.castShadow=true;stam.add(fil);
+    const anth=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.14,12),matPBR(0xf0d040));
+    anth.position.set(Math.cos(ang)*0.35,1.32,Math.sin(ang)*0.35);anth.castShadow=true;stam.add(anth);
+    g.add(stam);
+  }
+  // Pistil
+  const pist=new THREE.Group();
+  const sty=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.45,12),matPBR(0xd0c0a0));
+  sty.position.set(0,1.05,0);sty.castShadow=true;pist.add(sty);
+  const stig=new THREE.Mesh(new THREE.SphereGeometry(0.12,20,16),matPBR(0xf0a040));
+  stig.position.set(0,1.35,0);g.add(stig);
+  const ovar=new THREE.Mesh(new THREE.SphereGeometry(0.18,24,20),matPBR(0xe0d080));
+  ovar.position.set(0,0.72,0);g.add(ovar);
+  g.add(pist);
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0,3.6);
+  const lbls=[
+    {id:'ped',text:'Pedicel — फूल डंठल',pos:new THREE.Vector3(0,0,0),hi:true},
+    {id:'sep',text:'Sepals — दलपत्र',pos:new THREE.Vector3(0.4,0.65,0),hi:false},
+    {id:'pet',text:'Petals — पुष्पपत्र',pos:new THREE.Vector3(0.62,0.85,0),hi:false},
+    {id:'stam',text:'Stamens — पुंकेसर',pos:new THREE.Vector3(0.35,1.15,0),hi:false},
+    {id:'pist',text:'Pistil — स्त्रीकेसर',pos:new THREE.Vector3(0,1.15,0),hi:false},
+    {id:'stig',text:'Stigma — कलंक',pos:new THREE.Vector3(0,1.35,0),hi:false},
+    {id:'ovar',text:'Ovary — अंडाशय',pos:new THREE.Vector3(0,0.72,0),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Flower — फूल';
+  document.getElementById('topicDesc').textContent='Pedicel, sepals, petals, stamens, pistil, stigma, ovary — realistic flower parts with PBR materials.';
+  document.getElementById('topicDetail').textContent='फूल डंठल, दलपत्र, पुष्पपत्र, पुंकेसर, स्त्रीकेसर, कलंक, अंडाशय — वास्तविक फूल के अंग PBR मटीरियल के साथ।';
+}
+
+// --- 9. TEETH ---
+function buildTeeth(){
+  const g=new THREE.Group();
+  // Incisor
+  const inc=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.16,0.9,16),matMatte(0xf2f2f2));
+  inc.position.set(-0.55,0,0);inc.rotation.x=-0.3;inc.castShadow=true;g.add(inc);
+  const incRoot=new THREE.Mesh(new THREE.CylinderGeometry(0.11,0.11,0.6,12),matMatte(0xe8e0d0));
+  incRoot.position.set(-0.55,-0.75,0);incRoot.rotation.x=-0.3;g.add(incRoot);
+  // Canine
+  const can=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.18,1.0,16),matMatte(0xf2f2f2));
+  can.position.set(-0.15,0,0);can.rotation.x=-0.25;can.castShadow=true;g.add(can);
+  const canRoot=new THREE.Mesh(new THREE.CylinderGeometry(0.13,0.13,0.7,12),matMatte(0xe8e0d0));
+  canRoot.position.set(-0.15,-0.85,0);canRoot.rotation.x=-0.25;g.add(canRoot);
+  // Premolar
+  const pre=new THREE.Mesh(new THREE.CylinderGeometry(0.22,0.22,0.85,16),matMatte(0xf2f2f2));
+  pre.position.set(0.3,0,0);pre.rotation.x=-0.2;pre.castShadow=true;g.add(pre);
+  const preRoot=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.16,0.65,12),matMatte(0xe8e0d0));
+  preRoot.position.set(0.3,-0.75,0);preRoot.rotation.x=-0.2;g.add(preRoot);
+  // Molar
+  const mol=new THREE.Mesh(new THREE.CylinderGeometry(0.28,0.28,0.8,18),matMatte(0xf2f2f2));
+  mol.position.set(0.85,0,0);mol.rotation.x=-0.15;mol.castShadow=true;g.add(mol);
+  const molRoot=new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.2,0.7,12),matMatte(0xe8e0d0));
+  molRoot.position.set(0.85,-0.75,0);molRoot.rotation.x=-0.15;g.add(molRoot);
+  // Gum
+  const gum=new THREE.Mesh(new THREE.BoxGeometry(1.6,0.25,0.6),matWet(0xc04040));
+  gum.position.set(0,0.3,0.15);g.add(gum);
+  // Enamel (shiny cap on each crown)
+  [inc,can,pre,mol].forEach(m=>{
+    const cap=m.clone();cap.material=matGlass();cap.scale.set(1,0.75,1);cap.material.transparent=true;cap.material.opacity=0.35;g.add(cap);
+  });
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,-0.1,3.4);
+  const lbls=[
+    {id:'inc',text:'Incisor — काटने वाला दांत',pos:new THREE.Vector3(-0.55,0,0),hi:true},
+    {id:'can',text:'Canine — कैनाइन दांत',pos:new THREE.Vector3(-0.15,0,0),hi:false},
+    {id:'pre',text:'Premolar — प्रीमोलर',pos:new THREE.Vector3(0.3,0,0),hi:false},
+    {id:'mol',text:'Molar — मोलर दांत',pos:new THREE.Vector3(0.85,0,0),hi:false},
+    {id:'gum',text:'Gum — मसूड़ा',pos:new THREE.Vector3(0,0.3,0.15),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Teeth — दांत';
+  document.getElementById('topicDesc').textContent='Incisor, canine, premolar, molar with roots, enamel caps, and gums — realistic tooth anatomy.';
+  document.getElementById('topicDetail').textContent='काटने वाला दांत, कैनाइन, प्रीमोलर, मोलर जड़ों, एनामेल कैप और मसूड़ों के साथ — वास्तविक दांत शरीर रचना।';
+}
+
+// --- 10. SEEDS & GERMINATION ---
+function buildSeeds(){
+  const g=new THREE.Group();
+  // Seed (bean)
+  const seed=new THREE.Mesh(new THREE.SphereGeometry(0.5,40,32),matPBR(0x8a6d3f));
+  seed.position.set(0,0.6,0);seed.scale.set(1,0.85,0.9);seed.castShadow=true;g.add(seed);
+  // Seed coat
+  const coat=seed.clone();coat.material=matGlass();coat.scale.set(1.06,1.06,1.06);coat.material.transparent=true;coat.material.opacity=0.45;g.add(coat);
+  // Embryo (inside)
+  const emb=new THREE.Mesh(new THREE.SphereGeometry(0.2,24,20),matPBR(0xd0a060));
+  emb.position.copy(seed.position);g.add(emb);
+  // Radicle (root)
+  const rad=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,0.5,12),matPBR(0x6a4a2a));
+  rad.position.set(0,0.25,0.3);rad.rotation.x=-Math.PI/3;rad.castShadow=true;g.add(rad);
+  // Plumule (shoot)
+  const plum=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.45,12),matPBR(0x8a8a30));
+  plum.position.set(0,0.85,-0.15);plum.rotation.x=0.4;plum.castShadow=true;g.add(plum);
+  // Cotyledons
+  const cotL=new THREE.Mesh(new THREE.SphereGeometry(0.25,24,20),matPBR(0xc0a060));
+  cotL.position.set(-0.35,0.45,0);cotL.castShadow=true;g.add(cotL);
+  const cotR=cotL.clone();cotR.position.set(0.35,0.45,0);g.add(cotR);
+  // Germinated shoot (stage 2)
+  const stem=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.09,0.9,16),matPBR(0x7aa040));
+  stem.position.set(0,1.15,0);stem.castShadow=true;g.add(stem);
+  const leaf=new THREE.Mesh(new THREE.SphereGeometry(0.35,24,20),matPBR(0x6a9a40));
+  leaf.position.set(0,1.7,0);leaf.scale.set(1,0.6,0.8);leaf.castShadow=true;g.add(leaf);
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0,3.8);
+  const lbls=[
+    {id:'seed',text:'Seed — बीज',pos:new THREE.Vector3(0,0.6,0),hi:true},
+    {id:'coat',text:'Seed Coat — बीज आवरण',pos:new THREE.Vector3(0,0.6,0),hi:false},
+    {id:'emb',text:'Embryo — भ्रूण',pos:new THREE.Vector3(0,0.6,0),hi:false},
+    {id:'rad',text:'Radicle — मूलांकुर',pos:new THREE.Vector3(0,0.25,0.3),hi:false},
+    {id:'plum',text:'Plumule — अग्रांकुर',pos:new THREE.Vector3(0,0.85,-0.15),hi:false},
+    {id:'cot',text:'Cotyledons — बीजपत्र',pos:new THREE.Vector3(-0.35,0.45,0),hi:false},
+    {id:'stem',text:'Stem — तना',pos:new THREE.Vector3(0,1.15,0),hi:false},
+    {id:'leaf',text:'Leaf — पत्ता',pos:new THREE.Vector3(0,1.7,0),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Seeds & Germination — बीज और अंकुरण';
+  document.getElementById('topicDesc').textContent='Seed with coat, embryo, radicle, plumule, cotyledons, and germinated shoot with leaf — realistic PBR.';
+  document.getElementById('topicDetail').textContent='बीज आवरण, भ्रूण, मूलांकुर, अग्रांकुर, बीजपत्र और पत्ते वाला अंकुरित अंकुर — वास्तविक PBR।';
+}
+
+// --- 11. RESPIRATION IN PLANTS ---
+function buildRespiration(){
+  const g=new THREE.Group();
+  // Leaf cross section
+  const leaf=new THREE.Mesh(new THREE.BoxGeometry(2.2,0.18,1.4),matPBR(0x7aa040));
+  leaf.position.set(0,0,0);leaf.castShadow=true;g.add(leaf);
+  // Stomata (pores)
+  for(let i=0;i<8;i++){
+    const sto=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.06,0.04),matMatte(0x4a5a30));
+    sto.position.set((Math.random()-0.5)*1.8,0.09,(Math.random()-0.5)*1.1);g.add(sto);
+    const guard=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.04,0.04),matPBR(0x5a6a30));
+    guard.position.copy(sto.position);guard.position.y-=0.02;g.add(guard);
+  }
+  // Mesophyll cells
+  const mes=new THREE.Group();
+  for(let i=0;i<20;i++){
+    const cell=new THREE.Mesh(new THREE.SphereGeometry(0.1,20,16),matPBR(0x9ac060));
+    cell.position.set((Math.random()-0.5)*1.7,-0.02,(Math.random()-0.5)*1.1);cell.castShadow=true;mes.add(cell);
+  }
+  g.add(mes);
+  // Chloroplasts inside cells
+  for(let i=0;i<25;i++){
+    const chl=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,0.12,12),matPBR(0x4a8a30));
+    chl.position.set((Math.random()-0.5)*1.6,-0.02,(Math.random()-0.5)*1.0);chl.rotation.x=Math.random()*Math.PI;g.add(chl);
+  }
+  // Arrows: CO2 in, O2 out (anime motion lines)
+  function arrow(p0,p1,color){
+    const dir=new THREE.Vector3().subVectors(p1,p0).normalize();
+    const len=p0.distanceTo(p1);
+    const geo=new THREE.CylinderGeometry(0.02,0.02,len,10);
+    const mat=new THREE.MeshBasicMaterial({color});
+    const arr=new THREE.Mesh(geo,mat);
+    arr.position.copy(p0).lerp(p1,0.5);
+    arr.lookAt(p1);arr.rotation.x-=Math.PI/2;
+    g.add(arr);
+    const head=new THREE.Mesh(new THREE.ConeGeometry(0.05,0.15,12),mat);
+    head.position.copy(p1);head.lookAt(p0);head.rotation.x-=Math.PI/2;g.add(head);
+  }
+  arrow(new THREE.Vector3(-1.4,0.1,-0.2),new THREE.Vector3(-1.0,0.05,-0.2),0xff4444); // CO2 in
+  arrow(new THREE.Vector3(1.4,0.1,0.2),new THREE.Vector3(1.0,0.05,0.2),0x44ff88); // O2 out
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0.4,3.4);
+  const lbls=[
+    {id:'leaf',text:'Leaf Cross Section — पत्ता अनुप्रस्थ काट',pos:new THREE.Vector3(0,0,0),hi:true},
+    {id:'sto',text:'Stomata — रोमछिद्र',pos:new THREE.Vector3(-0.6,0.09,-0.3),hi:false},
+    {id:'mes',text:'Mesophyll Cells — मेसोफिल कोशिकाएं',pos:new THREE.Vector3(-0.4,-0.02,0.4),hi:false},
+    {id:'chl',text:'Chloroplast — क्लोरोप्लास्ट',pos:new THREE.Vector3(0.3,-0.02,-0.4),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Respiration in Plants — पादप श्वसन';
+  document.getElementById('topicDesc').textContent='Leaf cross-section with stomata, mesophyll cells, chloroplasts, CO2 in / O2 out arrows.';
+  document.getElementById('topicDetail').textContent='रोमछिद्र, मेसोफिल कोशिकाएं, क्लोरोप्लास्ट, CO2 अंदर / O2 बाहर तीर सहित पत्ते का अनुप्रस्थ काट।';
+}
+
+// --- 12. FIVE KINGDOMS ---
+function buildKingdoms(){
+  const g=new THREE.Group();
+  const kingdoms=[
+    {name:'Monera — बैक्टीरिया',color:0xa0a0a0,shape:'sphere',pos:new THREE.Vector3(-1.6,0.8,0),scale:new THREE.Vector3(0.5,0.5,0.5)},
+    {name:'Protista — प्रोटिस्टा',color:0x70b0e0,shape:'sphere',pos:new THREE.Vector3(-0.8,0.8,0),scale:new THREE.Vector3(0.55,0.55,0.55)},
+    {name:'Fungi — कवक',color:0xd0a060,shape:'mushroom',pos:new THREE.Vector3(0,0.8,0),scale:new THREE.Vector3(0.5,0.5,0.5)},
+    {name:'Plantae — पादप',color:0x6a9a40,shape:'plant',pos:new THREE.Vector3(0.8,0.8,0),scale:new THREE.Vector3(0.5,0.5,0.5)},
+    {name:'Animalia — पशु',color:0xc06060,shape:'animal',pos:new THREE.Vector3(1.6,0.8,0),scale:new THREE.Vector3(0.5,0.5,0.5)}
+  ];
+  kingdoms.forEach(k=>{
+    let mesh;
+    if(k.shape==='mushroom'){
+      const cap=new THREE.Mesh(new THREE.ConeGeometry(0.25,0.5,16),matPBR(k.color));
+      cap.position.set(0,0.25,0);cap.castShadow=true;
+      const stem=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,0.5,12),matMatte(0xe0d0c0));
+      stem.position.set(0,0,0);stem.castShadow=true;
+      const grp=new THREE.Group();grp.add(cap);grp.add(stem);grp.position.copy(k.pos);grp.scale.copy(k.scale);g.add(grp);
+      mesh=grp;
+    }else if(k.shape==='plant'){
+      const stem=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.08,0.6,12),matPBR(0x6a9a40));
+      stem.position.set(0,0.25,0);stem.castShadow=true;
+      const leaf=new THREE.Mesh(new THREE.SphereGeometry(0.2,24,20),matPBR(0x8ac050));
+      leaf.position.set(0,0.55,0);leaf.castShadow=true;
+      const grp=new THREE.Group();grp.add(stem);grp.add(leaf);grp.position.copy(k.pos);grp.scale.copy(k.scale);g.add(grp);
+      mesh=grp;
+    }else if(k.shape==='animal'){
+      const body=new THREE.Mesh(new THREE.EllipseCurve(0,0,0.35,0.25,0,2*Math.PI,false),new THREE.LineBasicMaterial({color:k.color}));
+      // simplified animal blob
+      const blob=new THREE.Mesh(new THREE.SphereGeometry(0.3,24,20),matPBR(k.color));
+      blob.position.set(0,0,0);blob.scale.set(1,0.6,0.7);blob.castShadow=true;
+      const grp=new THREE.Group();grp.add(blob);grp.position.copy(k.pos);grp.scale.copy(k.scale);g.add(grp);
+      mesh=grp;
+    }else{
+      mesh=new THREE.Mesh(new THREE.SphereGeometry(0.35,32,24),matPBR(k.color));
+      mesh.position.copy(k.pos);mesh.scale.copy(k.scale);mesh.castShadow=true;g.add(mesh);
+    }
+    label(k.name,k.name,k.pos,true,false);
+  });
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0,4.2);
+  document.getElementById('topicTitle').textContent='Five Kingdoms — पाँच जगत';
+  document.getElementById('topicDesc').textContent='Monera, Protista, Fungi, Plantae, Animalia — representative 3D models with PBR materials.';
+  document.getElementById('topicDetail').textContent='मोनेरा, प्रोटिस्टा, कवक, पादप, पशु — वास्तविक PBR मटीरियल में प्रतिनिधि 3D मॉडल।';
+}
+
+// --- 13. BACTERIA ---
+function buildBacteria(){
+  const g=new THREE.Group();
+  // Rod bacteria (bacilli)
+  for(let i=0;i<6;i++){
+    const b=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,0.4,16),matPBR(0x80b0a0));
+    b.position.set((i-2.5)*0.55,0,0);b.rotation.set(Math.random()*0.5,Math.random()*0.5,0);b.castShadow=true;g.add(b);
+    // flagella
+    const fl=new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,0.3,8),matPBR(0x90c0b0));
+    fl.position.copy(b.position);fl.rotation.set(Math.random()*Math.PI,Math.random()*Math.PI,0);g.add(fl);
+  }
+  // Spherical bacteria (cocci) cluster
+  const cocci=new THREE.Group();
+  for(let i=0;i<12;i++){
+    const c=new THREE.Mesh(new THREE.SphereGeometry(0.1,20,16),matPBR(0x90c0a0));
+    c.position.set(1.2+(Math.random()-0.5)*0.8,(Math.random()-0.5)*0.8,(Math.random()-0.5)*0.8);c.castShadow=true;cocci.add(c);
+  }
+  g.add(cocci);
+  // Spiral bacteria
+  const spir=new THREE.Mesh(new THREE.TorusKnotGeometry(0.18,0.05,12,16),matPBR(0x70b0c0));
+  spir.position.set(-0.8,-0.6,0);spir.scale.set(1,0.4,1);spir.castShadow=true;g.add(spir);
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,0,3.6);
+  const lbls=[
+    {id:'bacilli',text:'Bacilli — छड़ी आकार जीवाणु',pos:new THREE.Vector3(-0.5,0,0),hi:true},
+    {id:'cocci',text:'Cocci — गोल जीवाणु समूह',pos:new THREE.Vector3(1.2,0,0),hi:false},
+    {id:'spir',text:'Spirilla — सर्पिल जीवाणु',pos:new THREE.Vector3(-0.8,-0.6,0),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Bacteria — जीवाणु';
+  document.getElementById('topicDesc').textContent='Bacilli (rod-shaped), cocci (spherical clusters), spirilla (spiral) — realistic bacteria with flagella.';
+  document.getElementById('topicDetail').textContent='बैसिली (छड़ी आकार), कोकी (गोल समूह), स्पाइरिला (सर्पिल) — फ्लाजेला के साथ वास्तविक जीवाणु।';
+}
+
+// --- 14. FUNGI ---
+function buildFungi(){
+  const g=new THREE.Group();
+  // Mushroom (macroscopic)
+  const cap=new THREE.Mesh(new THREE.ConeGeometry(0.5,0.9,24),matPBR(0xd08040));
+  cap.position.set(0,0.9,0);cap.castShadow=true;g.add(cap);
+  const stem=new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.14,0.9,24),matMatte(0xe8e0d0));
+  stem.position.set(0,0,0);stem.castShadow=true;g.add(stem);
+  // Gills under cap
+  for(let i=0;i<10;i++){
+    const ang=(i/10)*Math.PI*2;
+    const gill=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.03,0.04),matMatte(0xe0d0c0));
+    gill.position.set(Math.cos(ang)*0.35,0.75,Math.sin(ang)*0.35);gill.rotation.y=ang;g.add(gill);
+  }
+  // Hyphae (microscopic)
+  const hyp=new THREE.Group();
+  for(let i=0;i<15;i++){
+    const h=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,0.6,10),matPBR(0xf0e0d0));
+    h.position.set(-1.4+(Math.random()*1.2),(Math.random()-0.5)*0.8,(Math.random()-0.5)*0.8);
+    h.rotation.set(Math.random()*Math.PI,Math.random()*Math.PI,0);h.castShadow=true;hyp.add(h);
+  }
+  // Spores
+  for(let i=0;i<20;i++){
+    const sp=new THREE.Mesh(new THREE.SphereGeometry(0.04,12,10),matPBR(0xd0a060));
+    sp.position.set(-1.4+(Math.random()*1.2),(Math.random()-0.5)*0.8,(Math.random()-0.5)*0.8);g.add(sp);
+  }
+  g.add(hyp);
+  // Yeast cells
+  const yeast=new THREE.Group();
+  for(let i=0;i<10;i++){
+    const y=new THREE.Mesh(new THREE.SphereGeometry(0.08,20,16),matPBR(0xe0c0a0));
+    y.position.set(1.4+(Math.random()-0.5)*0.8,(Math.random()-0.5)*0.8,(Math.random()-0.5)*0.8);y.castShadow=true;yeast.add(y);
+  }
+  g.add(yeast);
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,-0.1,4.0);
+  const lbls=[
+    {id:'cap',text:'Mushroom Cap — कवक टोपी',pos:new THREE.Vector3(0,0.9,0),hi:true},
+    {id:'stem',text:'Stem — कवक डंठल',pos:new THREE.Vector3(0,0,0),hi:false},
+    {id:'gill',text:'Gills — गिल्स',pos:new THREE.Vector3(0.35,0.75,0),hi:false},
+    {id:'hyp',text:'Hyphae — हाइफे',pos:new THREE.Vector3(-1.4,0,0),hi:false},
+    {id:'sp',text:'Spores — बीजाणु',pos:new THREE.Vector3(-1.0,-0.2,-0.2),hi:false},
+    {id:'yeast',text:'Yeast Cells — खमीर कोशिकाएं',pos:new THREE.Vector3(1.4,0,0),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Fungi — कवक';
+  document.getElementById('topicDesc').textContent='Mushroom with cap, stem, gills, hyphae, spores, and yeast cells — realistic PBR fungi.';
+  document.getElementById('topicDetail').textContent='टोपी, डंठल, गिल्स, हाइफे, बीजाणु और खमीर कोशिकाओं वाला मशरूम — वास्तविक PBR कवक।';
+}
+
+// --- 15. FOOD & DIET ---
+function buildDiet(){
+  const g=new THREE.Group();
+  // Carbohydrates (bread/rice) - yellow
+  const carb=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.3,0.6),matPBR(0xf0d080));
+  carb.position.set(-1.2,0.7,0);carb.castShadow=true;g.add(carb);
+  // Proteins (meat/eggs) - red/pink
+  const prot=new THREE.Mesh(new THREE.SphereGeometry(0.4,32,24),matWet(0xe06060));
+  prot.position.set(-0.4,0.7,0);g.add(prot);
+  // Fats (oil/butter) - yellow globule
+  const fat=new THREE.Mesh(new THREE.SphereGeometry(0.35,32,24),matGlossy(0xf0e060));
+  fat.position.set(0.4,0.7,0);fat.castShadow=true;g.add(fat);
+  // Vitamins (fruits) - colorful
+  const vit=new THREE.Mesh(new THREE.SphereGeometry(0.3,32,24),matPBR(0xff5a5a));
+  vit.position.set(1.2,0.7,0);vit.castShadow=true;g.add(vit);
+  // Minerals (salt) - white crystals
+  const min=new THREE.Mesh(new THREE.BoxGeometry(0.25,0.25,0.25),matMatte(0xf5f5f5));
+  min.position.set(2.0,0.7,0);min.castShadow=true;g.add(min);
+  // Water - blue drop
+  const wat=new THREE.Mesh(new THREE.SphereGeometry(0.3,32,24),matGlass());
+  wat.position.set(0,-0.6,0);wat.material.transparent=true;wat.material.opacity=0.6;wat.castShadow=true;g.add(wat);
+  // Fiber - green strands
+  const fib=new THREE.Group();
+  for(let i=0;i<6;i++){
+    const f=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,0.5,8),matPBR(0x6a9a40));
+    f.position.set(-1.2+(i*0.25),-0.6,(Math.random()-0.5)*0.4);f.rotation.z=Math.random()*Math.PI;f.castShadow=true;fib.add(f);
+  }
+  g.add(fib);
+  currentGroup=g;scene.add(g);
+  camera.position.set(0,-0.1,3.8);
+  const lbls=[
+    {id:'carb',text:'Carbohydrates — कार्बोहाइड्रेट',pos:new THREE.Vector3(-1.2,0.7,0),hi:true},
+    {id:'prot',text:'Proteins — प्रोटीन',pos:new THREE.Vector3(-0.4,0.7,0),hi:false},
+    {id:'fat',text:'Fats — वसा',pos:new THREE.Vector3(0.4,0.7,0),hi:false},
+    {id:'vit',text:'Vitamins — विटामिन',pos:new THREE.Vector3(1.2,0.7,0),hi:false},
+    {id:'min',text:'Minerals — खनिज',pos:new THREE.Vector3(2.0,0.7,0),hi:false},
+    {id:'wat',text:'Water — पानी',pos:new THREE.Vector3(0,-0.6,0),hi:false},
+    {id:'fib',text:'Fiber — फाइबर',pos:new THREE.Vector3(-0.7,-0.6,0),hi:false}
+  ];
+  lbls.forEach(l=>label(l.id,l.text,l.pos,true,l.hi));
+  document.getElementById('topicTitle').textContent='Food & Diet — भोजन और आहार';
+  document.getElementById('topicDesc').textContent='Carbohydrates, proteins, fats, vitamins, minerals, water, fiber — balanced diet components in realistic PBR.';
+  document.getElementById('topicDetail').textContent='कार्बोहाइड्रेट, प्रोटीन, वसा, विटामिन, खनिज, पानी, फाइबर — संतुलित आहार के घटक वास्तविक PBR में।';
+}
+
+// ---------- Topic registry ----------
+const builders = {
+  cell:buildCell,tissues:buildTissues,digestive:buildDigestive,heart:buildHeart,
+  respiratory:buildRespiratory,skeleton:buildSkeleton,skin:buildSkin,flower:buildFlower,
+  teeth:buildTeeth,seeds:buildSeeds,respiration:buildRespiration,kingdoms:buildKingdoms,
+  bacteria:buildBacteria,fungi:buildFungi,diet:buildDiet
+};
+
+// ---------- Topic selection ----------
+function selectTopic(t){
+  state.topic=t;
+  clearScene();
+  builders[t]();
+  document.querySelectorAll('.topic').forEach(el=>{
+    el.classList.remove('active');
+    if(el.dataset.topic===t)el.classList.add('active');
+  });
+  controls.autoRotate=true;
+}
+function toggleSidebar(){
+  const s=document.getElementById('sidebar');
+  s.classList.toggle('open');
+}
+
+// ---------- Animation ----------
+const clock=new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const t=performance.now()*0.0015;
+  controls.update();
+  if(currentGroup&&state.playing){
+    currentGroup.rotation.y=Math.sin(t*0.4)*0.12;
+    currentGroup.rotation.x=Math.sin(t*0.25)*0.08;
+    if(currentGroup.position)currentGroup.position.y=Math.sin(t*0.6)*0.03;
+  }
+  // labels for current topic
+  if(currentMesh)label(currentMesh.id||'',currentMesh.text||'',currentMesh.pos||new THREE.Vector3(),true,true);
+  renderer.render(scene,camera);
+}
+animate();
+
+// ---------- Resize ----------
+window.addEventListener('resize',()=>{
+  camera.aspect=view.clientWidth/view.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(view.clientWidth,view.clientHeight);
+});
+
+// ---------- Play / Isolate ----------
+document.getElementById('btnPlay').addEventListener('click',()=>{
+  state.playing=!state.playing;
+  controls.autoRotate=state.playing;
+  document.getElementById('btnPlay').textContent=state.playing?'⏸ Pause':'▶ Play';
+});
+document.getElementById('btnIso').addEventListener('click',()=>{
+  state.isolate=!state.isolate;
+  if(currentGroup){
+    currentGroup.traverse(o=>{
+      if(o.isMesh&&o.material&&o.material.transparent!==undefined){
+        o.material.transparent=state.isolate;
+        o.material.opacity=state.isolate?0.45:1;
+      }
+    });
+  }
+  document.getElementById('btnIso').textContent=state.isolate?'Show All':'Isolate';
+});
+
+// Start
+selectTopic('cell');
+</script>
+</body>
+</html>
