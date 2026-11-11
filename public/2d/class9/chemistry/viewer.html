@@ -66,6 +66,18 @@
     <div class="sub" data-sub="tyndall" onclick="selectSub('tyndall')">Light through Colloid — कोलाइड में प्रकाश पथ</div>
     <div class="topic" data-topic="conserve" onclick="selectTopic('conserve')">द्रव्यमान संरक्षण · Conservation of Mass <span class="hi">द्रव्यमान संरक्षण</span></div>
     <div class="sub" data-sub="conserve" onclick="selectSub('conserve')">Sealed Flask Reaction on Balance — बंद फ्लास्क व तुला</div>
+    <div class="topic" data-topic="rays" onclick="selectTopic('rays')">कैथोड व कैनाल किरणें · Cathode & Canal Rays <span class="hi">विसर्जन नली</span></div>
+    <div class="sub" data-sub="rays" onclick="selectSub('rays')">Electron Beam Deflection & Positive Ion Rays</div>
+    <div class="topic" data-topic="spectrum" onclick="selectTopic('spectrum')">हाइड्रोजन स्पेक्ट्रम · Line Spectra & Series <span class="hi">रेखा स्पेक्ट्रम</span></div>
+    <div class="sub" data-sub="spectrum" onclick="selectSub('spectrum')">Prism Line Spectrum & Bohr Energy Jumps</div>
+    <div class="topic" data-topic="models" onclick="selectTopic('models')">रदरफोर्ड बनाम बोर मॉडल · Rutherford vs Bohr <span class="hi">परमाणु मॉडल</span></div>
+    <div class="sub" data-sub="models" onclick="selectSub('models')">Alpha Scattering vs Quantized Orbits</div>
+    <div class="topic" data-topic="bonding" onclick="selectTopic('bonding')">रासायनिक आबंधन · Lewis, Exceptions & Metallic Bond <span class="hi">आबंधन</span></div>
+    <div class="sub" data-sub="bonding" onclick="selectSub('bonding')">Shared Pairs, SF₆ Octahedron & Electron Sea</div>
+    <div class="topic" data-topic="column" onclick="selectTopic('column')">स्तंभ वर्णलेखन · Column Chromatography <span class="hi">क्रोमैटोग्राफी</span></div>
+    <div class="sub" data-sub="column" onclick="selectSub('column')">Silica Adsorbent, Eluent & Separated Bands</div>
+    <div class="topic" data-topic="fractional" onclick="selectTopic('fractional')">प्रभाजी आसवन · Fractional Distillation <span class="hi">प्रभाजी आसवन</span></div>
+    <div class="sub" data-sub="fractional" onclick="selectSub('fractional')">Lab Fractionating Column & Crude-Oil Tower</div>
   </div>
   <div id="stage">
     <div id="imageWrap"><img id="mainImg" src="" alt=""><div id="labels"></div></div>
@@ -173,6 +185,72 @@ const DATA={
     {x:45,y:36,en:'Conical Flask',hi:'शंक्वाकार फ्लास्क'},
     {x:50,y:77,en:'Digital Weighing Scale',hi:'डिजिटल तुला'}
   ]
+ },
+ rays:{
+  title:'कैथोड व कैनाल किरणें · Cathode & Canal Rays', desc:'इलेक्ट्रॉन पुंज का वैद्युत विक्षेपण तथा छिद्रित कैथोड से गुजरती धनावेशित कैनाल किरणें। Cathode-ray electron deflection and positive canal rays passing through perforated cathode.',
+  img:'images/cathode_canal_rays.jpg',
+  marks:[
+    {x:17,y:29,en:'Cathode (Electron Emitter)',hi:'कैथोड (इलेक्ट्रॉन स्रोत)'},
+    {x:57,y:25,en:'Electrostatic Deflection Plates',hi:'वैद्युत विक्षेपण प्लेटें'},
+    {x:90,y:31,en:'Fluorescent Zinc Sulphide Screen',hi:'प्रतिदीप्त पर्दा'},
+    {x:50,y:72,en:'Perforated Cathode Disc',hi:'छिद्रित कैथोड'},
+    {x:33,y:72,en:'Positive Canal Rays (Protons)',hi:'धनावेशित कैनाल किरणें'}
+  ]
+ },
+ spectrum:{
+  title:'रेखा स्पेक्ट्रम व हाइड्रोजन श्रेणियाँ · Hydrogen Line Spectra', desc:'प्रिज्म द्वारा असतत उत्सर्जन रेखाएँ तथा बोर कक्षाओं में इलेक्ट्रॉन संक्रमण (लाइमन, बामर, पाश्चन)। Discrete hydrogen emission lines and quantized downward shell transitions.',
+  img:'images/hydrogen_line_spectrum.jpg',
+  marks:[
+    {x:8,y:50,en:'Hydrogen Discharge Lamp',hi:'हाइड्रोजन विसर्जन लैम्प'},
+    {x:25,y:52,en:'Triangular Glass Prism',hi:'काँच का प्रिज्म'},
+    {x:43,y:44,en:'Discrete Spectral Lines',hi:'असतत स्पेक्ट्रम रेखाएँ'},
+    {x:75,y:50,en:'Quantized Bohr Energy Shells',hi:'क्वांटित ऊर्जा कक्षाएँ'},
+    {x:78,y:25,en:'Electron Jumps (Lyman / Balmer)',hi:'इलेक्ट्रॉन संक्रमण श्रेणियाँ'}
+  ]
+ },
+ models:{
+  title:'रदरफोर्ड बनाम बोर मॉडल · Rutherford vs Bohr Model', desc:'अल्फा कण प्रकीर्णन व अस्थिर कक्षाएँ बनाम क्वांटित स्थायी कक्षाओं में फोटॉन उत्सर्जन। Alpha scattering & classical spiral problem vs Bohr stationary quantized orbits.',
+  img:'images/rutherford_vs_bohr.jpg',
+  marks:[
+    {x:25,y:50,en:'Rutherford Positive Nucleus',hi:'रदरफोर्ड का धनावेशित नाभिक'},
+    {x:31,y:65,en:'Alpha Particle Scattering',hi:'अल्फा कण प्रकीर्णन'},
+    {x:18,y:25,en:'Elliptical Orbits (Unstable)',hi:'दीर्घवृत्ताकार कक्षाएँ'},
+    {x:75,y:11,en:'Bohr Stationary Orbits (n = 1,2,3,4)',hi:'बोर की स्थायी कक्षाएँ'},
+    {x:85,y:31,en:'Emitted Photon on Orbit Jump',hi:'कक्षा परिवर्तन पर उत्सर्जित फोटॉन'}
+  ]
+ },
+ bonding:{
+  title:'रासायनिक आबंधन · Lewis Dots, Octet Exceptions & Metallic Bond', desc:'सहसंयोजक युग्म व एकाकी युग्म, अष्टक अपवाद (SF₆ अष्टफलकीय) तथा धात्विक इलेक्ट्रॉन-समुद्र मॉडल। Shared/lone electron pairs, expanded-octet SF₆ and metallic electron-sea lattice.',
+  img:'images/chemical_bonding_lewis.jpg',
+  marks:[
+    {x:25,y:25,en:'Shared Covalent Electron Pair',hi:'साझा सहसंयोजक इलेक्ट्रॉन युग्म'},
+    {x:16,y:8,en:'Non-Bonding Lone Electron Pairs',hi:'एकाकी इलेक्ट्रॉन युग्म'},
+    {x:25,y:73,en:'Expanded Octet Geometry (SF₆)',hi:'विस्तारित अष्टक ज्यामिति (SF₆)'},
+    {x:66,y:39,en:'Positive Metal Cation Lattice (+)',hi:'धनावेशित धातु धनायन जालक'},
+    {x:84,y:52,en:'Sea of Mobile Delocalized Electrons',hi:'मुक्त इलेक्ट्रॉनों का समुद्र'}
+  ]
+ },
+ column:{
+  title:'स्तंभ वर्णलेखन · Column Chromatography', desc:'सिलिका जेल स्थिर प्रावस्था व गतिशील विलायक द्वारा रंगद्रव्य घटकों का अलग-अलग बैंड में पृथक्करण। Stationary silica phase and mobile eluent separating mixture bands.',
+  img:'images/column_chromatography.jpg',
+  marks:[
+    {x:50,y:9,en:'Mobile Phase Solvent (Eluent)',hi:'गतिशील प्रावस्था (विलायक)'},
+    {x:50,y:56,en:'Stationary Phase (Silica Gel)',hi:'स्थिर प्रावस्था (सिलिका जेल)'},
+    {x:81,y:47,en:'Separated Pigment Bands',hi:'पृथक हुए रंगीन बैंड'},
+    {x:50,y:72,en:'Glass Stopcock Valve',hi:'स्टॉपकॉक नियामक वाल्व'},
+    {x:50,y:91,en:'Collected Separated Fraction',hi:'एकत्रित पृथक अंश'}
+  ]
+ },
+ fractional:{
+  title:'प्रभाजी आसवन · Fractional Distillation & Crude Oil', desc:'निकट क्वथनांक वाले मिश्रणीय द्रवों का ग्लास-बीड प्रभाजी स्तंभ व अपरिष्कृत तेल शोधन मीनार द्वारा पृथक्करण। Bead-packed fractionating column and industrial multi-tray crude-oil tower.',
+  img:'images/fractional_distillation.jpg',
+  marks:[
+    {x:17,y:65,en:'Heated Boiling Flask',hi:'गर्म आसवन फ्लास्क'},
+    {x:17,y:32,en:'Bead-Packed Fractionating Column',hi:'काँच के मनकों वाला प्रभाजी स्तंभ'},
+    {x:33,y:35,en:'Liebig Water Condenser',hi:'लीबिग जल संघनित्र'},
+    {x:48,y:69,en:'Distillate Receiving Flask',hi:'आसवन ग्राही फ्लास्क'},
+    {x:75,y:52,en:'Crude-Oil Multi-Tray Tower',hi:'अपरिष्कृत तेल शोधन मीनार'}
+  ]
  }
 };
 
@@ -230,7 +308,7 @@ function renderLabels(){
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
 
 // Init
-const _ALIASES={separation:'mixture'};
+const _ALIASES={separation:'mixture',cathode_canal_rays:'rays',hydrogen_line_spectrum:'spectrum',rutherford_vs_bohr:'models',chemical_bonding_lewis:'bonding',column_chromatography:'column',fractional_distillation:'fractional'};
 const _qp=new URLSearchParams(window.location.search);
 const _rawSub=_qp.get('sub'),_sub=_ALIASES[_rawSub]||_rawSub;
 const _rawTop=_qp.get('topic'),_top=_ALIASES[_rawTop]||_rawTop;
