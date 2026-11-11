@@ -53,6 +53,12 @@
         <button class="btn" data-style="anime">Anime</button>
         <button class="btn" data-style="realistic">Ultra-realistic</button>
       </div>
+      <div class="chip"><span class="tag">PBR tissue preset</span>
+        <button class="btn row active" data-preset="skin">Skin</button>
+        <button class="btn row" data-preset="wet">Wet mucosa</button>
+        <button class="btn row" data-preset="bone">Bone</button>
+        <button class="btn row" data-preset="glass">Glass</button>
+      </div>
       <div class="chip">
         <label>Cross-section <span id="valX">0%</span></label>
         <input type="range" id="sec" min="-130" max="130" value="0">
@@ -69,7 +75,7 @@
     </div>
   </div>
   <div id="labels"></div>
-  <div class="hint">Drag to rotate · Pinch to zoom · Cross-section slice = surgeon's view · Built with three.js r160 · Demo only — assets are procedural, no external models</div>
+  <div class="hint">Drag to rotate · Pinch to zoom · Cross-section slice = surgeon's view · PBR tissue presets: Skin / Wet mucosa / Bone / Glass · Built with three.js r160 · Demo only — assets are procedural, no external models</div>
 </div>
 <script type="importmap">
 {"imports":{"three":"./lib/three.module.js","three/addons/":"./lib/"}}
@@ -181,7 +187,9 @@ let state = {
   isolate: false,
   playing: true,
   speed: 1,
+  tissuePreset: 'skin', // skin | wet | bone | glass  (PBR preset applied to the organ)
 };
+let heartBodyMesh; // reference to the main heart mesh for preset swaps
 
 // Parts registry: { id, mesh, geo, color, kind, toon, edges, labelPos, labelText, labelHi, cap }
 const parts = [];
@@ -216,6 +224,45 @@ function matBasic(color, opts = {}) {
   return new THREE.MeshBasicMaterial(Object.assign({ color, transparent: opts.transparent, opacity: opts.opacity !== undefined ? opts.opacity : 1 }, opts));
 }
 
+// ---------------- PBR tissue presets (built-in three.js r160, no external package) ----------------
+// Skin: clearcoat sheen approximates subsurface scattering; warm, slightly rough flesh
+function presetSkin(color) {
+  return new THREE.MeshStandardMaterial({
+    color, roughness: 0.62, metalness: 0.04,
+    clearcoat: 0.35, clearcoatRoughness: 0.45,
+  });
+}
+// Wet mucosa / organ surface: glossy wet look via strong clearcoat + slight transmission
+function presetWetMucosa(color) {
+  return new THREE.MeshPhysicalMaterial({
+    color, roughness: 0.22, metalness: 0.0,
+    clearcoat: 1.0, clearcoatRoughness: 0.10,
+    transmission: 0.12, thickness: 0.35,
+  });
+}
+// Bone: matte, non-metallic, porous look
+function presetBone(color) {
+  return new THREE.MeshStandardMaterial({
+    color, roughness: 0.85, metalness: 0.02,
+  });
+}
+// Glass / clear organ cover: transmission + clearcoat + IOR refraction
+function presetGlass() {
+  return new THREE.MeshPhysicalMaterial({
+    color: 0xffffff, roughness: 0.04, metalness: 0.0,
+    transmission: 0.92, thickness: 0.9, attenuationDistance: 1.2, attenuationColor: 0xffffff,
+    clearcoat: 1.0, clearcoatRoughness: 0.08,
+    ior: 1.5,
+  });
+}
+
+const PRESETS = {
+  skin: { label: 'चमड़ी / Skin', fn: presetSkin, color: 0xe8a58a },
+  wet:  { label: 'गीला अंग / Wet mucosa', fn: presetWetMucosa, color: 0xa83232 },
+  bone: { label: 'हड्डी / Bone', fn: presetBone, color: 0xe6e2d0 },
+  glass:{ label: 'कांच / Glass', fn: presetGlass, color: 0xffffff },
+};
+
 function edgesFor(mesh, color = 0x11182a) {
   const geo = new THREE.EdgesGeometry(mesh.geometry);
   const mat = new THREE.LineSegmentsMaterial({ color, linewidth: 1.5 });
@@ -238,6 +285,7 @@ function buildHeart() {
   // Main heart body: ellipsoid
   const bodyGeo = new THREE.SphereGeometry(1.0, 64, 48);
   const body = new THREE.Mesh(bodyGeo, bodyMat);
+  heartBodyMesh = body;
   body.scale.set(1, 0.82, 0.7);
   body.position.set(0, 0.05, 0);
   body.castShadow = true; body.receiveShadow = true;
@@ -442,7 +490,13 @@ function applyStyle(style) {
       p.mesh.material.clippingPlanes = [clipPlane];
       p.mesh.material.clipIntersection = true;
     } else {
-      p.mesh.material = matStandard(p.baseColor, { transparent: p.material.transparent, opacity: p.material.opacity });
+      let m;
+      if (p.mesh === heartBodyMesh && state.tissuePreset && PRESETS[state.tissuePreset]) {
+        m = PRESETS[state.tissuePreset].fn(state.tissuePreset === 'glass' ? 0xffffff : p.baseColor);
+      } else {
+        m = matStandard(p.baseColor, { transparent: p.material.transparent, opacity: p.material.opacity });
+      }
+      p.mesh.material = m;
       p.mesh.material.clippingPlanes = [clipPlane];
       p.mesh.material.clipIntersection = true;
     }
@@ -628,6 +682,14 @@ document.querySelectorAll('[data-style]').forEach(b => {
     b.classList.add('active');
     state.style = b.dataset.style;
     applyStyle(state.style);
+  });
+});
+document.querySelectorAll('[data-preset]').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('[data-preset]').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    state.tissuePreset = b.dataset.preset;
+    if (state.style === 'realistic') applyStyle('realistic');
   });
 });
 document.getElementById('sec').addEventListener('input', (e) => {
