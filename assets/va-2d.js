@@ -46,7 +46,7 @@ const css=document.createElement("style");css.textContent=`
 .vseg button[aria-pressed="true"]{background:var(--acc);color:#0b1220}
 .vseg button:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
 .vseg.big{margin:0 0 18px}.vseg.big button{padding:10px 18px;font-size:calc(15px*var(--fs));min-height:44px}
-#v2d{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;background:var(--bg);padding:58px 12px 10px;gap:8px}
+#v2d{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;background:var(--bg);padding:58px 12px calc(10px + var(--vtp,0px));gap:8px}
 #v2d[hidden]{display:none}
 #v2dHead{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 #v2dHead h2{font-size:calc(15px*var(--fs));margin:0;color:var(--ink);flex:1;min-width:160px}
@@ -79,7 +79,7 @@ const css=document.createElement("style");css.textContent=`
 body.v2d #tlab,body.v2d #resetv,body.v2d #hud,body.v2d #labels,body.v2d #leaders,body.v2d #fpsm,body.v2d #perfBar,body.v2d #nogl{display:none!important}
 #v2dWrap.busy img{opacity:.35}#v2dWrap img{transition:opacity .15s}
 #v2dLoad{color:var(--ink);font-size:calc(14px*var(--fs));opacity:.85}
-@media (max-width:640px){#v2dHead select{max-width:100%;flex:1}}
+@media (max-width:640px){#v2dHead select{max-width:100%;flex:1}#v2dChips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;padding-bottom:2px}#v2dChips button{flex:none}}
 @media print{.vseg{display:none}}`;
 document.head.appendChild(css);
 
@@ -101,7 +101,7 @@ let view="3d",cur=null,list=[],lastKey=null,preferId=null,inited=false,showAll=L
 const get=id=>{const i=id.lastIndexOf("/"),g=id.slice(0,i),v=DATA[g]&&DATA[g][id.slice(i+1)];return v?{id,g,...v}:null};
 function forKey(k){if(!k)return{ids:[],rel:false};if(MAP[k])return{ids:MAP[k],rel:false};
  const ch=k.split("/")[0]+"/",ids=[...new Set(Object.keys(MAP).filter(x=>x.startsWith(ch)).flatMap(x=>MAP[x]))];return{ids,rel:true}}
-let marks=[],sel=-1,wide=true;
+let marks=[],sel=-1,wide=true,curMarks=[];
 function fit(){ov.style.paddingTop=(bar.offsetTop+bar.offsetHeight+8)+"px";if(wrap.hidden){lines.innerHTML="";call.hidden=legend.hidden=true;return}
  wide=ov.clientWidth>=640;ov.classList.toggle("narrow",!wide);call.hidden=!wide;legend.hidden=wide||!marks.length;const host=wide?call:legend;marks.forEach(m=>{if(m.lab.parentNode!==host)host.appendChild(m.lab)});
  const r=body.getBoundingClientRect(),lw=wide&&marks.length?Math.round(Math.max(118,Math.min(210,r.width*.22))):0,mw=Math.max(120,r.width-2*(lw?lw+34:1)),mh=Math.max(100,r.height-2),nw=img.naturalWidth||16,nh=img.naturalHeight||9,k=Math.min(mw/nw,mh/nh);
@@ -136,7 +136,7 @@ function show(id){const d=get(id);if(!d)return;if(id===cur&&!wrap.hidden&&!wrap.
  chips.querySelectorAll("button").forEach(c=>c.setAttribute("aria-pressed",String(c.dataset.id===id)));all.value=id;if(all.value!==id)all.value="";
  clearMarks();wrap.classList.add("busy");if(!img.getAttribute("src"))wrap.hidden=true;loadEl.hidden=!wrap.hidden;
  load(u).then(()=>{if(my!==tok)return;img.alt=d.title;img.src=u;
-  clearMarks();(d.marks||[]).slice().sort((a,b)=>a.y-b.y||a.x-b.x).forEach((m,i)=>{const n=i+1,dot=document.createElement("button"),lab=document.createElement("button");
+  clearMarks();curMarks=(d.marks||[]).slice().sort((a,b)=>a.y-b.y||a.x-b.x);curMarks.forEach((m,i)=>{const n=i+1,dot=document.createElement("button"),lab=document.createElement("button");
    dot.type=lab.type="button";dot.className="vmk";dot.style.left=m.x+"%";dot.style.top=m.y+"%";dot.setAttribute("aria-label",n+". "+m.en+" · "+m.hi);dot.innerHTML=`<i>${n}</i>`;
    lab.className="vcl";lab.setAttribute("aria-pressed","false");lab.innerHTML=`<span class="n">${n}</span><span><span class="en">${esc(m.en)}</span><span class="hi" lang="hi">${esc(m.hi)}</span></span>`;
    dot.onclick=lab.onclick=()=>pick(i);wrap.appendChild(dot);marks.push({x:m.x,y:m.y,dot,lab})});
@@ -161,5 +161,5 @@ const ttl=$("#ttl");if(ttl)new MutationObserver(onTopic).observe(ttl,{childList:
 addEventListener("keydown",e=>{if(e.key!=="v"&&e.key!=="V")return;if(e.ctrlKey||e.metaKey||e.altKey||/^(INPUT|TEXTAREA|SELECT)$/.test((e.target||{}).tagName||""))return;setView(view==="2d"?"3d":"2d")});
 const qp=new URLSearchParams(location.search).get("view"),init=qp==="2d"||qp==="3d"?qp:LS.get("va.view");
 setView(init==="2d"?"2d":"3d",!qp&&true);
-window.__va2d={set:setView,get:()=>view,show,current:()=>cur,images:()=>list.slice(),map:MAP};
+window.__va2d={set:setView,get:()=>view,show,current:()=>cur,images:()=>list.slice(),map:MAP,info:()=>{const d=cur&&get(cur);return d?{title:d.title,desc:d.desc||"",marks:curMarks.map(m=>({en:m.en,hi:m.hi}))}:null},select:i=>{if(sel!==i&&marks[i])pick(i)},clear:()=>{if(sel>=0)pick(sel)}};
 })();
