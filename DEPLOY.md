@@ -16,3 +16,6 @@ Keys: **N** chapters panel · **P** lesson panel · **H** home · **F** fps · �
 ## 3D | 2D switch (one screen)
 The app is the root `index.html`. The **3D | 2D** switch sits in its top bar and on Home (key **V**); 2D shows the labelled image for the *current* topic in the same stage, with the same chapters and lesson panel. Code + topic→image map: `assets/va-2d.js`; images: `public/2d/<class>/<subject>/images/`. Deep link: `index.html?view=2d#ch5/heart`.
 Deploy the **repository root** (GitHub Pages: branch root; Vercel: `outputDirectory` is `.`). `public/index.html` and `public/science/index.html` only forward old links to the app.
+
+## Teacher narration
+🎙 button in the top bar narrates the current topic (Hindi / English / both, male / female). Free, offline, uses device voices. Real recordings can be dropped into `assets/voice/` — see `docs/VOICE.md`.
