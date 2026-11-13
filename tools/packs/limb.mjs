@@ -1,0 +1,8 @@
+export default {
+ 'scapula':['skeletal','Scapula.l','bone',2500,1200],'clavicle':['skeletal','Clavicle.l','bone',900,500],'humerus':['skeletal','Humerus.l','bone',3500,1500],'radius':['skeletal','Radius.l','bone',2500,1100],'ulna':['skeletal','Ulna.l','bone',3000,1300],
+ 'biceps-long':['muscular','Long head of biceps brachii.l','muscle',2500,1000],'biceps-short':['muscular','Short head of biceps brachii.l','muscle',2000,900],'brachialis':['muscular','Brachialis muscle.l','muscle',2200,900],
+ 'triceps-long':['muscular','Long head of triceps brachii.l','muscle',2500,1000],'triceps-lateral':['muscular','Lateral head of triceps brachii.l','muscle',2000,900],'triceps-medial':['muscular','Medial head of triceps brachii.l','muscle',2000,900],
+ 'capsule-elbow':['joints','Articular capsule of elbow joint.l','capsule',1500,700],'annular-lig':['joints','Annular ligament of radius.l','ligament',400,250],
+ 'knee-femur':['skeletal','Femur.l','bone',3500,1500],'knee-tibia':['skeletal','Tibia.l','bone',3000,1300],'knee-fibula':['skeletal','Fibula.l','bone',1500,700],'knee-patella':['skeletal','Patella.l','bone',700,400],
+ 'knee-capsule':['joints','Articular capsule of knee joint.l','capsule',2000,900],'lcl':['joints','Fibular collateral ligament.l','ligament',400,250],'mcl':['joints','Superficial part of tibial collateral ligament.l','ligament',500,300],
+ 'acl':['joints','Anterior cruciate ligament.l','ligament',400,250],'pcl':['joints','Posterior cruciate ligament.l','ligament',400,250],'meniscus-l':['joints','Lateral meniscus.l','cartilage',500,300],'meniscus-m':['joints','Medial meniscus.l','cartilage',500,300]};

@@ -190,3 +190,14 @@ How to add a row:
 2. Read the LICENCE file. "None" = all rights reserved; "NOASSERTION" = read the file text personally.
 3. Trace each model to its original author and terms (asset pages often carry their own licence).
 4. Fill one row per adopted asset; keep a copy of the licence text in `docs/licences/<asset-name>/` if possible.
+
+## Added 2026-11-13 — eye, elbow joint, lungs packs
+
+| Files | Size | What | Licence |
+|---|---|---|---|
+| `assets/eye/eye.glb` (+`_lo`) | 52 kB / 33 kB | 13 meshes: sclera, cornea, iris, lens, retina, vitreous body, zonular fibres, anterior chamber, optic nerve, 4 extraocular muscles (left eye) | CC BY-SA 4.0 chain (BodyParts3D CC BY-SA 2.1 JP via Z-Anatomy CC BY-SA 4.0) |
+| `assets/limb/limb.glb` (+`_lo`) | 141 kB / 86 kB | 24 meshes: shoulder girdle, humerus, radius, ulna, biceps/triceps heads, brachialis, elbow capsule, annular ligament; knee bones, capsule, cruciate/collateral ligaments, menisci (knee not yet used in a scene) | same |
+| `assets/lungs/lungs.glb` (+`_lo`) | 261 kB / 162 kB | 57 meshes: five lobes, trachea, epiglottis, main/lobar/segmental bronchi, diaphragm, ribs 1–10, sternum | same |
+
+Source: the same `nqwrc/3d-anatomy` Draco GLB layers as the digestive/heart packs (visceral, skeletal, muscular, nervous, joints). Excluded on purpose: kidney (CC BY-NC), inner ear (CC BY-NC-SA), the "Brainder"/"White matter" brain models (no licence stated), so there is still no realistic brain scene.
+Built with `tools/build-pack.mjs` + `tools/packs/*.mjs`; scene code is `tools/anatomy-module.js` (injected into `index.html` by `tools/inject-anatomy.py`). Meshes were simplified and re-encoded (modified). Same share-alike and attribution terms as above apply.

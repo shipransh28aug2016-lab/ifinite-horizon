@@ -17,7 +17,7 @@ const MAP={
 "ch7/human":[B10+"reproductive_system"],"ch7/flower":[B9+"flower",B9+"seeds_germination"],"ch7/fission":[B10+"binary_fission"],"ch7/budding":[B10+"budding_hydra"],"ch7/vegetative":[B10+"vegetative_propagation"],
 "ch8/mendel":[B10+"genetics_dna"],"ch8/dihybrid":[B10+"genetics_dna"],"ch8/sex":[B10+"chromosome_structure",B10+"genetics_dna"],"ch8/evolution":[B10+"human_evolution"],
 "ch9/reflection":[P10+"reflection"],"ch9/optics":[P10+"lens",P10+"reflection"],"ch9/slab":[P10+"refraction"],"ch9/power":[P10+"lens"],
-"ch10/prism":[P10+"dispersion"],"ch10/eyeparts":[P10+"human_eye_anatomy"],"ch10/eye":[P10+"human_eye_anatomy"],"ch10/scatter":[P10+"scattering_light"],
+"ch10/prism":[P10+"dispersion"],"ch10/eyeparts":[P10+"human_eye_anatomy"],"ix6/atom3d":[C9+"atom"],"ch10/eye3d":[P10+"human_eye_anatomy"],"ix2/joint3d":[B9+"skeleton_joint",B9+"tissue_muscular"],"ch5/lungs3d":[B9+"respiratory_system"],"ch10/eye":[P10+"human_eye_anatomy"],"ch10/scatter":[P10+"scattering_light"],
 "ch11/ohm":[P10+"ohm",P10+"circuit"],"ch11/resistance":[P10+"circuit"],"ch11/series":[P10+"circuit"],"ch11/heating":[P10+"joule_heating"],
 "ch12/magnet":[P10+"magnetic_field_lines"],"ch12/field":[P10+"magnetic_field_lines"],"ch12/solenoid":[P10+"electromagnet"],"ch12/flhr":[P10+"motor"],"ch12/motor":[P10+"motor"],"ch12/induction":[P10+"electromagnetic_induction"],"ch12/domestic":[P10+"domestic_circuit"],
 "ch13/pyramid":[B10+"food_pyramid"],"ch13/web":[B10+"food_web"],"ch13/ozone":[B10+"pollution"],"ch13/waste":[B10+"pollution"],
