@@ -40,7 +40,7 @@ function factory(cfg){const D=(X9.ds[cfg.slot]=X9.ds[cfg.slot]||{state:"idle",da
   const ex=cfg.extra?cfg.extra(ctx):{};Object.assign(ctx,ex);
   const fly=k=>window.__atlas.fly(cfg.cam[k][0].toArray(),cfg.cam[k][1].toArray(),1.3);
   const ST=cfg.steps;let lastS=-1,lastT=0;
-  const labels=cfg.labels(ctx).map(([id,en,hi,part,st])=>lb(id,en,hi,()=>part.call?part():wp(part),{steps:{includes:i=>ctx.allLab||st.includes(i),length:1,find:()=>st[0]},up:!0}));
+  const labels=cfg.labels(ctx).map(([id,en,hi,part,st])=>lb(id,en,hi,()=>ctx.allLab||st.includes(lastS)?(part.call?part():wp(part)):c(1e6,1e6,1e6),{steps:{includes:i=>ctx.allLab||st.includes(i),length:1,find:()=>st[0]},up:!0}));
   const tools=[...Object.keys(cfg.cam).map((k,i)=>({label:"📷 "+cfg.camNames[k],group:"cam",on:i===0,act:()=>fly(k)})),
    {label:"Transparent organs",toggle:()=>(ctx.trans=ctx.trans?0:1,!!ctx.trans)},{label:"Isolate selected",toggle:()=>(ctx.isolate=ctx.isolate?0:1,!!ctx.isolate)},...(cfg.clipIds?[{label:"✂ Cut-away",toggle:()=>(ctx.cut=ctx.cut?0:1,!!ctx.cut)}]:[]),...(cfg.tools?cfg.tools(ctx):[]),{label:"All labels",toggle:()=>(ctx.allLab=ctx.allLab?0:1,!!ctx.allLab)}];
   return{scene:n,view:{pos:cfg.cam[Object.keys(cfg.cam)[0]][0],target:cfg.cam[Object.keys(cfg.cam)[0]][1]},labels,pickables:pick,tools,

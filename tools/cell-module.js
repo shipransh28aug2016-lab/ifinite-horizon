@@ -1,4 +1,4 @@
-/* ===== Custom model sets 1-2: eukaryotic animal cell, plant cell, bacterium (detailed 3D) =====
+/* ===== Custom model sets 1-3: animal cell, plant cell, bacterium, atomic models (detailed 3D) =====
    Fully procedural, hand-modelled geometry (no imported mesh): parametric surfaces for the membrane, nuclear envelope with pores, mitochondria with cristae,
    rough ER sheets with ribosomes, Golgi stack, lysosomes, vesicles, centrioles and microtubules. Source for the block injected by tools/inject-anatomy.py.
    Proportions are artistic but follow textbook organisation; sizes are NOT to scale and the protein-traffic particles are schematic (stated on screen). */
@@ -123,7 +123,7 @@ function Mcell3d(){
   ["c-er","Rough ER (with ribosomes)","खुरदरी ER (राइबोसोम सहित)",()=>g.localToWorld(c(NUC[0]+1.2,NUC[1]+1.5,NUC[2]+1.2)),[3,4]],["c-rb","Ribosomes","राइबोसोम",()=>g.localToWorld(c(NUC[0]+1.9,NUC[1]+.5,NUC[2]+.7)),[3]],["c-se","Smooth ER","चिकनी ER",()=>g.localToWorld(c(NUC[0]+2.4,NUC[1]+.4,NUC[2]+.4)),[3]],
   ["c-go","Golgi apparatus","गॉल्जी उपकरण",()=>g.localToWorld(c(GP[0],GP[1]+.2,GP[2])),[4]],["c-ve","Vesicles carry proteins","पुटिकाएँ प्रोटीन ले जाती हैं",()=>g.localToWorld(c(GP[0]+1.0,GP[1]-.1,GP[2])),[4]],["c-ex","Exocytosis (out of the cell)","बहिःस्राव (कोशिका से बाहर)",()=>c(4.3,-.2,3.0),[4]],
   ["c-ly","Lysosome (digestion)","लाइसोसोम (पाचन)",()=>g.localToWorld(c(-2.2,2.2,.9)),[5]],["c-va","Vacuole (storage)","रिक्तिका (भंडारण)",()=>g.localToWorld(c(2.8,2.0,1.0)),[5]],
-  ["c-ce","Centrioles","तारककाय",()=>g.localToWorld(c(CP[0]+.2,CP[1],CP[2])),[6]],["c-mt","Microtubules","सूक्ष्मनलिकाएँ",()=>g.localToWorld(c(CP[0]+1.6,CP[1]+.6,CP[2]+1.2)),[6]]].map(([id,en,hi,p,st])=>lb(id,en,hi,p,{steps:{includes:i=>allLab||st.includes(i),length:1,find:()=>st[0]},up:!0}));
+  ["c-ce","Centrioles","तारककाय",()=>g.localToWorld(c(CP[0]+.2,CP[1],CP[2])),[6]],["c-mt","Microtubules","सूक्ष्मनलिकाएँ",()=>g.localToWorld(c(CP[0]+1.6,CP[1]+.6,CP[2]+1.2)),[6]]].map(([id,en,hi,p,st])=>lb(id,en,hi,()=>allLab||st.includes(lastS)?p():c(1e6,1e6,1e6),{steps:{includes:i=>allLab||st.includes(i),length:1,find:()=>st[0]},up:!0}));
  const tools=[...cams.map((q,i)=>({label:"📷 "+camK[i],group:"cam",on:i===0,act:()=>fly(i)})),{label:"✂ Cut-away membrane",on:!0,toggle:()=>(cut=cut?0:1,!!cut)},{label:"Isolate selected",toggle:()=>(iso=iso?0:1,!!iso)},{label:"All labels",toggle:()=>(allLab=allLab?0:1,!!allLab)}];
  return{scene:n,view:{pos:cams[0][0],target:cams[0][1]},labels,pickables:org.map(o=>o.m),tools,
   steps:ST.map(s=>({dur:s[6],en:`${s[0]} · ${s[1]} — ${s[3]}`,hi:`${s[2]} — ${s[4]}`})),
@@ -163,8 +163,8 @@ const cristae2=(L,Rr)=>param(40,48,(u,v)=>{const th=u*PI,ph=v*TAU,x=cos(th),rad=
 /* shared runner */
 function run(C){const {n,g,org,show,base,ST,cams,camK,labels,frame,predict,plane,cutAt=.9,op}=C;let lastS=-1,lastT=0,sel=null,allLab=0,iso=0,cut=1;const hl=new Set();
  const fly=i=>window.__atlas.fly(cams[i][0].toArray(),cams[i][1].toArray(),1.4);
- const lab=labels.map(([id,en,hi,p,st])=>lb(id,en,hi,p,{steps:{includes:i=>allLab||st.includes(i),length:1,find:()=>st[0]},up:!0}));
- const tools=[...cams.map((q,i)=>({label:"📷 "+camK[i],group:"cam",on:i===0,act:()=>fly(i)})),...(plane?[{label:"✂ Cut-away",on:!0,toggle:()=>(cut=cut?0:1,!!cut)}]:[]),{label:"Isolate selected",toggle:()=>(iso=iso?0:1,!!iso)},{label:"All labels",toggle:()=>(allLab=allLab?0:1,!!allLab)}];
+ const FAR=c(1e6,1e6,1e6);const lab=labels.map(([id,en,hi,p,st])=>{const P=typeof p==="function"?p:()=>p;return lb(id,en,hi,()=>allLab||st.includes(lastS)?P():FAR,{steps:{includes:i=>allLab||st.includes(i),length:1,find:()=>st[0]},up:!0})});
+ const tools=[...cams.map((q,i)=>({label:"📷 "+camK[i],group:"cam",on:i===0,act:()=>fly(i)})),...(C.tools2||[]),...(plane?[{label:"✂ Cut-away",on:!0,toggle:()=>(cut=cut?0:1,!!cut)}]:[]),{label:"Isolate selected",toggle:()=>(iso=iso?0:1,!!iso)},{label:"All labels",toggle:()=>(allLab=allLab?0:1,!!allLab)}];
  return{scene:n,view:{pos:cams[0][0],target:cams[0][1]},labels:lab,pickables:org.map(o=>o.m),tools,
   steps:ST.map(s=>({dur:s[6],en:`${s[0]} · ${s[1]} — ${s[3]}`,hi:`${s[2]} — ${s[4]}`})),predict,
   onPick(o){const id=o.userData.part,i=KIND2[id]||KINDS[id];if(i)note(i[0],i[1],i[2],i[3]);sel=id;hl.clear();hl.add(id)},
@@ -263,4 +263,85 @@ function Mbact(){sd=21;const n=new Ne;Ge(n,{key:1.9});Je(n,-3.6,13,.1);Vt.localC
 Q_("ix1/bacterium3d",[["Which of these is absent in a bacterial cell?","जीवाणु कोशिका में क्या नहीं होता?",["Ribosomes","Nuclear membrane","Cell wall","DNA"],1,"Prokaryotes have no nuclear membrane."],["The genetic material of a bacterium lies in the…","जीवाणु का आनुवंशिक पदार्थ कहाँ होता है?",["Nucleus","Nucleoid","Vacuole","Golgi"],1,"The nucleoid region of the cytoplasm."],["What does the flagellum do?","कशाभिका क्या करती है?",["Makes proteins","Helps swimming","Stores DNA","Makes energy"],1,"It is a rotating whip-like tail."],["Small extra DNA rings in bacteria are…","जीवाणु में छोटे अतिरिक्त DNA छल्ले…",["Plasmids","Ribosomes","Pili","Capsules"],0,"Used in genetic engineering."]]);
 Px["ix1/bacterium3d"]=[["Antibiotics like penicillin work by attacking the bacterial cell wall — human cells have none, so they are safe.","पेनिसिलिन जैसी औषधियाँ जीवाणु की भित्ति पर वार करती हैं; मानव कोशिका में भित्ति नहीं होती, इसलिए वे सुरक्षित हैं।"],["Curd forms when Lactobacillus bacteria turn milk sugar into lactic acid.","दही में लैक्टोबैसिलस जीवाणु दूध की शर्करा को लैक्टिक अम्ल में बदलते हैं।"]];
 {const Lh=Hj.find(h=>h.kp==="ix1").topics,i=Lh.findIndex(x=>x.id==="cell3d");Lh.splice(i<0?Lh.length:i+1,0,{id:"plant3d",title:"Plant cell — detailed 3D",hi:"पादप कोशिका — विस्तृत 3D",build:Mplant,ncert:"Class IX · plant cell"},{id:"bacterium3d",title:"Bacterium — detailed 3D",hi:"जीवाणु — विस्तृत 3D",build:Mbact,ncert:"Class IX · prokaryotic cell"})}
+/* ============================ ATOMIC MODELS (set 3) ============================ */
+const KIND3={
+ dalton:["Dalton's atom (1803)","डाल्टन का परमाणु (1803)","Atoms are tiny, solid, indivisible spheres. All atoms of an element are identical. (We now know atoms can be divided.)","परमाणु सूक्ष्म, ठोस, अविभाज्य गोले हैं; किसी तत्व के सभी परमाणु समान होते हैं। (अब हम जानते हैं कि परमाणु विभाज्य है।)"],
+ thomson:["Thomson's model (1904)","थॉमसन का मॉडल (1904)","A positive sphere with negative electrons embedded in it, like plums in a pudding or seeds in a watermelon. The atom is neutral overall.","धनावेशित गोले में ऋणावेशित इलेक्ट्रॉन धँसे हैं — पुडिंग में बेर या तरबूज़ में बीज की तरह; परमाणु कुल मिलाकर उदासीन है।"],
+ foil:["Gold foil","सोने की पन्नी","An extremely thin gold foil (about 1000 atoms thick) that Rutherford's students bombarded with alpha particles.","लगभग 1000 परमाणु मोटी अत्यंत पतली सोने की पन्नी, जिस पर α-कण बरसाए गए।"],
+ nucleus:["Nucleus","नाभिक","A tiny, dense, positively charged centre holding protons and neutrons: almost all the mass of the atom in a space about 1/100000 of its size.","छोटा, घना, धनावेशित केंद्र जिसमें प्रोटॉन व न्यूट्रॉन हैं; परमाणु का लगभग पूरा द्रव्यमान, आकार का लगभग 1/100000 भाग।"],
+ rings:["Electron shell (orbit)","इलेक्ट्रॉन कक्षा (शेल)","Electrons move only in fixed energy levels called shells K, L, M, N. K holds up to 2 electrons, L up to 8, M up to 18 (8 for the first 20 elements).","इलेक्ट्रॉन केवल निश्चित ऊर्जा-स्तरों (कक्षाओं) K, L, M, N में घूमते हैं। K में अधिकतम 2, L में 8, M में 18 (पहले 20 तत्वों में 8)।"]};
+const A_ST=[
+["1","Dalton: the solid ball","डाल्टन: ठोस गेंद","In 1803 John Dalton pictured the atom as a tiny, solid, indivisible sphere — like a billiard ball.","1803 में जॉन डाल्टन ने परमाणु को छोटे, ठोस, अविभाज्य गोले की तरह माना — बिलियर्ड की गेंद जैसा।","Model (1803)",8],
+["2","Thomson: plum pudding","थॉमसन: प्लम पुडिंग","In 1897 J. J. Thomson discovered the electron. His model: negative electrons embedded in a positive sphere, so the atom is neutral.","1897 में जे. जे. थॉमसन ने इलेक्ट्रॉन खोजा। उनका मॉडल: धनावेशित गोले में ऋणावेशित इलेक्ट्रॉन धँसे हैं, इसलिए परमाणु उदासीन है।","Model (1904) · electrons jiggle",9],
+["3","Rutherford: gold foil experiment","रदरफ़ोर्ड: सोने की पन्नी का प्रयोग","Alpha particles were fired at a thin gold foil. Most went straight through, some bent, and a very few bounced back — so most of the atom is empty space and the positive charge is packed in a tiny nucleus.","पतली सोने की पन्नी पर α-कण दागे गए। अधिकांश सीधे निकल गए, कुछ मुड़े और बहुत थोड़े वापस लौटे — अतः परमाणु का अधिकांश भाग खाली है और धनावेश एक छोटे नाभिक में है।","Animated (1911) · schematic path",12],
+["4","Rutherford's atom and the neutron","रदरफ़ोर्ड का परमाणु व न्यूट्रॉन","Electrons orbit a tiny dense nucleus. In 1932 Chadwick found the neutron: the nucleus holds protons (+) and neutrons (no charge).","इलेक्ट्रॉन छोटे घने नाभिक की परिक्रमा करते हैं। 1932 में चैडविक ने न्यूट्रॉन खोजा: नाभिक में प्रोटॉन (+) और न्यूट्रॉन (आवेशहीन) हैं।","Model · not to scale",10],
+["5","Bohr: electrons in shells","बोर: कक्षाओं में इलेक्ट्रॉन","In 1913 Bohr said electrons move only in fixed orbits (shells) and do not lose energy while in them. Choose an element below to fill the shells.","1913 में बोर ने कहा कि इलेक्ट्रॉन केवल निश्चित कक्षाओं में घूमते हैं और उनमें ऊर्जा नहीं खोते। नीचे से तत्व चुनकर कक्षाएँ भरें।","Model (1913) · not to scale",12],
+["6","An electron jumps: light is emitted","इलेक्ट्रॉन की छलाँग: प्रकाश उत्सर्जन","When an electron falls from an outer shell to an inner one, it gives out the energy difference as a photon of light — this is how atoms make their spectrum.","जब इलेक्ट्रॉन बाहरी कक्षा से भीतरी कक्षा में गिरता है तो ऊर्जा-अंतर प्रकाश-फ़ोटॉन के रूप में निकलता है — परमाणु का स्पेक्ट्रम ऐसे ही बनता है।","Animated · schematic",11],
+["7","Build an atom","अपना परमाणु बनाइए","Atomic number Z = number of protons = number of electrons. Mass number A = protons + neutrons. Valency = electrons gained, lost or shared to complete the outer shell.","परमाणु क्रमांक Z = प्रोटॉन = इलेक्ट्रॉन। द्रव्यमान संख्या A = प्रोटॉन + न्यूट्रॉन। संयोजकता = बाहरी कक्षा पूरी करने के लिए ली, दी या साझा की गई इलेक्ट्रॉन संख्या।","Interactive",14]];
+const ELS=[["H","Hydrogen","हाइड्रोजन",1,0,1],["He","Helium","हीलियम",2,2,0],["Li","Lithium","लिथियम",3,4,1],["C","Carbon","कार्बन",6,6,4],["N","Nitrogen","नाइट्रोजन",7,7,3],["O","Oxygen","ऑक्सीजन",8,8,2],["Ne","Neon","नियॉन",10,10,0],["Na","Sodium","सोडियम",11,12,1],["Al","Aluminium","ऐल्युमिनियम",13,14,3],["Cl","Chlorine","क्लोरीन",17,18,1],["Ar","Argon","आर्गन",18,22,0],["K","Potassium","पोटैशियम",19,20,1],["Ca","Calcium","कैल्शियम",20,20,2]];
+const shellFill=z=>{const cap=[2,8,8,2],o=[];let r=z;for(const k of cap){const t=Math.min(k,r);if(t<=0)break;o.push(t);r-=t}return o};
+function Matom(){sd=31;const n=new Ne;Ge(n,{key:1.8});Je(n,-4.2,13,.1);const g=new J;n.add(g);const org=[];const add=mkAdd(g,org);
+ const gD=new J,gT=new J,gR=new J,gB=new J;[gD,gT,gR,gB].forEach(x=>g.add(x));
+ const pM=MAT(0xe0453a,{roughness:.3,clearcoat:.8,emissive:0x5a0e08,emissiveIntensity:.3,bumpScale:.05}),nM=MAT(0xaab3bd,{roughness:.35,clearcoat:.8,emissive:0x1a2026,emissiveIntensity:.2,bumpScale:.05}),eM=MAT(0x3b82f6,{roughness:.2,clearcoat:1,emissive:0x1033aa,emissiveIntensity:.8,bumpScale:0});
+ const sphG=r=>new it(r,20,16);
+ /* Dalton */
+ add("dalton",sph(2,.0,1,1,1,1,40,56),MAT(0xc9d3dd,{roughness:.15,clearcoat:1,metal:.3,opacity:1,bumpScale:.03,envMapIntensity:1.5,sheen:0}),[0,0,0],{parent:gD});
+ /* Thomson */
+ add("thomson",sph(2.6,.0,1,1,1,1,40,56),MAT(0xff9aa0,{opacity:.4,roughness:.2,clearcoat:.4,sheen:0,envMapIntensity:.5,depthWrite:!1,bumpScale:.02}),[0,0,0],{parent:gT,ns:1});
+ const plum=[];for(let i=0;i<12;i++){const d=c(R()-.5,R()-.5,R()-.5).normalize().multiplyScalar(.4+1.7*Math.cbrt(R()));const m=new N(sphG(.17),eM);m.position.copy(d);m.userData.part="thomson";gT.add(m);plum.push([m,d.clone(),R()*TAU])}
+ /* Rutherford foil + alpha particles */
+ const foilM=MAT(0xf2c447,{roughness:.25,clearcoat:.9,metal:.7,emissive:0x4a3300,emissiveIntensity:.15,bumpScale:.02});
+ for(let y=-3;y<=3;y++)for(let z=-3;z<=3;z++){const m=add("foil",sphG(.26),foilM,[0,y*.62,z*.62],{parent:gR,ns:1});add("foil",sphG(.05),nM,[0,y*.62,z*.62],{parent:gR,ns:1})}
+ const NA=22,al=new Wn(new it(.12,12,10),new bt({color:0xffd54f}),NA);al.frustumCulled=!1;gR.add(al);const m4=new gt;
+ const AP=[];for(let i=0;i<NA;i++){const big=i%7===0,small=i%4===0&&!big,sgn=i%2?1:-1;AP.push({y:big?sgn*.06+(i%3-1)*.02:(R()-.5)*3.4,z:(R()-.5)*3.4,ang:big?sgn*(0.7+R()*2.2):small?sgn*(.08+R()*.14):(R()-.5)*.02,ph:i/NA})}
+ /* screen arc behind */
+ const scr=add("screen",param(30,12,(u,v)=>{const a=(u-.5)*2.6,y=(v-.5)*5;return[cos(a)*8,y,sin(a)*8]}),MAT(0x7ad1a8,{opacity:.18,roughness:.5,sheen:0,depthWrite:!1,envMapIntensity:.3}),[0,0,0],{parent:gR,ns:1});scr.rotation.y=PI/2;
+ /* Bohr / nuclear atom (element dependent) */
+ const nucG=new J;gB.add(nucG);const shG=new J;gB.add(shG);let curEl=ELS[3],eList=[];
+ add("nucleus",new it(1.2,24,20),MAT(0xffb4a8,{opacity:.12,depthWrite:!1,sheen:0,envMapIntensity:.3}),[0,0,0],{parent:gB,ns:1});
+ const ringM=MAT(0x9fb3cf,{opacity:.35,roughness:.4,sheen:0,depthWrite:!1,envMapIntensity:.3});const ringMeshes=[];
+ const label2=new J;gB.add(label2);
+ function build(el){curEl=el;while(nucG.children.length)nucG.remove(nucG.children[0]);while(shG.children.length)shG.remove(shG.children[0]);eList=[];
+  const Z=el[3],Nn=el[4],A=Z+Nn,rN=.2*Math.cbrt(A)+.1;const pts=[];for(let i=0;i<A;i++){const y=1-(i+.5)/A*2,r=Math.sqrt(1-y*y),a=i*2.399963;pts.push(c(cos(a)*r,y,sin(a)*r).multiplyScalar(rN*(A>1?1:0)))}
+  for(let i=A-1;i>0;i--){const j=(i*7+3)%(i+1);const t=pts[i];pts[i]=pts[j];pts[j]=t}
+  pts.forEach((p,i)=>{const isP=i<Z,m=new N(sphG(.2),isP?pM:nM);m.position.copy(p);m.userData.part="nucleus";nucG.add(m)});
+  const sh=shellFill(Z);sh.forEach((cnt,k)=>{const R_=1.9+1.35*k,rg=new J;rg.rotation.set(.35*k,0,k*.5);shG.add(rg);
+   const ring=new N(torus(R_,.02),ringM);ring.userData.part="rings";rg.add(ring);ringMeshes.push(ring);
+   for(let e=0;e<cnt;e++){const m=new N(sphG(.14),eM);m.userData.part="rings";rg.add(m);eList.push({m,k,R_,e,cnt,rg})}})}
+ build(ELS[3]);
+ /* photon for the jump */
+ const ph=new N(new it(.16,12,10),new bt({color:0xfff2a0}));gB.add(ph);ph.visible=!1;
+ const cams=[[c(0,.6,9),c(0,0,0)],[c(0,.6,10),c(0,0,0)],[c(-.6,5.4,13),c(2.5,0,0)],[c(0,2.4,9.5),c(0,0,0)],[c(0,3,12),c(0,0,0)],[c(0,2.8,11.5),c(0,0,0)],[c(0,3.2,12.5),c(0,0,0)]];
+ const camK=["Dalton","Thomson","Gold foil","Nucleus","Bohr","Photon","Build"];
+ const show={dalton:[1,0,0,0,0,0,0],thomson:[0,1,0,0,0,0,0],foil:[0,0,1,0,0,0,0],screen:[0,0,1,0,0,0,0],nucleus:[0,0,0,1,1,1,1]};
+ const base={dalton:1,thomson:.4,foil:1,screen:.18,nucleus:.12};
+ const W=(g_,p)=>()=>g_.localToWorld(c(...p));
+ const labels=[["a-d","Solid, indivisible sphere","ठोस, अविभाज्य गोला",W(gD,[1.5,1.4,0]),[0]],["a-t1","Positive sphere (pudding)","धन-आवेशित गोला (पुडिंग)",W(gT,[1.9,1.8,0]),[1]],["a-t2","Electrons (plums), negative","इलेक्ट्रॉन (बेर), ऋणात्मक",()=>gT.localToWorld(plum[2][0].position.clone()),[1]],
+  ["a-f","Gold foil","सोने की पन्नी",W(gR,[0,2.3,2.3]),[2]],["a-a","α-particles (positive)","α-कण (धनात्मक)",()=>al.localToWorld(c(-4.5,.8,0)),[2]],["a-s","Fluorescent screen","प्रतिदीप्त पर्दा",W(gR,[0,2.6,-7.7]),[2]],["a-m","Most pass straight: atom is mostly empty","अधिकांश सीधे: परमाणु मुख्यतः खाली",W(gR,[4.8,-.3,0]),[2]],["a-b","A few bounce back: tiny dense nucleus","कुछ वापस: छोटा घना नाभिक",W(gR,[-4.5,.2,2.6]),[2]],
+  ["a-n","Nucleus (protons + neutrons)","नाभिक (प्रोटॉन + न्यूट्रॉन)",W(gB,[0,.9,0]),[3,4,6]],["a-p","Proton (+)","प्रोटॉन (+)",W(gB,[.7,-.4,.5]),[3]],["a-nn","Neutron (no charge)","न्यूट्रॉन (आवेशहीन)",W(gB,[-.6,.3,.7]),[3]],["a-e","Electron (−)","इलेक्ट्रॉन (−)",()=>eList[0]?eList[0].m.getWorldPosition(c()):c(),[3,4]],
+  ["a-k","K shell (n = 1): max 2","K कक्षा (n = 1): अधिकतम 2",()=>g.localToWorld(c(0,1.9,0)),[4,6]],["a-l","L shell (n = 2): max 8","L कक्षा (n = 2): अधिकतम 8",()=>g.localToWorld(c(0,3.25,0)),[4,6]],["a-ph","Photon (energy emitted)","फ़ोटॉन (ऊर्जा उत्सर्जित)",()=>ph.getWorldPosition(c()),[5]],["a-jump","Electron falls L → K","इलेक्ट्रॉन L → K में गिरा",()=>g.localToWorld(c(0,2.6,0)),[5]],["a-z","Z = protons = electrons","Z = प्रोटॉन = इलेक्ट्रॉन",()=>g.localToWorld(c(0,-.4,0)),[6]]];
+ const tools2=ELS.map((e,i)=>({label:e[0]+" · "+e[3],group:"el",on:i===3,act:()=>build(e)}));
+ const info=()=>{const e=curEl,sh=shellFill(e[3]);return`${e[1]} (${e[0]}) · Z = ${e[3]} · A = ${e[3]+e[4]} · shells ${sh.join(",")} · valency ${e[5]}`};
+ const run0=run({n,g,org,show,base,ST:A_ST,cams,camK,labels,tools2,
+  frame:(s,t,dt)=>{g.rotation.y=s===2?0:sin(t*.12)*.2;gD.visible=s===0;gT.visible=s===1;gR.visible=s===2;gB.visible=s>=3;
+   plum.forEach(([m,d,p])=>{m.position.set(d.x+.06*sin(t*3+p),d.y+.06*cos(t*2.6+p),d.z+.06*sin(t*2.2+p*2))});
+   /* alpha scattering */
+   for(let i=0;i<NA;i++){if(s!==2){m4.makeScale(0,0,0);al.setMatrixAt(i,m4);continue}const a=AP[i],f=(t*.18+a.ph)%1;let x,y,z=a.z;
+    if(f<.5){x=-7+14*f;y=a.y}else{const d=(f-.5)*14,cs=cos(a.ang),sn=sin(a.ang);x=cs*d;y=a.y+sn*d}
+    m4.makeScale(1,1,1);m4.setPosition(x,y,z);al.setMatrixAt(i,m4)}al.instanceMatrix.needsUpdate=!0;
+   /* electrons orbit */
+   const shellsOn=s>=4,flat=s===3;eList.forEach(o=>{const w=(1.6/(o.k+1))*(s===5||s===4||s===6?1:1)*.9,a=o.e/o.cnt*TAU+t*w;let R_=o.R_;let x=cos(a)*R_,z=sin(a)*R_;
+    if(s===5&&o.k===1&&o.e===0){const j=((t*.25)%1);const q=cl((j-.15)/.4,0,1);R_=lerp(o.R_,1.9,q);x=cos(a*0+1.2)*R_;z=sin(1.2)*R_;o.jump=q}
+    o.m.position.set(x,0,z)});
+   shG.children.forEach((rg,k)=>{rg.children[0].visible=shellsOn||s===3?true:true});
+   if(s===3)shG.children.forEach((rg,k)=>{rg.children[0].material.opacity=.12});else ringM.opacity=.35;
+   /* photon */
+   const j=((t*.25)%1);ph.visible=s===5&&j>.55;if(ph.visible){const q=(j-.55)/.45;const dirv=c(cos(1.2),.5,sin(1.2)).normalize();ph.position.copy(dirv.multiplyScalar(1.9+q*6));ph.scale.setScalar(1+q*.8)}
+   if(s===6||s===4){const d=info();window.__atomInfo=d}},
+  predict:{q:"Rutherford found that a few alpha particles bounced straight back. What did this show?",opts:[["Electrons are heavy",!1,"Electrons are very light; they cannot reflect alpha particles."],["A tiny, dense, positive nucleus",!0,"Correct — only a very concentrated positive centre could repel them so strongly."],["The atom is a solid ball",!1,"Then none would pass straight through."]]}});
+ const ap=run0.apply;run0.apply=(s,k,t)=>{ap(s,k,t);if(s===4||s===6){const i=A_ST[s];$e(`<b>${i[0]} · ${i[1]}</b> <span style="color:var(--hi)">/ ${i[2]}</span><br><span style="color:#ffd36b">${i[5]}</span> · ${i[3]}<br><b style="color:#2b6cb0">${info()}</b><br><span style="color:#9fb3cf;font-size:.82em">Hand-modelled procedural geometry. Sizes are not to scale; motion is schematic.</span>`)}};
+ return run0}
+Q_("ix6/atom3d",[["Who discovered the electron?","इलेक्ट्रॉन की खोज किसने की?",["Rutherford","J. J. Thomson","Bohr","Chadwick"],1,"Thomson, in 1897."],["The nucleus was discovered by…","नाभिक की खोज किसने की?",["Dalton","Rutherford","Bohr","Thomson"],1,"Using the gold-foil experiment."],["Maximum electrons in the L shell:","L कक्षा में अधिकतम इलेक्ट्रॉन:",["2","8","18","32"],1,"K:2, L:8, M:18."],["Sodium has atomic number 11. Its shell arrangement is…","सोडियम का परमाणु क्रमांक 11 है; कक्षा-व्यवस्था:",["2,8,1","2,8,2","2,9","1,8,2"],0,"2 + 8 + 1 = 11."],["Neutrons were discovered by…","न्यूट्रॉन की खोज किसने की?",["Chadwick","Goldstein","Thomson","Bohr"],0,"In 1932."]]);
+Px["ix6/atom3d"]=[["The atom is ~99.999% empty space — if the nucleus were a marble, the electrons would be ~1 km away.","परमाणु लगभग पूरा खाली है — यदि नाभिक कंचा हो तो इलेक्ट्रॉन लगभग 1 किमी दूर होंगे।"],["The colours of fireworks and neon signs are photons from electrons falling to lower shells.","आतिशबाज़ी व नियॉन बोर्ड के रंग निचली कक्षा में गिरते इलेक्ट्रॉनों के फ़ोटॉन हैं।"]];
+{const La=Hj.find(h=>h.kp==="ix6").topics,i=La.findIndex(x=>x.id==="models");La.splice(i<0?La.length:i+1,0,{id:"atom3d",title:"Structure of the atom — detailed 3D",hi:"परमाणु की संरचना — विस्तृत 3D",build:Matom,ncert:"Class IX · structure of the atom"})}
 })();
