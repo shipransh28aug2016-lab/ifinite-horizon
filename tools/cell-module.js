@@ -184,9 +184,9 @@ const PST=[
 ["5","Nucleus, mitochondria and the rest","केंद्रक, माइटोकॉन्ड्रिया व अन्य","The nucleus is squeezed to the edge. Mitochondria still release energy by respiration, and ER and Golgi make and pack proteins, as in an animal cell.","केंद्रक किनारे दबा होता है; माइटोकॉन्ड्रिया श्वसन से ऊर्जा देते हैं, ER व गॉल्जी जंतु कोशिका की तरह प्रोटीन बनाते व पैक करते हैं।","Artistic model",9],
 ["6","Plant vs animal cell","पादप बनाम जंतु कोशिका","Only plant cells have a cell wall, chloroplasts and a large central vacuole. Both have a nucleus, mitochondria, ER, Golgi and a plasma membrane.","केवल पादप कोशिका में कोशिका भित्ति, हरितलवक व बड़ी रिक्तिका होती है; दोनों में केंद्रक, माइटोकॉन्ड्रिया, ER, गॉल्जी व कोशिका झिल्ली होती है।","Summary",9]];
 function Mplant(){sd=11;const n=new Ne;Ge(n,{key:1.9});Je(n,-4.4,13,.1);Vt.localClippingEnabled=!0;const g=new J;n.add(g);const org=[];const add=mkAdd(g,org);
- const plane=new Zt(c(0,0,-1),99);const wallMat=MAT(0x9bc86a,{opacity:.5,roughness:.3,clearcoat:.8,transmission:.25,thickness:.5,depthWrite:!1,bumpScale:.3,emissive:0x1d3a08,emissiveIntensity:.1});wallMat.clippingPlanes=[plane];
+ const plane=new Zt(c(0,0,-1),99);const wallMat=MAT(0x9bc86a,{opacity:.5,roughness:.4,clearcoat:.2,sheen:0,envMapIntensity:.4,depthWrite:!1,bumpScale:.3,emissive:0x1d3a08,emissiveIntensity:.1});wallMat.clippingPlanes=[plane];
  add("wall",boxy(4.8,3.3,3.3,.2,.02,1),wallMat,[0,0,0],{ns:1});
- const memMat=MAT(0xf0c9a8,{opacity:.28,roughness:.2,clearcoat:1,depthWrite:!1,bumpScale:.1});memMat.clippingPlanes=[plane];add("mem",boxy(4.55,3.1,3.1,.2,.015,2),memMat,[0,0,0],{ns:1});
+ const memMat=MAT(0xf0c9a8,{opacity:.28,roughness:.3,clearcoat:.2,sheen:0,envMapIntensity:.4,depthWrite:!1,bumpScale:.1});memMat.clippingPlanes=[plane];add("mem",boxy(4.55,3.1,3.1,.2,.015,2),memMat,[0,0,0],{ns:1});
  /* plasmodesmata: small channels through the wall on the +x/-x faces */
  const pdMat=MAT(0xf2e6a0,{roughness:.4,opacity:1});for(let i=0;i<9;i++){const y=(i%3-1)*1.6,z=(((i/3)|0)-1)*1.6;add("pd",tube([c(4.45,y,z),c(4.95,y,z)],.09,10),pdMat,[0,0,0],{ns:1});add("pd",tube([c(-4.95,y*.9,z),c(-4.45,y*.9,z)],.09,10),pdMat,[0,0,0],{ns:1})}
  /* vacuole */
@@ -214,11 +214,11 @@ function Mplant(){sd=11;const n=new Ne;Ge(n,{key:1.9});Je(n,-4.4,13,.1);Vt.local
  const cams=[[c(0,2.6,17),c(0,0,0)],[c(5.4,1.6,9),c(2,0,0)],[c(0,1.2,10),c(.3,0,0)],[c(3.6,2.6,11),c(2.4,2,1)],[c(-4,2,8),c(-3,.6,.5)],[c(0,2.6,17),c(0,0,0)]];
  const camK=["Whole cell","Wall","Vacuole","Chloroplast","Nucleus etc.","Summary"];
  const show={wall:[1,1,0,0,0,1],mem:[1,1,0,0,0,1],pd:[0,1,0,0,0,1],pvac:[0,0,1,0,0,1],chl:[0,0,0,1,0,1],grana:[0,0,0,1,0,1],nuc:[0,0,0,0,1,1],nucleolus:[0,0,0,0,1,0],chromatin:[0,0,0,0,1,0],mit:[0,0,0,0,1,1],rer:[0,0,0,0,1,0],golgi:[0,0,0,0,1,0]};
- const base={wall:.4,mem:.28,pd:1,pvac:.24,chl:.4,grana:1,nuc:.55,nucleolus:1,chromatin:.95,mit:.34,rer:.88,golgi:.95};
+ const base={wall:.4,mem:.28,pd:1,pvac:.24,chl:.4,grana:1,nuc:.55,nucleolus:1,chromatin:.95,mit:.34,rer:.45,golgi:.95};
  const L=(p)=>()=>g.localToWorld(c(...p));
- const labels=[["p-w","Cell wall (cellulose)","कोशिका भित्ति (सेलुलोज़)",L([4.8,2.4,3.3]),[0,1,5]],["p-m","Plasma membrane","कोशिका झिल्ली",L([4.5,-2.2,2.9]),[1,5]],["p-pd","Plasmodesmata","जीवद्रव्य तंतु",L([4.9,1.6,1.6]),[1]],["p-v","Large central vacuole","बड़ी केंद्रीय रिक्तिका",L([.4,.4,2.4]),[2,5]],["p-tu","Turgor pressure ↔ wall","स्फीति दाब ↔ भित्ति",L([3.3,-1.2,2.0]),[2]],
+ const labels=[["p-w","Cell wall (cellulose)","कोशिका भित्ति (सेलुलोज़)",L([4.8,2.4,3.3]),[0,1,5]],["p-m","Plasma membrane","कोशिका झिल्ली",L([4.5,-2.2,2.9]),[1]],["p-pd","Plasmodesmata","जीवद्रव्य तंतु",L([4.9,1.6,1.6]),[1]],["p-v","Large central vacuole","बड़ी केंद्रीय रिक्तिका",L([.4,.4,2.4]),[2,5]],["p-tu","Turgor pressure ↔ wall","स्फीति दाब ↔ भित्ति",L([3.3,-1.2,2.0]),[2]],
   ["p-c","Chloroplast","हरितलवक",L([2.9,2.5,1.6]),[3,5]],["p-g","Grana (chlorophyll)","ग्रेना (क्लोरोफ़िल)",L([-2.6,-2.55,1.9]),[3]],["p-s","Sunlight","सूर्य-प्रकाश",L([4.2,4.6,3]),[3]],["p-co","CO₂ in · O₂ out","CO₂ अंदर · O₂ बाहर",L([1.2,3.6,2.4]),[3]],
-  ["p-n","Nucleus (pushed to the side)","केंद्रक (किनारे खिसका)",L(NP),[4,5]],["p-mi","Mitochondrion","माइटोकॉन्ड्रिया",L([3.1,-.9,-2.5]),[4,5]],["p-er","Rough ER","खुरदरी ER",L([-3.2,2.1,1.5]),[4]],["p-go","Golgi apparatus","गॉल्जी उपकरण",L([-3.3,-.5,-1.2]),[4]]];
+  ["p-n","Nucleus (pushed to the side)","केंद्रक (किनारे खिसका)",L(NP),[4,5]],["p-mi","Mitochondrion","माइटोकॉन्ड्रिया",L([3.1,-.9,-2.5]),[4]],["p-er","Rough ER","खुरदरी ER",L([-3.2,2.1,1.5]),[4]],["p-go","Golgi apparatus","गॉल्जी उपकरण",L([-3.3,-.5,-1.2]),[4]]];
  return run({n,g,org,show,base,ST:PST,cams,camK,labels,plane,cutAt:1.2,
   frame:(s,t)=>{g.rotation.y=sin(t*.12)*.16;const tu=s===2?1+.03*sin(t*1.6):1;vac.scale.set(tu,tu,tu);
    for(let i=0;i<NPT;i++){if(s!==3){m4.makeScale(0,0,0);pt.setMatrixAt(i,m4);continue}const ch=chs[i%chs.length],f=((i/NPT)+t*.12)%1,k=kind(i),T=ch.position;let p;
@@ -237,9 +237,9 @@ const BST=[
 ["6","Prokaryote vs eukaryote","प्रोकैरियोट बनाम यूकैरियोट","Prokaryote: no true nucleus, no membrane-bound organelles, small (1–5 µm). Eukaryote: DNA inside a nucleus and many membrane-bound organelles, larger (10–100 µm).","प्रोकैरियोट: सच्चा केंद्रक नहीं, झिल्ली-युक्त अंगक नहीं, छोटा (1–5 µm)। यूकैरियोट: DNA केंद्रक में व अनेक झिल्ली-युक्त अंगक, बड़ा (10–100 µm)।","Summary",9]];
 function Mbact(){sd=21;const n=new Ne;Ge(n,{key:1.9});Je(n,-3.6,13,.1);Vt.localClippingEnabled=!0;const g=new J;n.add(g);const org=[];const add=mkAdd(g,org);const cell=new J;g.add(cell);
  const plane=new Zt(c(0,0,-1),99);const L=5.2,r=1.35;
- const cap_=MAT(0xd8e8c8,{opacity:.16,roughness:.1,clearcoat:1,transmission:.4,thickness:.5,depthWrite:!1,bumpScale:.4});cap_.clippingPlanes=[plane];add("capsule",rod(L+.5,r+.32,.06,1.1,1),cap_,[0,0,0],{parent:cell,ns:1});
- const bw=MAT(0xd8c694,{opacity:.4,roughness:.35,clearcoat:.5,depthWrite:!1,bumpScale:.5,emissive:0x3a2f0a,emissiveIntensity:.1});bw.clippingPlanes=[plane];add("bwall",rod(L+.2,r+.1,.025,1.8,2),bw,[0,0,0],{parent:cell,ns:1});
- const bm=MAT(0xe8a5a5,{opacity:.3,roughness:.2,clearcoat:1,depthWrite:!1,bumpScale:.1});bm.clippingPlanes=[plane];add("bmem",rod(L,r,.01,1,3),bm,[0,0,0],{parent:cell,ns:1});
+ const cap_=MAT(0xd8e8c8,{opacity:.16,roughness:.3,clearcoat:.2,sheen:0,envMapIntensity:.4,depthWrite:!1,bumpScale:.4});cap_.clippingPlanes=[plane];add("capsule",rod(L+.5,r+.32,.06,1.1,1),cap_,[0,0,0],{parent:cell,ns:1});
+ const bw=MAT(0xd8c694,{opacity:.4,roughness:.4,clearcoat:.15,sheen:0,envMapIntensity:.4,depthWrite:!1,bumpScale:.5,emissive:0x3a2f0a,emissiveIntensity:.1});bw.clippingPlanes=[plane];add("bwall",rod(L+.2,r+.1,.025,1.8,2),bw,[0,0,0],{parent:cell,ns:1});
+ const bm=MAT(0xe8a5a5,{opacity:.3,roughness:.3,clearcoat:.2,sheen:0,envMapIntensity:.4,depthWrite:!1,bumpScale:.1});bm.clippingPlanes=[plane];add("bmem",rod(L,r,.01,1,3),bm,[0,0,0],{parent:cell,ns:1});
  /* nucleoid: coiled circular DNA */
  const pts=[];for(let i=0;i<=90;i++){const a=i/90*TAU;pts.push(c(sin(3*a)*1.6+.45*sin(11*a),.6*sin(5*a)+.3*sin(13*a),.6*cos(4*a)+.3*cos(15*a)))}
  const dna=MAT(0x5e6ad8,{roughness:.4,clearcoat:.6,emissive:0x16206a,emissiveIntensity:.3});add("nucleoid",tube(pts,.055,8),dna,[0,0,0],{parent:cell,ns:1});
@@ -255,8 +255,8 @@ function Mbact(){sd=21;const n=new Ne;Ge(n,{key:1.9});Je(n,-3.6,13,.1);Vt.localC
  const show={capsule:[1,1,0,0,1,1],bwall:[1,1,0,0,1,1],bmem:[1,1,0,0,1,1],nucleoid:[0,0,1,0,0,1],plasmid:[0,0,1,0,0,1],brib:[0,0,0,1,0,1],flag:[0,0,0,0,1,1],pili:[0,0,0,0,1,1]};
  const base={capsule:.16,bwall:.4,bmem:.3,nucleoid:1,plasmid:1,brib:1,flag:1,pili:1};
  const W=(p)=>()=>cell.localToWorld(c(...p));
- const labels=[["b-ca","Capsule","कैप्सूल",W([1.2,1.9,.4]),[1]],["b-w","Cell wall (peptidoglycan)","कोशिका भित्ति",W([2.0,1.7,0]),[0,1]],["b-m","Plasma membrane","कोशिका झिल्ली",W([-.6,-1.45,0]),[1]],["b-cy","Cytoplasm (no organelles)","कोशिकाद्रव्य (अंगक नहीं)",W([.2,-.2,.9]),[1,3]],
-  ["b-n","Nucleoid — DNA, no nuclear membrane","केंद्राभ — DNA, केंद्रक झिल्ली नहीं",W([-.2,.5,.4]),[2,5]],["b-p","Plasmid","प्लाज़्मिड",W([1.3,-.55,.3]),[2]],["b-r","Ribosomes","राइबोसोम",W([-1.0,-.6,.5]),[3,5]],["b-f","Flagellum","कशाभिका",W([-5.0,.2,.2]),[4,5]],["b-bb","Basal body (motor)","आधार-मोटर",W([-2.5,0,0]),[4]],["b-pi","Pili","पिली",W([1.0,2.1,.8]),[4]],["b-sz","About 1–5 µm long","लगभग 1–5 µm लंबा",W([0,-2.2,0]),[0]]];
+ const labels=[["b-ca","Capsule","कैप्सूल",W([1.2,1.9,.4]),[1]],["b-w","Cell wall (peptidoglycan)","कोशिका भित्ति",W([2.0,1.7,0]),[0,1]],["b-m","Plasma membrane","कोशिका झिल्ली",W([-.6,-1.45,0]),[1]],["b-cy","Cytoplasm (no organelles)","कोशिकाद्रव्य (अंगक नहीं)",W([.2,-.2,.9]),[1]],
+  ["b-n","Nucleoid — DNA, no nuclear membrane","केंद्राभ — DNA, केंद्रक झिल्ली नहीं",W([-.2,.5,.4]),[2,5]],["b-p","Plasmid","प्लाज़्मिड",W([1.3,-.55,.3]),[2]],["b-r","Ribosomes","राइबोसोम",W([-1.0,-.6,.5]),[3,5]],["b-f","Flagellum","कशाभिका",W([-5.0,.2,.2]),[4]],["b-bb","Basal body (motor)","आधार-मोटर",W([-2.5,0,0]),[4]],["b-pi","Pili","पिली",W([1.0,2.1,.8]),[4]],["b-sz","About 1–5 µm long","लगभग 1–5 µm लंबा",W([0,-2.2,0]),[0]]];
  return run({n,g,org,show,base,ST:BST,cams,camK,labels,plane,cutAt:.5,
   frame:(s,t)=>{g.rotation.y=s===4?sin(t*.3)*.25:sin(t*.12)*.16;fl.rotation.x=t*(s===4?7:1.2);cell.position.x=s===4?sin(t*.4)*.8:0;cell.position.y=s===4?sin(t*.9)*.12:0},
   predict:{q:"Why is a bacterium called a prokaryote?",opts:[["It has no true nucleus",!0,"Correct — its DNA lies free in the cytoplasm (nucleoid)."],["It has no DNA",!1,"It does have DNA, as a circular chromosome."],["It is multicellular",!1,"Bacteria are single-celled."]]}})}
