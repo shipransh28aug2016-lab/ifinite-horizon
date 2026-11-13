@@ -16,3 +16,7 @@ Keys: **N** chapters panel · **P** lesson panel · **H** home · **F** fps · �
 ## 3D | 2D switch (one screen)
 The app is the root `index.html`. The **3D | 2D** switch sits in its top bar and on Home (key **V**); 2D shows the labelled image for the *current* topic in the same stage, with the same chapters and lesson panel. Code + topic→image map: `assets/va-2d.js`; images: `public/2d/<class>/<subject>/images/`. Deep link: `index.html?view=2d#ch5/heart`.
 Deploy the **repository root** (GitHub Pages: branch root; Vercel: `outputDirectory` is `.`). `public/index.html` and `public/science/index.html` only forward old links to the app.
+
+## Visitor Counter & Analytics
+`assets/va-visits.js` automatically displays a privacy-friendly **Unique Visitors** pill (`👥 N visitors · दर्शक`) on the Home screen (`#homeStats`) and `public/2d/index.html` using [Abacus](https://v2.jasoncameron.dev/abacus/) (`abacus.jasoncameron.dev`, no cookies, no signup, deduplicated per browser via `localStorage`, and skipped on `localhost` / `file://` / `navigator.webdriver` / offline).
+For a full analytics dashboard (daily graphs, countries, devices, top pages), create a free [GoatCounter](https://www.goatcounter.com/) site and add `<meta name="va-goatcounter" content="YOUR_SITE_CODE">` inside `<head>` of `index.html`. If deploying on Vercel, you can also enable **Vercel Web Analytics** in the Vercel dashboard.
