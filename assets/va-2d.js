@@ -37,6 +37,7 @@ const GROUPS=[["class9/biology","Class IX · Biology · जीव विज्�
 const $=s=>document.querySelector(s),B=document.body,A=()=>window.__atlas;
 const LS={get:k=>{try{return localStorage.getItem(k)}catch{return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch{}}};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fn=n=>{const t=window.VA_FN&&window.VA_FN(n);return t?`<span class="fn">${esc(t)}</span>`:""};
 const stage=$("#stage"),bar=$("#stagebar");if(!stage||!bar)return;
 const base=new URL("../public/2d/",(document.currentScript||{}).src||new URL("assets/va-2d.js",location.href)).href;
 
@@ -69,10 +70,14 @@ const css=document.createElement("style");css.textContent=`
 #v2dCall .vcl{position:absolute;left:0;top:0;width:max-content}
 .vcl .n{flex:none;min-width:19px;height:19px;border-radius:50%;background:#ffd54f;color:#0b1220;font:700 11px/19px system-ui,sans-serif;text-align:center}
 .vcl .en{font-weight:700;display:block}.vcl .hi{display:block;color:var(--hi,#8ee0a7);font-size:.93em;line-height:1.45}
+.vcl .fn{display:none;margin-top:2px;font-size:.84em;line-height:1.3;font-weight:400;color:var(--ink);opacity:.82;white-space:normal}
+#v2d:not(.tap):not(.compact) .vcl .fn,#v2d .vcl.on .fn{display:block}
+body.nofn .vcl .fn{display:none!important}
 .vcl.on{border-color:#ffd54f;box-shadow:0 0 0 2px rgba(255,213,79,.45)}
 #v2d.hassel .vcl:not(.on){opacity:.45}
 #v2d.tap #v2dCall .vcl:not(.on){visibility:hidden}
-#v2dLegend{display:flex;flex-wrap:wrap;gap:6px;max-height:30%;overflow:auto;justify-content:center;flex:none}
+#v2dLegend .vcl{flex:1 1 230px;max-width:calc(50% - 3px)}
+#v2dLegend{display:flex;flex-wrap:wrap;gap:6px;max-height:36%;overflow:auto;justify-content:center;flex:none}
 #v2dLegend[hidden]{display:none}
 #v2d.narrow #v2dLab{display:none}
 #v2dDesc{font-size:calc(12.5px*var(--fs));color:var(--ink);opacity:.9;text-align:center;line-height:1.45;max-height:3.2em;overflow:auto}
@@ -87,6 +92,10 @@ const seg=big=>{const d=document.createElement("div");d.className="vseg"+(big?" 
  d.innerHTML=`<button type="button" data-v="3d" title="Interactive 3D model">3D ${big?"models · मॉडल":""}</button><button type="button" data-v="2d" title="Labelled 2D image">2D ${big?"images · चित्र":""}</button>`;
  d.addEventListener("click",e=>{const b=e.target.closest("button[data-v]");if(b)setView(b.dataset.v)});return d};
 const segBar=seg(false);bar.insertBefore(segBar,$("#tlab")||null);
+const fnBtn=document.createElement("button");fnBtn.type="button";fnBtn.className="ib";fnBtn.id="fnBtn";fnBtn.textContent="ⓘ Info";
+const paintFn=on=>{B.classList.toggle("nofn",!on);fnBtn.classList.toggle("on",on);fnBtn.setAttribute("aria-pressed",String(on));fnBtn.title="Show/hide a one-line function note on every label (I)";if(typeof place==="function")try{place()}catch{}};
+let fnOn=LS.get("va.fn")!=="off";fnBtn.onclick=()=>{fnOn=!fnOn;LS.set("va.fn",fnOn?"on":"off");paintFn(fnOn)};
+bar.insertBefore(fnBtn,$("#tlab")||null);paintFn(fnOn);
 const hact=$("#home .hact");const segHome=seg(true);if(hact)hact.parentNode.insertBefore(segHome,hact);
 
 const ov=document.createElement("div");ov.id="v2d";ov.hidden=true;
@@ -111,6 +120,7 @@ function place(){if(wrap.hidden||!marks.length){lines.innerHTML="";return}
  marks.forEach(m=>{m.px=I.left-O.left+I.width*m.x/100;m.py=I.top-O.top+I.height*m.y/100});
  if(wide){const by=marks.slice().sort((a,b)=>a.x-b.x),nl=Math.round(by.length/2);let L=by.filter(m=>m.x<50),Rt=by.filter(m=>m.x>=50);
   while(L.length-Rt.length>1)Rt.unshift(L.pop());while(Rt.length-L.length>1)L.push(Rt.shift());
+  ov.classList.remove("compact");const need=()=>[L,Rt].some(c=>c.reduce((t,m)=>t+m.lab.offsetHeight+6,0)>bot-top);if(showAll&&need())ov.classList.add("compact");
   [[L,"l"],[Rt,"r"]].forEach(([col,sd])=>{col.sort((a,b)=>a.py-b.py);let y=top;col.forEach(m=>{m.sd=sd;m.w=m.lab.offsetWidth;m.h=m.lab.offsetHeight;m.lx=sd==="l"?I.left-O.left-28-m.w:I.right-O.left+28;m.ly=Math.max(m.py-m.h/2,y);y=m.ly+m.h+6});
    y=bot;for(let i=col.length-1;i>=0;i--){const m=col[i];m.ly=Math.max(top,Math.min(m.ly,y-m.h));y=m.ly-6}
    col.forEach(m=>{m.lab.style.left=Math.round(Math.max(2,m.lx))+"px";m.lab.style.top=Math.round(m.ly)+"px"})})}
@@ -138,7 +148,7 @@ function show(id){const d=get(id);if(!d)return;if(id===cur&&!wrap.hidden&&!wrap.
  load(u).then(()=>{if(my!==tok)return;img.alt=d.title;img.src=u;
   clearMarks();curMarks=(d.marks||[]).slice().sort((a,b)=>a.y-b.y||a.x-b.x);curMarks.forEach((m,i)=>{const n=i+1,dot=document.createElement("button"),lab=document.createElement("button");
    dot.type=lab.type="button";dot.className="vmk";dot.style.left=m.x+"%";dot.style.top=m.y+"%";dot.setAttribute("aria-label",n+". "+m.en+" · "+m.hi);dot.innerHTML=`<i>${n}</i>`;
-   lab.className="vcl";lab.setAttribute("aria-pressed","false");lab.innerHTML=`<span class="n">${n}</span><span><span class="en">${esc(m.en)}</span><span class="hi" lang="hi">${esc(m.hi)}</span></span>`;
+   lab.className="vcl";lab.setAttribute("aria-pressed","false");lab.innerHTML=`<span class="n">${n}</span><span><span class="en">${esc(m.en)}</span><span class="hi" lang="hi">${esc(m.hi)}</span>${fn(m.en)}</span>`;
    dot.onclick=lab.onclick=()=>pick(i);wrap.appendChild(dot);marks.push({x:m.x,y:m.y,dot,lab})});
   loadEl.hidden=true;wrap.hidden=false;wrap.classList.remove("busy");fit()},
  ()=>{if(my!==tok)return;clearMarks();loadEl.hidden=true;wrap.hidden=true;wrap.classList.remove("busy");img.removeAttribute("src");empty.hidden=false;empty.textContent="Image could not be loaded · चित्र लोड नहीं हुआ ("+d.img+")"})}
@@ -158,7 +168,7 @@ labBtn.onclick=()=>{showAll=!showAll;LS.set("va.2dlabels2",showAll?"all":"tap");
 addEventListener("resize",fit);if(window.ResizeObserver){const ro=new ResizeObserver(fit);ro.observe(body);ro.observe(bar)}
 const onTopic=()=>{const k=A()&&A().key&&A().key();if(view==="2d"){render(false);neighbours(k)}else if(k!==preKey){preKey=k;if(!saver())idle(()=>preload(k))}};let preKey=null;setInterval(onTopic,500);addEventListener("hashchange",()=>setTimeout(onTopic,0));
 const ttl=$("#ttl");if(ttl)new MutationObserver(onTopic).observe(ttl,{childList:true,subtree:true,characterData:true});
-addEventListener("keydown",e=>{if(e.key!=="v"&&e.key!=="V")return;if(e.ctrlKey||e.metaKey||e.altKey||/^(INPUT|TEXTAREA|SELECT)$/.test((e.target||{}).tagName||""))return;setView(view==="2d"?"3d":"2d")});
+addEventListener("keydown",e=>{if(e.key==="i"||e.key==="I"){if(!(e.ctrlKey||e.metaKey||e.altKey||/^(INPUT|TEXTAREA|SELECT)$/.test((e.target||{}).tagName||""))){fnBtn.click()}return}if(e.key!=="v"&&e.key!=="V")return;if(e.ctrlKey||e.metaKey||e.altKey||/^(INPUT|TEXTAREA|SELECT)$/.test((e.target||{}).tagName||""))return;setView(view==="2d"?"3d":"2d")});
 const qp=new URLSearchParams(location.search).get("view"),init=qp==="2d"||qp==="3d"?qp:LS.get("va.view");
 setView(init==="2d"?"2d":"3d",!qp&&true);
 window.__va2d={set:setView,get:()=>view,show,current:()=>cur,images:()=>list.slice(),map:MAP,info:()=>{const d=cur&&get(cur);return d?{title:d.title,desc:d.desc||"",marks:curMarks.map(m=>({en:m.en,hi:m.hi}))}:null},select:i=>{if(sel!==i&&marks[i])pick(i)},clear:()=>{if(sel>=0)pick(sel)}};
