@@ -19,3 +19,7 @@ Deploy the **repository root** (GitHub Pages: branch root; Vercel: `outputDirect
 
 ## Teacher narration
 🎙 button in the top bar narrates the current topic (Hindi / English / both, male / female). Free, offline, uses device voices. Real recordings can be dropped into `assets/voice/` — see `docs/VOICE.md`.
+
+## Visitor Counter & Analytics
+`assets/va-visits.js` automatically displays a privacy-friendly **Unique Visitors** pill (`👥 N visitors · दर्शक`) on the Home screen (`#homeStats`) and `public/2d/index.html` using [Abacus](https://v2.jasoncameron.dev/abacus/) (`abacus.jasoncameron.dev`, no cookies, no signup, deduplicated per browser via `localStorage`, and skipped on `localhost` / `file://` / `navigator.webdriver` / offline).
+For a full analytics dashboard (daily graphs, countries, devices, top pages), create a free [GoatCounter](https://www.goatcounter.com/) site and add `<meta name="va-goatcounter" content="YOUR_SITE_CODE">` inside `<head>` of `index.html`. If deploying on Vercel, you can also enable **Vercel Web Analytics** in the Vercel dashboard.
