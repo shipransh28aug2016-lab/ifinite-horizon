@@ -24,6 +24,11 @@ body.cine #cine{display:block}
 #cine .end b{display:block;font-size:20px;margin-bottom:12px}
 #cine .end button{margin:4px;border:0;border-radius:10px;background:#1d4ed8;color:#fff;font:700 15px system-ui,sans-serif;padding:11px 20px;cursor:pointer}
 #cine .end button.s{background:#e7efff;color:#1d4ed8}
+#cine .cap{position:absolute;left:5%;right:5%;bottom:calc(9% + 18px);display:none;background:linear-gradient(180deg,rgba(5,10,20,.62),rgba(5,10,20,.82));color:#fff;border-radius:14px;padding:14px 22px;font:500 calc(19px*var(--fs))/1.5 system-ui,sans-serif;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+#cine .cap .hi{display:block;color:#ffd9a8;margin-top:4px;font-size:.92em}
+#cine.explore .cap{display:block}
+#cine.nostep #cPrev,#cine.nostep #cNext,#cine.nostep #cPlay{display:none}
+body.cine-nolab #labels,body.cine-nolab #leaders{display:none!important}
 /* big lower-third caption: restyle the existing step caption while cinema is on */
 body.cine #stagebar,body.cine #edgeL,body.cine #edgeR,body.cine #fpsm,body.cine #perfBar,body.cine #thome,body.cine #crumb{display:none!important}
 body.cine #hud{left:5%!important;right:5%!important;bottom:calc(9% + 18px)!important;max-width:none!important;width:auto!important;font-size:calc(19px*var(--fs))!important;line-height:1.5;background:linear-gradient(180deg,rgba(5,10,20,.62),rgba(5,10,20,.82))!important;color:#fff!important;border:0!important;border-radius:14px!important;padding:14px 22px!important;box-shadow:0 10px 40px rgba(0,0,0,.5)!important}
@@ -37,8 +42,8 @@ const btn=document.createElement("button");btn.type="button";btn.className="ib";
 bar.insertBefore(btn,$("#tlab")||null);
 const el=document.createElement("div");el.id="cine";
 el.innerHTML=`<div class="lb t"></div><div class="lb b"></div><div class="ttl"><span id="cineT"></span><small id="cineS"></small></div>
-<div class="ctl"><button type="button" id="cPrev" title="Previous step (←)">◀</button><button type="button" id="cPlay" title="Pause / play (Space)">❚❚</button><button type="button" id="cNext" title="Next step (→)">▶</button><button type="button" id="cX" title="Exit (Esc)">✕</button></div>
-<div class="prog"></div>
+<div class="ctl"><button type="button" id="cPrev" title="Previous step (←)">◀</button><button type="button" id="cPlay" title="Pause / play (Space)">❚❚</button><button type="button" id="cNext" title="Next step (→)">▶</button><button type="button" id="cLab" title="Show / hide labels (L)">🏷</button><button type="button" id="cX" title="Exit (Esc)">✕</button></div>
+<div class="cap" id="cineCap"></div><div class="prog"></div>
 <div class="end"><div><b>Lesson complete · पाठ पूर्ण</b><button type="button" id="cAgain">↺ Replay · दोबारा</button><button type="button" id="cExit" class="s">Exit · बाहर</button></div></div>`;
 stage.appendChild(el);
 const prog=el.querySelector(".prog"),cT=$("#cineT"),cS=$("#cineS"),cPlay=$("#cPlay");
@@ -46,27 +51,33 @@ let on=false,prevHide=null,timer=null,wasFull=false;
 const playBtn=()=>document.getElementById("play");
 const state=()=>{const t=(playBtn()||{}).textContent||"";return/Again|↺/.test(t)?"ended":/Pause|❚/.test(t)?"playing":"paused"};
 const stepNo=()=>{const t=($("#stepno")||{}).textContent||"";const m=t.match(/(\d+)\s*(?:\/|of)\s*(\d+)/);return m?[+m[1],+m[2]]:null};
-function tick(){if(!on)return;const st=state();el.classList.toggle("ended",st==="ended");cPlay.textContent=st==="playing"?"❚❚":"▶";
+function tick(){if(!on)return;const exp=B.classList.contains("explore");el.classList.toggle("explore",exp);el.classList.toggle("nostep",exp);
+ if(exp){const hud=$("#hud"),hasHud=hud&&!hud.hidden&&(hud.textContent||"").trim();const ip=$("#intro");const cap=$("#cineCap");
+  if(hasHud)el.classList.remove("explore");else if(ip){const ps=[...ip.querySelectorAll("p,div,span")].filter(x=>x.children.length===0&&x.textContent.trim());const en=ps.find(x=>!x.classList.contains("hi")&&!x.closest(".hi")),hi=ps.find(x=>x.classList.contains("hi")||x.closest(".hi"));
+   cap.innerHTML=(en?"<div>"+en.textContent+"</div>":"")+(hi?'<span class="hi" lang="hi">'+hi.textContent+"</span>":"")}
+  prog.style.width="0";cPlay.textContent="";const tl0=$("#ttl .en"),th0=$("#ttl .hi");cT.textContent=(tl0?tl0.textContent:"")+(th0&&th0.textContent?" · "+th0.textContent:"");cS.textContent="Live model · drag to rotate";return}
+ const st=state();el.classList.toggle("ended",st==="ended");cPlay.textContent=st==="playing"?"❚❚":"▶";
  const s=stepNo();if(s)prog.style.width=Math.round(s[0]/s[1]*100)+"%";else prog.style.width=st==="ended"?"100%":"0";
  const tl=$("#ttl .en"),th=$("#ttl .hi");cT.textContent=(tl?tl.textContent:"")+(th&&th.textContent?" · "+th.textContent:"");cS.textContent=s?"Step "+s[0]+" / "+s[1]:""}
 function enter(){if(on)return;if(!$("#play")||!$("#steps")||!$("#steps").children.length&&!$("#play").offsetParent&&!document.body.classList.contains("explore")){}
- on=true;B.classList.add("cine");try{A()&&A().hide&&A().hide(true,true)}catch{}
+ on=true;B.classList.add("cine");B.classList.add("cine-nolab");try{A()&&A().hide&&A().hide(true,true)}catch{}
  try{if(document.documentElement.requestFullscreen&&!document.fullscreenElement){document.documentElement.requestFullscreen().then(()=>{wasFull=true}).catch(()=>{})}}catch{}
  window.dispatchEvent(new Event("resize"));
- try{A().send("REPLAY",void 0,"playback")}catch{}
+ if(!B.classList.contains("explore")){try{A().send("REPLAY",void 0,"playback")}catch{}}
  timer=setInterval(tick,300);tick()}
-function exit(){if(!on)return;on=false;B.classList.remove("cine");clearInterval(timer);try{A().send("PAUSE",void 0,"playback")}catch{}
+function exit(){if(!on)return;on=false;B.classList.remove("cine","cine-nolab");clearInterval(timer);try{A().send("PAUSE",void 0,"playback")}catch{}
  try{A()&&A().hide&&A().hide(false,false)}catch{}
  try{if(wasFull&&document.fullscreenElement)document.exitFullscreen()}catch{}wasFull=false;el.classList.remove("ended");window.dispatchEvent(new Event("resize"))}
 btn.onclick=()=>on?exit():enter();
-$("#cX").onclick=$("#cExit").onclick=exit;
+$("#cX").onclick=$("#cExit").onclick=exit;$("#cLab").onclick=()=>B.classList.toggle("cine-nolab");
 $("#cAgain").onclick=()=>{try{A().send("REPLAY",void 0,"playback")}catch{}el.classList.remove("ended")};
 cPlay.onclick=()=>{try{A().send("TOGGLE",void 0,"playback")}catch{}setTimeout(tick,50)};
 $("#cNext").onclick=()=>{const n=$("#next");n&&n.click();setTimeout(tick,80)};
 $("#cPrev").onclick=()=>{const n=$("#prev");n&&n.click();setTimeout(tick,80)};
 addEventListener("keydown",e=>{if(e.ctrlKey||e.metaKey||e.altKey||/^(INPUT|TEXTAREA|SELECT)$/.test((e.target||{}).tagName||""))return;
  if(on&&e.key==="Escape"){exit();return}
- if(e.key==="c"||e.key==="C"){on?exit():enter()}
+ if(on&&(e.key==="l"||e.key==="L")){$("#cLab").click()}
+ else if(e.key==="c"||e.key==="C"){on?exit():enter()}
  else if(on&&e.key===" "){e.preventDefault();cPlay.click()}});
 document.addEventListener("fullscreenchange",()=>{if(on&&!document.fullscreenElement&&wasFull){wasFull=false}});
 window.__vaCinema={enter,exit,active:()=>on};
